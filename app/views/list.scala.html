@@ -1,0 +1,15 @@
+@(list: Seq[(String,String)])
+
+@import helper._
+
+@main("Tłumacz PL -> NS - Lista Słówek") {
+	<font size=-1>
+	<b>Lista słów w słowniku, z pominięciem przyimków, zaimków i partykuł:</b>
+	<ul>
+	@list.map{ t =>
+		<li> @t._1 -> @t._2 
+	}
+	</ul>
+	Razem: @list.size
+	</font>
+}

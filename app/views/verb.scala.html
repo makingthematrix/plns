@@ -1,0 +1,185 @@
+@(pl: String, verbForm: Form[VerbPair])
+
+@import helper._
+@import logic.CaseDescription.tenses
+@import logic.CaseDescription.genders
+@import logic.CaseDescription.personsShort
+@import logic.CaseDescription.personsSeq
+@import logic.CaseDescription.impPersonsSeq
+@import logic.CaseDescription
+@import Application.plVerbPatterns
+@import Application.nsVerbPatterns
+
+@caseBlock(id:String,descr: String) = {
+	<font size=-1><b>@{descr}</b>
+		<span id="@{id}"></span> 
+		<a href='javascript:void(0)' id="@{id}_except" name="@{id}_except" width="20">[!]</a>
+		<a href='javascript:void(0)' id="@{id}_unexcept" name="@{id}_unexcept" style="display:none" width="20">[*]</a>
+	</font>
+}
+
+@caseInfinitive(lang: String) = {
+	<td width="25%">@caseBlock(lang + "INF",tenses("INF"))</td>
+}
+
+@caseTense2(lang:String,tense: String) = {
+	<td width="25%">
+		<h2>@tenses(tense)</h2>
+		@for(ps <- personsSeq){
+			<br>@caseBlock(lang + tense + ps,personsShort(ps))
+		}
+	</td>
+}
+
+@caseTense3(lang:String,tense: String,gender: String) = {
+	<td width="25%">
+		<h2>@tenses(tense), @genders(gender)</h2>
+		@for(ps <- personsSeq){
+			<br>@caseBlock(lang + tense + ps + gender,personsShort(ps))
+		}
+	</td>
+}
+
+@caseImperative(lang:String) = {
+	<td width="25%">
+		<h2>@tenses("IMP")</h2>
+		@for(ps <- impPersonsSeq){
+			<br>@caseBlock(lang + "IMP" + ps,personsShort(ps))
+		}
+	</td>
+}
+
+@active(lang:String) = {
+	<font size=-1><b>@tenses("ACTIVE")</b>
+		<span id="@{lang}ACTIVE"></span> 
+		<a href='javascript:void(0)' id="@{lang}ACTIVE_except" name="@{lang}ACTIVE_except" width="20">[!]</a>
+		<a href='javascript:void(0)' id="@{lang}ACTIVE_unexcept" name="@{lang}ACTIVE_unexcept" style="display:none" width="20">[*]</a>
+		<a href='javascript:void(0)' id="@{lang}ACTIVE_add" name="@{lang}ACTIVE_add" width="20">[->]</a>
+	</font>	
+}
+
+@passive(lang:String) = {
+	<font size=-1><b>@tenses("PASSIVE")</b>
+		<span id="@{lang}PASSIVE"></span> 
+		<a href='javascript:void(0)' id="@{lang}PASSIVE_add" name="@{lang}PASSIVE_add" width="20">[->]</a>
+	</font>	
+}
+
+@noun(lang:String) = {
+	<font size=-1><b>@tenses("NOUN")</b>
+		<span id="@{lang}NOUN"></span> 
+		<a href='javascript:void(0)' id="@{lang}NOUN_add" name="@{lang}NOUN_add" width="20">[->]</a>
+	</font>	
+}
+
+@main("Tłumacz polsko-nowosłowiański - Dodaj czasownik") { 
+<link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/style.css")" media="screen" />
+
+  <div id="top">
+    <h2> <a href="http://plns.herokuapp.com/">Tłumacz polsko-nowosłowiański</a></h2>
+  </div>
+  <div id="content">
+  	<div id="wrap">
+	@form(routes.Application.addVerb,'id -> "verbForm") {
+		<div id="left">
+			<div class="longbox">
+				<h2><center>Czasownik PL</center></h2>
+				<br><h2>Temat 1</h2> @input(verbForm("plInfRoot")){ (id, name, value, args) =>
+    				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value="@pl"></input>
+    			}
+    			<br><h2>Temat 2</h2> @input(verbForm("plImpRoot")){ (id, name, value, args) =>
+    				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value="@pl"></input>
+    			}
+    			<br><h2>Wzorzec odmiany</h2> @select(verbForm("plPattern"), options = options(plVerbPatterns))
+    		</div><div class="longbox">
+				<h2>Wyjątki PL</h2>
+				<div id="plExceptionsDiv" name="plExceptionsDiv"></div>
+				@input(verbForm("plExceptions")){ (id,name, value, args) =>
+    				<input type="hidden" name="@name" id="@id" @toHtmlArgs(args)>
+    			}
+				<br><input type="button" id="clearPlExceptions" value="Wyczyść"/>
+				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
+			</div><div class="longbox">
+   				<h2>Jeśli zakończyłeś edycję:</h2><input type="submit" value="Dodaj do słownika"/>
+   			</div>
+		</div>
+		<div id="right">
+			<div class="longbox">
+				<h2><center>Czasownik NS</center></h2>
+				<br><h2>Temat 1</h2> @input(verbForm("nsInfRoot")){ (id, name, value, args) =>
+    				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value=""></input>
+    			}
+    			<br><h2>Temat 2</h2> @input(verbForm("nsImpRoot")){ (id, name, value, args) =>
+    				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value=""></input>
+    			}
+    			<br><h2>Wzorzec odmiany</h2> @select(verbForm("nsPattern"), options = options(nsVerbPatterns))
+    		</div><div class="longbox">
+				<h2>Wyjątki NS</h2>
+				<div id="nsExceptionsDiv" name="nsExceptionsDiv"></div>
+				@input(verbForm("nsExceptions")){ (id,name, value, args) =>
+    				<input type="hidden" name="@name" id="@id" @toHtmlArgs(args)>
+    			}
+				<br><input type="button" id="clearNsExceptions" value="Wyczyść"/>
+				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
+			</div>
+		</div>
+	<div id="clear"></div>
+	}
+	
+	<center>
+	<table width=800><tr><td colspan=4><p><center><h2>Odmiana</h2></center></p></td></tr>
+		<tr>
+			<td width="25%"><center><h2>Język polski</h2></center></td>
+			<td width="25%"><center><h2>Jezyk novosloviensky</h2></center></td>
+			<td width="25%"><center><h2>Język polski</h2></center></td>
+			<td width="25%"><center><h2>Jezyk novosloviensky</h2></center></td>
+		</tr>
+		<tr>			
+			@caseInfinitive("pl")
+			@caseInfinitive("ns")
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			@caseTense2("pl","PRES")
+			@caseTense2("ns","PRES")
+			@caseTense3("pl","PAST","M")
+			@caseTense3("ns","PAST","M")
+		</tr>
+		<tr>
+			@caseImperative("pl")
+			@caseImperative("ns")
+			@caseTense3("pl","PAST","F")
+			@caseTense3("ns","PAST","F")
+		</tr>
+		<tr>
+			<td>
+				@active("pl")
+				@passive("pl")
+				@noun("pl")
+			</td>
+			<td>
+				@active("ns")
+				@passive("ns")
+				@noun("ns")
+			</td>
+		</tr>
+	</table>
+	</center>
+  </div>
+  <div id="footer">
+    Copyright 2013 Maciej Gorywoda, <a href="mailto:makingthematrix@@gmail.com">makingthematrix@@gmail.com</a>,<a href="http://makingthematrix.wordpress.com" target="_blank">http://makingthematrix.wordpress.com</a> CSS design by <a href="http://www.colorlightstudio.com">Igor Penjivrag</a>
+	</div>
+
+	<div id="popupcontent">
+		<font size=-1>
+		<a id="statusbar" href="javascript:void(0);">Zamknij</a>
+		<input type="hidden" id="exceptionKey" name="exceptionKey"/>
+		<input type="hidden" id="exceptionLang" name="exceptionLang"/>
+		<br><input type="text" id="exceptionInput" name="exceptionInput" width="40" height="20"></input>
+		</font>
+	</div>
+	<div id="errors"></div>
+	
+	<script src="@routes.Assets.at("javascripts/verb.js")" type="text/javascript"></script>
+}

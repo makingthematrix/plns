@@ -1,0 +1,28 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+# Translation
+POST	/translate				controllers.Application.translate
+GET		/list					controllers.Application.list
+
+GET		/verb/:pl				controllers.Application.verb(pl: String)
+POST	/addVerb				controllers.Application.addVerb
+GET     /verbTemplates     		controllers.Application.verbTemplates
+GET		/noun/:pl				controllers.Application.noun(pl: String)
+POST	/addNoun				controllers.Application.addNoun
+GET     /nounTemplates     		controllers.Application.nounTemplates
+GET		/adjective/:pl			controllers.Application.adjective(pl: String)
+POST	/addAdjective			controllers.Application.addAdjective
+GET     /adjectiveTemplates     controllers.Application.adjectiveTemplates
+GET		/adverb/:pl				controllers.Application.adverb(pl: String)
+POST	/addAdverb				controllers.Application.addAdverb
+GET     /adverbTemplates        controllers.Application.adverbTemplates
+GET		/uninflected/:pl		controllers.Application.uninflected(pl: String)
+POST	/addUninflected			controllers.Application.addUninflected

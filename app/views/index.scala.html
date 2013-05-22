@@ -1,0 +1,58 @@
+@(t: TranslationPair, list: Array[String], translateForm: Form[(String,String)]) 
+
+@import helper._
+
+@main("Tłumacz polsko-nowosłowiański") {
+<link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/style.css")" media="screen" />
+  <div id="top">
+    <h2> <a href="http://plns.herokuapp.com/">Tłumacz polsko-nowosłowiański</a></h2>
+  </div>
+  <div id="content">
+    @form(routes.Application.translate) {
+    <table width="100%"><tr>
+    	<td width="50%"><center>
+    	@input(translateForm("source")){ (id,name, value, args) =>
+    		<textarea rows="4" cols="50" name="@name" id="@id" @toHtmlArgs(args)>@t.source</textarea>
+    	}
+    	</center>
+    </td><td><center>
+    	@input(translateForm("target")){ (id,name, value, args) =>
+    		<textarea rows="4" cols="50" name="@name" id="@id" @toHtmlArgs(args)>@t.target</textarea>
+    	}
+    </center>
+    </td></tr></table>
+    <p><input type="submit" value="Przetłumacz">
+    }
+    
+    @if(list.isEmpty == false){
+    <hr size=1>
+    <font size=-1>
+    <br><b>Słowa, których nie umiem przetłumaczyć:</b>
+    <br><ul>
+    @list.map { word =>
+    	<li> @word (Dodaj jako: <a href="/verb/@word">czasownik</a>, <a href="/noun/@word" target="_blank">rzeczownik</a>, <a href="/adjective/@word" target="_blank">przymiotnik</a>, <a href="/adverb/@word" target="_blank">przysłówek</a>, <a href="/uninflected/@word" target="_blank">bez odmiany</a>.
+    }
+    </ul>
+    }
+    </font>
+    <hr size=1><font size=-1>
+	<p>Wersja 0.0001 tłumacza one-to-one z języka polskiego na novosloviensky, napisana w <a href="http://www.scala-lang.org/" target="_blank">Scali</a> i <a href="http://www.playframework.org/" target="_blank">Play! Framework</a>.
+	<br>Po więcej informacji nt. języka novoslovienskiego zapraszam tutaj: <a href="http://pl.neoslavonic.org/" target="_blank">http://pl.neoslavonic.org/</a>.
+	<br>Na razie działa tłumaczenie tylko słów z poniższych kilku zdań:
+	<ul>
+	<li>"To jest przykładowe zdanie w języku polskim."
+	<li>"To są przykładowe zdania w językach polskim i międzysłowiańskim."
+	<li>"Ten mąż ciężko pracuje razem ze swoją żoną."
+	<li>"Powiadają, że dnia pewnego, mniej-więcej rok po tym jak zerwał kontakty ze swoim dawnym nauczycielem, <a href="http://pl.scribd.com/doc/105133020" target="_blank">[1]</a>
+	<li> Szymon przyszedł do Kłódzi, nad strumień Białej Wijeny, by tam w ciszy zgłębiać magiczną sztukę." :) <a href="http://pl.scribd.com/doc/100113420" target="_blank">[2]</a>
+	<li>"Bardzo wstępna wersja tłumacza języka polskiego na nowosłowiański."
+	</ul>
+	<br>oraz dokładanie nowych słów - ale nie są one zapamiętywane w bazie danych i po kolejnym restarcie zostaną zapomniane :P
+	<a href="/list" target="_blank">Lista słów</a>
+	<br>Można też je mieszać i odmieniać przez przypadki i czasy - w końcu o to właśnie w takim tłumaczu chodzi.
+	</font>
+	</div>
+	<div id="footer">
+	Copyright 2013 Maciej Gorywoda, <a href="mailto:makingthematrix@@gmail.com">makingthematrix@@gmail.com</a>,<a href="http://makingthematrix.wordpress.com" target="_blank">http://makingthematrix.wordpress.com</a> CSS design by <a href="http://www.colorlightstudio.com">Igor Penjivrag</a>
+	</div> 
+}
