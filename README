@@ -1,4 +1,28 @@
-This is your new Play 2.0 application
-=====================================
+This a one-to-one Polish-Interslavic (Neoslavonic) translator written in Scala and the Play! framework.
+Interslavic is an artificial language created as a middleground for all Slavic languages. You can read more about it here:
+http://www.interslavic.net
+Neoslavonic is a so to say "dialect" of Interslavic, a part of the project focused on the continuity from the Old Church Slavonic language:
+http://en.neoslavonic.org
 
-This file will be packaged with your application, when using `play dist`.
+The working instance of PL-NS is set on Heroku:
+http://plns.herokuapp.com
+
+Please note that this version here is still my playground rather than a serious webapp (and that's why I'm writing to you in English, not in Neoslavonic). 
+Basically, if you type in a text in Polish, you will see the translation and a list of words the translator doesn't know. Each of these words you can add 
+to the dictionary - as a verb, noun, adjective, adverb, or an unchanging word. If you decide to add it, you will be redirected to the page where you can 
+manage the whole declension or conjugation, so not only this very word and its translation will be added, but the whole set of words. Then you can go back 
+to the main page and see how it works.
+ 
+Since it's still a very early stage of implementation, the added words are not stored in a permanent way, so don't waste your time adding the whole 
+dictionary ;) They will be lost after the next restart. Also, it's almost certain GUI will be changed - I know this one is crap, you don't have to remind me. 
+Basically, this version is just for kicks. There's still a lot of work to be done.
+
+The next steps will involve:
+* a database structure, so added words will be kept permanently;
+* the Slovianski grammar along with the Neoslavonic one and the ability to switch between them;
+* making the graphical interface more readable;
+* enabling users to browse, edit, and delete words which were already added;
+* ability to backup and restore the dictionary;
+* user accounts for people who are allowed to add, edit, etc.
+
+It's a long, long way...
