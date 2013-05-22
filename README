@@ -1,4 +1,5 @@
-This a one-to-one Polish-Interslavic (Neoslavonic) translator written in Scala and the Play! framework.
+This is a one-to-one Polish-Interslavic (Neoslavonic) translator written in Scala and the Play! framework.
+
 Interslavic is an artificial language created as a middleground for all Slavic languages. You can read more about it here:
 http://www.interslavic.net
 Neoslavonic is a so to say "dialect" of Interslavic, a part of the project focused on the continuity from the Old Church Slavonic language:
