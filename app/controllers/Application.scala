@@ -39,7 +39,7 @@ object Application extends Controller {
     	  if(NSTranslator.isEmpty){
     		  NSTranslator.init();
     		  NSTranslator.testInit(); // for tests
-    	  }
+    	  } else println("NSTranslator not empty")
     	  NSTranslator.translate(source);
     	}
     	Ok(views.html.index(new TranslationPair(source,target),untranslated,translateForm));
@@ -88,7 +88,6 @@ object Application extends Controller {
   def addVerb = Action {
     implicit request => {
       Logger("MyApp").info("addVerb")
-      val obj = verbForm.bindFromRequest
       verbForm.bindFromRequest.fold(
     	formWithErrors => printFormErrors(formWithErrors), 
     	pair => add(pair)
@@ -128,7 +127,6 @@ object Application extends Controller {
   def addNoun = Action {
     implicit request => {
       Logger("MyApp").info("addNoun")
-      val obj = nounForm.bindFromRequest
       nounForm.bindFromRequest.fold(
     	formWithErrors => printFormErrors(formWithErrors), 
     	pair => add(pair)
@@ -167,7 +165,6 @@ object Application extends Controller {
   def addAdjective = Action {
     implicit request => {
       Logger("MyApp").info("addAdjective")
-      val obj = adjectiveForm.bindFromRequest
       adjectiveForm.bindFromRequest.fold(
     	formWithErrors => printFormErrors(formWithErrors), 
     	pair => add(pair)

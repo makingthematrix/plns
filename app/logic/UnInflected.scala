@@ -1,16 +1,23 @@
 package logic
 
-class UnInflected(val word: String) extends SpeechPart[UnInflected] {
-  override def translateTo(singleWord: UnInflected) = NSTranslator.add(word, singleWord.word);
-  
-  override def mainRoot = word;
+class UnInflected(val word: String,override val lang: String) extends SpeechPart[UnInflected] {
+  override def mainRoot = word
+  override val speechPart = "uninflected"
+    
+  override def translateTo(un: UnInflected) = addRoots(un) match {
+    case Some((rootId1,rootId2)) => {
+      NSTranslator.add(word, rootId1, un.word, rootId2)
+      true
+    }
+    case None => false
+  }
 }
 
 object UnInflected {
-  def word(_word: String) = new UnInflected(_word);
+  def word(_word: String,lang: String) = new UnInflected(_word,lang);
   
   def main(args: Array[String]): Unit = {
-    NSTranslator.add(new UnInflected("w"),new UnInflected("v"));
+    NSTranslator.add(new UnInflected("w","pl"),new UnInflected("v","ns"));
     NSTranslator.example("w");
   }
 }

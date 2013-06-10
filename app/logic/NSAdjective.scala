@@ -39,7 +39,7 @@ object NSAdjective {
   def word(ind:String,cmp:String):Adjective = word(ind,cmp,ind,cmp,false);
   
   def word(ind:String,cmp:String,advInd:String,advCmp:String,cmpIgnored:Boolean):Adjective = 
-    new Adjective(ind,cmp+"iejš","naj"+cmp+"iejš",NSAdverb.word(advInd, advCmp, cmpIgnored),declMap,declMap,cmpIgnored);
+    new Adjective(ind,cmp+"iejš","naj"+cmp+"iejš",NSAdverb.word(advInd, advCmp, cmpIgnored),declMap,declMap,cmpIgnored,"ns");
   
   def template() = new AdjectiveTemplate("ns","","iejš",MASCULINE.template,FEMININE.template,NEUTER.template,PLURAL.template,PLURAL.template);
 

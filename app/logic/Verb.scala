@@ -6,8 +6,10 @@ import scala.collection.mutable;
 
 case class VerbException(val conjCase: Conj.Value, val word: String);
 
-case class Verb (val infRoot: String,val impRoot: String,val conjugation: ConjugationPattern) extends SpeechPart[Verb]{
+case class Verb (val infRoot: String,val impRoot: String,val conjugation: ConjugationPattern,
+				 override val lang: String) extends SpeechPart[Verb]{
   override def mainRoot = exceptions.getOrElse(INF,infConjugation()(INF));
+  override val speechPart = "verb"
 	
   private val exceptions = mutable.Map[Conj.Value,String]();
   
@@ -30,26 +32,34 @@ case class Verb (val infRoot: String,val impRoot: String,val conjugation: Conjug
 	
   def impConjugation() = conjugation.conjugate(impRoot, Verb.impConj)
 	
-  private def translateTo(verb: Verb, cases: Seq[Conj.Value], fromConj: Map[Conj.Value,String], toConj: Map[Conj.Value,String]): Unit = {
+  private def translateTo(verb: Verb, cases: Seq[Conj.Value], 
+		  				  fromConj: Map[Conj.Value,String], 
+		  				  toConj: Map[Conj.Value,String],
+		  				  rootId1: Int, rootId2: Int
+		  				 ): Unit = {
 	cases.foreach(c => {
 	  val from = exceptions.getOrElse(c,fromConj.getOrElse(c, null));
 	  if(from != null){
 		val to = verb.exceptions.getOrElse(c,toConj.getOrElse(c, null));
-		if(to != null) NSTranslator.add(from,to);
+		if(to != null) NSTranslator.add(from,rootId1,to,rootId2);
 	  } 	 
 	});
   }
 	
-  override def translateTo(verb: Verb): Unit = {
-	//println("Verb.translateTo, " + infRoot + " -> " + verb.infRoot);
-	lazy val fromInfConj = infConjugation();
-	lazy val toInfConj = verb.infConjugation();
-	translateTo(verb, Verb.infConj, fromInfConj, toInfConj);
+  override def translateTo(verb: Verb): Boolean = addRoots(verb) match {
+    case Some((rootId1,rootId2)) => {
+	  //println("Verb.translateTo, " + infRoot + " -> " + verb.infRoot)
+	  lazy val fromInfConj = infConjugation()
+	  lazy val toInfConj = verb.infConjugation()
+	  translateTo(verb, Verb.infConj, fromInfConj, toInfConj,rootId1,rootId2)
 		
-	//println("Verb.translateTo, " + impRoot + " -> " + verb.impRoot);
-	val fromImpConj = impConjugation();
-	val toImpConj = verb.impConjugation();
-	translateTo(verb, Verb.impConj, fromImpConj, toImpConj);
+	  //println("Verb.translateTo, " + impRoot + " -> " + verb.impRoot)
+	  val fromImpConj = impConjugation()
+	  val toImpConj = verb.impConjugation()
+	  translateTo(verb, Verb.impConj, fromImpConj, toImpConj,rootId1,rootId2)
+	  true
+    }
+    case None => false
   }
 }
 
@@ -63,12 +73,12 @@ object Verb {
   
 }
 
-trait VerbGenerator {
+abstract class VerbGenerator(val lang: String) {
   protected val patternMap = scala.collection.mutable.HashMap[String,ConjugationPattern]();
   
-  def word(infRoot: String, impRoot:String, conj: ConjugationPattern):Verb = new Verb(infRoot,impRoot,conj);
+  def word(infRoot: String, impRoot:String, conj: ConjugationPattern):Verb = new Verb(infRoot,impRoot,conj,lang);
   def word(infRoot: String, conj: ConjugationPattern):Verb = word(infRoot,infRoot,conj);
-  def word(infRoot: String, impRoot:String, patternId: String):Verb =  word(infRoot,impRoot,patternMap(patternId));
+  def word(infRoot: String, impRoot:String, patternId: String):Verb = word(infRoot,impRoot,patternMap(patternId));
   def word(infRoot: String, patternId: String):Verb = word(infRoot,infRoot,patternId);
   
   def examples = patternMap.values.map(d => d.example)

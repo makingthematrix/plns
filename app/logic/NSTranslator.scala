@@ -5,8 +5,16 @@ import PlMode._
 import scala.collection.mutable;
 import models.AdjectivePair
 
+case class RootWord(word: String, speechPart: String, lang: String);
+
 object NSTranslator {
-  val dictionary = new Dictionary;
+  private var dictionary:AbstractDictionary = DictionaryFactory.DB_DICT;
+  
+  def changeDictionary(name: String) = name match {
+    case "debug" => dictionary = DictionaryFactory.DEBUG_DICT;
+    case "db" => dictionary = DictionaryFactory.DB_DICT;
+    case _ =>
+  }
   
   def example(str: String) = {
     val (translation,untranslated) = dictionary.translate(str);
@@ -54,34 +62,32 @@ object NSTranslator {
 	val pl = PLAdjective.word(plInd, plCmp, plInd, plCmp, mode, mode, false);
 	val ns = NSAdjective.word(nsInd, nsCmp);
 	pl.translateTo(ns);
-	if(isRoot){
-	  val t = (pl.mainRoot,ns.mainRoot);
-	  roots += t;
-	}
   }
 
   def addAdjective(plRoot: String, nsRoot: String,mode: PlMode.Value, isRoot: Boolean): Unit =  {
 	val pl = PLAdjective.word(plRoot, mode);
 	val ns = NSAdjective.word(nsRoot);
 	pl.translateTo(ns);
-	if(isRoot){
-	  val t = (pl.mainRoot,ns.mainRoot);
-	  roots += t;
-	}
   }
   
-  private val roots = new mutable.ArrayBuffer[(String,String)];
+  private val roots = new mutable.ArrayBuffer[RootWord];
 	
-  def add[T <: SpeechPart[T]] (from: T,to: T, isRoot: Boolean = true):Unit = {
+  def add[T <: SpeechPart[T]] (from: T,to: T):Unit = {
     from.translateTo(to);
-    if(isRoot){
-      val t = (from.mainRoot,to.mainRoot);
-      println(t)
-      roots += t;
-    }
   }
 	
-  def list:Seq[(String,String)] = roots.toSeq
+  def addRoot(word: String,speechPart: String,lang: String):Option[Int] = {
+    val rw = RootWord(word,speechPart,lang)
+    if(roots.contains(rw)) None
+    else {
+      roots += rw
+      Some(roots.size)
+    }
+  }
+  
+  def add(from: String, rootid1: Int, to: String, rootid2: Int):Unit = dictionary.add(from,to);
+  
+  def list:Seq[RootWord] = roots.toSeq
   
   def add(from: String, to:String):Unit = dictionary.add(from,to);
   def update(from: String, to:String):Unit = dictionary.update(from,to);
@@ -91,7 +97,8 @@ object NSTranslator {
   def init() = {
 	pronouns.foreach(dictionary.add);
 	toBe.foreach(dictionary.add);
-	roots.+=(("być","byti"));
+	addRoot("być","verb","pl")
+	addRoot("byti","verb","ns")
 	add("mo",PLAdjective.PLURAL_MASCULINE_SOFT,"moj",NSAdjective.PLURAL);
 	add("moj","moj",HARD,false);
 	update("mój","moj");
@@ -125,7 +132,8 @@ object NSTranslator {
   private def nsAdverb(root: String) = NSAdverb.word1(root)
   private def plAdverb(ind: String, cmp: String, pattern: PlMode.Value) = PLAdverb.word(ind, cmp, pattern, false)
   private def nsAdverb(ind: String, cmp: String) = NSAdverb.word(ind, cmp, false)
-  private def word(word: String) = UnInflected.word(word);
+  private def plWord(word: String) = UnInflected.word(word,"pl");
+  private def nsWord(word: String) = UnInflected.word(word,"ns");
   
   def testInit() = {
     add("przykładow","priměrn",HARD);
@@ -137,7 +145,7 @@ object NSTranslator {
     add("w","v");
     add(plAdverb("ciężk","cięż",HARD), nsAdverb("težk"));
     add(plVerb("pracow", "pracuj", PLVerb.II),nsVerb("dela","delaj",NSVerb.HARD));
-    add(word("razem"),word("zajedno"));
+    add(plWord("razem"),nsWord("zajedno"));
     add("ze","s");
     add(plNoun("męż",PLNoun.SOFT_MASCULINE_PERSON).except(NOMS, "mąż"),
         nsNoun("muž",NSNoun.SOFT_MASCULINE_PERSON));
@@ -170,7 +178,7 @@ object NSTranslator {
     add(plVerb("przychodz","przychodź",PLVerb.I),
         nsVerb("prihod",NSVerb.SOFT));
     add(plVerb("","",PLVerb.Xa),
-        nsVerb("se",NSVerb.SOFT),false);
+        nsVerb("se",NSVerb.SOFT));
     add(plVerb("przy","przy",PLVerb.Xa),
         nsVerb("prise",NSVerb.SOFT));
     add("do","do");

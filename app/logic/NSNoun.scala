@@ -2,7 +2,7 @@ package logic
 
 import Decl._;
 
-object NSNoun extends NounGenerator {
+object NSNoun extends NounGenerator("ns") {
   val HARD_MASCULINE_PERSON = new DeclensionPattern("ns","HARD_MASCULINE_PERSON","brat") { // "brat"
     override def suffices() = Map(
       NOMS -> "", GENS -> "a", DATS -> "u", ACCS -> "a", VOCS -> "e", LOCS -> "u", INSS -> "om",

@@ -2,7 +2,7 @@ package logic
 
 import Decl._;
 
-object PLNoun extends NounGenerator{
+object PLNoun extends NounGenerator("pl"){
 	val HARD_MASCULINE_PERSON = new DeclensionPattern("pl","HARD_MASCULINE_PERSON","brat") { // "brat"
 		override def suffices = Map(
 		    NOMS -> "", GENS -> "a", DATS -> "u", ACCS -> "a", VOCS -> "ie", LOCS -> "ie", INSS -> "em",

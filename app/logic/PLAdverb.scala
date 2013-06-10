@@ -8,8 +8,8 @@ object PLAdverb {
   def word(root: String, mode: PlMode.Value, cmpIgnored: Boolean): Adverb = word(root,root,mode,cmpIgnored);
 	
   def word(ind: String, cmp: String, mode: PlMode.Value, cmpIgnored: Boolean): Adverb = mode match {
-	case HARD => new Adverb(ind+"o",cmp+"ej","naj"+cmp+"ej",cmpIgnored);
-	case SOFT => new Adverb(ind+"e",cmp+"ej","naj"+cmp+"ej",cmpIgnored);
+	case HARD => new Adverb(ind+"o",cmp+"ej","naj"+cmp+"ej",cmpIgnored,"pl");
+	case SOFT => new Adverb(ind+"e",cmp+"ej","naj"+cmp+"ej",cmpIgnored,"pl");
   }
   
   def template(mode: PlMode.Value) = mode match {

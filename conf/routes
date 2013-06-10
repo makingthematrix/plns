@@ -26,3 +26,8 @@ POST	/addAdverb				controllers.Application.addAdverb
 GET     /adverbTemplates        controllers.Application.adverbTemplates
 GET		/uninflected/:pl		controllers.Application.uninflected(pl: String)
 POST	/addUninflected			controllers.Application.addUninflected
+
+GET		/translation			controllers.DBHelper.translation
+POST	/addTranslation			controllers.DBHelper.addTranslation
+GET		/listTranslations		controllers.DBHelper.listTranslations
+GET		/listWords				controllers.DBHelper.listWords

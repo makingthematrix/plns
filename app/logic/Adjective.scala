@@ -5,17 +5,21 @@ import scala.collection.mutable;
 
 case class AdjectiveException(val gender:String, val degree: String, val declCase: Decl.Value, val word: String);
 
-case class Adjective (val indicative:String,val comparative:String,val superlative:String,val adverb:Adverb,
-				 val indDeclension:Map[String,DeclensionPattern],val cmpDeclension:Map[String,DeclensionPattern],val cmpIgnored: Boolean) 
+case class Adjective (val ind:String,val cmp:String,val sup:String,val adverb:Adverb,
+				      val indDeclension:Map[String,DeclensionPattern],
+				      val cmpDeclension:Map[String,DeclensionPattern],
+				      val cmpIgnored: Boolean,override val lang:String) 
                 extends SpeechPart[Adjective]{
   
   override def mainRoot:String = { 
     val exOpt:Option[String] = exceptions.get(CaseDescription.key("m", "i", NOMS)); 
     exOpt match {
       case Some(str) => str
-      case None => indDeclension("m").decline(indicative, NOMS)
+      case None => indDeclension("m").decline(ind, NOMS)
     }
   }
+  
+  override val speechPart = "adjective"
   
   val exceptions = new mutable.HashMap[String,String]()
   
@@ -32,21 +36,21 @@ case class Adjective (val indicative:String,val comparative:String,val superlati
     return this;
   }
   
-  def this(ind:String,cmp:String,sup:String,adv:Adverb,declMap:Map[String,DeclensionPattern]) 
-    = this(ind,cmp,sup,adv,declMap,declMap,true);
-  def this(ind:String,cmp:String,sup:String,adv:Adverb,indDeclension:Map[String,DeclensionPattern],cmpDeclension:Map[String,DeclensionPattern]) 
-    = this(ind,cmp,sup,adv,indDeclension,cmpDeclension,true);
-  def this(ind:String,adv:Adverb,declMap:Map[String,DeclensionPattern])
-    = this(ind,null,null,adv,declMap,null,false);
+  def this(ind:String,cmp:String,sup:String,adv:Adverb,declMap:Map[String,DeclensionPattern],lang:String) 
+    = this(ind,cmp,sup,adv,declMap,declMap,true,lang);
+  def this(ind:String,cmp:String,sup:String,adv:Adverb,indDeclension:Map[String,DeclensionPattern],cmpDeclension:Map[String,DeclensionPattern],lang:String) 
+    = this(ind,cmp,sup,adv,indDeclension,cmpDeclension,true,lang);
+  def this(ind:String,adv:Adverb,declMap:Map[String,DeclensionPattern],lang:String)
+    = this(ind,null,null,adv,declMap,null,false,lang);
   
   private def getDeclPattern(degree: String) = degree match {
-    case "i" => (indicative,indDeclension)
-    case "c" if !cmpIgnored => (comparative,cmpDeclension)
-    case "s" if !cmpIgnored => (superlative,cmpDeclension)
+    case "i" => (ind,indDeclension)
+    case "c" if !cmpIgnored => (cmp,cmpDeclension)
+    case "s" if !cmpIgnored => (sup,cmpDeclension)
     case _ => throw new IllegalArgumentException("I can't give you that declination, with degree="+degree+" and cmpIgnored="+cmpIgnored)
   }
 
-  private def translateDegreeTo(adj: Adjective, degree: String): Unit = {
+  private def translateDegreeTo(adj: Adjective, degree: String,rootId1: Int,rootId2: Int): Unit = {
     val (fromRoot,fromDeclPattern) = getDeclPattern(degree)
     val (toRoot,toDeclPattern) = adj.getDeclPattern(degree)
   
@@ -59,16 +63,20 @@ case class Adjective (val indicative:String,val comparative:String,val superlati
         val from = exceptions.getOrElse(key,fromDecl.getOrElse(decl, null));
         if(from != null){
           val to = adj.exceptions.getOrElse(key,toDecl.getOrElse(decl, null)) 
-          if(to != null) NSTranslator.add(from,to);
+          if(to != null) NSTranslator.add(from,rootId1,to,rootId2);
         }
       })
     })
   }
   
-  override def translateTo(adj: Adjective): Unit = {
-    if(cmpIgnored || adj.cmpIgnored) translateDegreeTo(adj,"i")
-    else CaseDescription.degrees.keys.foreach( degree => translateDegreeTo(adj,degree) )    
-	adverb.translateTo(adj.adverb);
+  override def translateTo(adj: Adjective): Boolean = addRoots(adj) match {
+    case Some((rootId1,rootId2)) => {
+      if(cmpIgnored || adj.cmpIgnored) translateDegreeTo(adj,"i",rootId1,rootId2)
+      else CaseDescription.degrees.keys.foreach( degree => translateDegreeTo(adj,degree,rootId1,rootId2) )    
+      adverb.translateTo(adj.adverb)
+      true
+    }
+    case None => false
   }
 }
 

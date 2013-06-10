@@ -102,10 +102,10 @@ object PLAdjective {
 	  = mode match {
 	  case HARD => new Adjective(ind,cmp+"sz","naj"+cmp+"sz",
 	                             PLAdverb.word(advInd, advCmp, advMode,cmpIgnored),
-	                             hardModeMap,hardModeMap,cmpIgnored);
+	                             hardModeMap,hardModeMap,cmpIgnored,"pl");
 	  case SOFT => new Adjective(ind,cmp+"sz","naj"+cmp+"sz",
 	                             PLAdverb.word(advInd, advCmp, advMode,cmpIgnored),
-	                             softModeMap,hardModeMap,cmpIgnored);
+	                             softModeMap,hardModeMap,cmpIgnored,"pl");
 	}
 	
 	def template(mode: PlMode.Value) = mode match {

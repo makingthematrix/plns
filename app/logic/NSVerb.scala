@@ -2,7 +2,7 @@ package logic
 
 import Conj._;
 
-object NSVerb extends VerbGenerator{
+object NSVerb extends VerbGenerator("ns"){
 	val HARD = new ConjugationPattern("ns","HARD","imati"){ // imati
 	  override def suffices() = Map(
 	    INF -> "ti", // ima|ti 

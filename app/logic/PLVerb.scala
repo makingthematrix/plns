@@ -2,7 +2,7 @@ package logic
 
 import Conj._;
 
-object PLVerb extends VerbGenerator {
+object PLVerb extends VerbGenerator("pl") {
   	val I = new ConjugationPattern("pl","I","czytać"){ // czyt|ać
 	  override def suffices() = Map(
 	      INF -> "ać", // czyt|ać 

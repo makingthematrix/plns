@@ -1,0 +1,30 @@
+@(translationForm: Form[(String,String)]) 
+
+@import helper._
+
+@main("Tłumacz polsko-nowosłowiański") {
+<link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/style.css")" media="screen" />
+  <div id="top">
+    <h2> <a href="http://plns.herokuapp.com/">Tłumacz polsko-nowosłowiański</a></h2>
+  </div>
+  <div id="content">
+    @form(routes.DBHelper.addTranslation) {
+    <table width="100%"><tr>
+    	<td width="50%"><center>
+    	@input(translationForm("word1")){ (id,name, value, args) =>
+    		<input type="text" name="@name" id="@id" @toHtmlArgs(args)></input>
+    	}
+    	</center>
+    </td><td><center>
+    	@input(translationForm("word2")){ (id,name, value, args) =>
+    		<input type="text" name="@name" id="@id" @toHtmlArgs(args)></input>
+    	}
+    </center>
+    </td></tr></table>
+    <p><input type="submit" value="Przetłumacz">
+    }
+  </div>
+  <div id="footer">
+  Copyright 2013 Maciej Gorywoda, <a href="mailto:makingthematrix@@gmail.com">makingthematrix@@gmail.com</a>,<a href="http://makingthematrix.wordpress.com" target="_blank">http://makingthematrix.wordpress.com</a> CSS design by <a href="http://www.colorlightstudio.com">Igor Penjivrag</a>
+  </div> 
+}
