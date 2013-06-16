@@ -50,7 +50,7 @@ case class Adjective (val ind:String,val cmp:String,val sup:String,val adverb:Ad
     case _ => throw new IllegalArgumentException("I can't give you that declination, with degree="+degree+" and cmpIgnored="+cmpIgnored)
   }
 
-  private def translateDegreeTo(adj: Adjective, degree: String,rootId1: Int,rootId2: Int): Unit = {
+  private def translateDegreeTo(adj: Adjective, degree: String,rootId1: Long,rootId2: Long): Unit = {
     val (fromRoot,fromDeclPattern) = getDeclPattern(degree)
     val (toRoot,toDeclPattern) = adj.getDeclPattern(degree)
   

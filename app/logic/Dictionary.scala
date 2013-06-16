@@ -4,6 +4,7 @@ import scala.collection.mutable;
 
 class Dictionary extends AbstractDictionary {
   private val map = new mutable.HashMap[String, String];
+  private val rootsArr = new mutable.ArrayBuffer[RootWord];
 
   override def get(word: String) = map.get(word)
   
@@ -31,4 +32,14 @@ class Dictionary extends AbstractDictionary {
   
   override def isEmpty = map.isEmpty;
   
+  override def addRoot(word: String, speechPart: String, lang: String):Option[Long] = {
+    val rw = RootWord(word,speechPart,lang)
+    if(rootsArr.contains(rw)) None
+    else {
+      rootsArr += rw
+      Some(rootsArr.size)
+    }
+  }
+
+  override def roots:Seq[RootWord] = rootsArr.toSeq
 }

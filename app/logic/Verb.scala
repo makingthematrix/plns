@@ -35,15 +35,33 @@ case class Verb (val infRoot: String,val impRoot: String,val conjugation: Conjug
   private def translateTo(verb: Verb, cases: Seq[Conj.Value], 
 		  				  fromConj: Map[Conj.Value,String], 
 		  				  toConj: Map[Conj.Value,String],
-		  				  rootId1: Int, rootId2: Int
+		  				  rootId1: Long, rootId2: Long
 		  				 ): Unit = {
 	cases.foreach(c => {
-	  val from = exceptions.getOrElse(c,fromConj.getOrElse(c, null));
-	  if(from != null){
-		val to = verb.exceptions.getOrElse(c,toConj.getOrElse(c, null));
-		if(to != null) NSTranslator.add(from,rootId1,to,rootId2);
-	  } 	 
+	  val from = exceptions.get(c) match {
+	    case Some(ex) => ex
+	    case None => fromConj.get(c) match {
+	      case Some(from) => from
+	      case _ => throw new IllegalArgumentException("The case " + c + " does not exist in the conjugation of the verb " + this)
+	    }
+	  }
+	  
+	  val to = verb.exceptions.get(c) match {
+	    case Some(ex) => ex
+	    case None => toConj.get(c) match {
+	      case Some(to) => to
+	      case _ => throw new IllegalArgumentException("The case " + c + " does not exist in the conjugation of the verb " + verb)
+	    }
+	  }
+	  
+	  NSTranslator.add(from,rootId1,to,rootId2)
 	});
+	 // val from = exceptions.getOrElse(c,fromConj.getOrElse(c, null));
+	 // if(from != null){
+	//	val to = verb.exceptions.getOrElse(c,toConj.getOrElse(c, null));
+	//	if(to != null) NSTranslator.add(from,rootId1,to,rootId2);
+	//  } 	 
+	//});
   }
 	
   override def translateTo(verb: Verb): Boolean = addRoots(verb) match {

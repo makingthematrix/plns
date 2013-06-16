@@ -5,8 +5,6 @@ import PlMode._
 import scala.collection.mutable;
 import models.AdjectivePair
 
-case class RootWord(word: String, speechPart: String, lang: String);
-
 object NSTranslator {
   private var dictionary:AbstractDictionary = DictionaryFactory.DB_DICT;
   
@@ -69,25 +67,16 @@ object NSTranslator {
 	val ns = NSAdjective.word(nsRoot);
 	pl.translateTo(ns);
   }
-  
-  private val roots = new mutable.ArrayBuffer[RootWord];
-	
+  	
   def add[T <: SpeechPart[T]] (from: T,to: T):Unit = {
     from.translateTo(to);
   }
 	
-  def addRoot(word: String,speechPart: String,lang: String):Option[Int] = {
-    val rw = RootWord(word,speechPart,lang)
-    if(roots.contains(rw)) None
-    else {
-      roots += rw
-      Some(roots.size)
-    }
-  }
+  def addRoot(word: String,speechPart: String,lang: String):Option[Long] = dictionary.addRoot(word, speechPart, lang)
   
-  def add(from: String, rootid1: Int, to: String, rootid2: Int):Unit = dictionary.add(from,to);
+  def add(from: String, rootid1: Long, to: String, rootid2: Long):Unit = dictionary.add(from,to);
   
-  def list:Seq[RootWord] = roots.toSeq
+  def list:Seq[RootWord] = dictionary.roots
   
   def add(from: String, to:String):Unit = dictionary.add(from,to);
   def update(from: String, to:String):Unit = dictionary.update(from,to);
@@ -227,8 +216,7 @@ object NSTranslator {
     add(PLAdjective.word("lekk","lżej",SOFT),NSAdjective.word("legk"));
     example("lekki");
     dictionary.tuples.foreach(println);
-    println(roots.size);
-  
+    println(dictionary.roots.size);
   }
 
 }

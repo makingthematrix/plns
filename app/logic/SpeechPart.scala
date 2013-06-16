@@ -6,9 +6,9 @@ trait SpeechPart[T <: SpeechPart[T]] {
   val speechPart: String;
   val lang: String;
 	
-  protected def addRoot():Option[Int] = NSTranslator.addRoot(mainRoot, speechPart, lang)
+  protected def addRoot():Option[Long] = NSTranslator.addRoot(mainRoot, speechPart, lang)
 
-  def addRoots(t: T):Option[(Int,Int)] = this.addRoot() match {
+  def addRoots(t: T):Option[(Long,Long)] = this.addRoot() match {
     case Some(rootid1) => t.addRoot() match {
       case Some(rootid2) => Some(rootid1,rootid2)
       case None => None

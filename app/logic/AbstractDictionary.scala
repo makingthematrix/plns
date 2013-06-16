@@ -2,6 +2,8 @@ package logic
 
 import scala.collection.mutable;
 
+case class RootWord(word: String, speechPart: String, lang: String);
+
 abstract class AbstractDictionary {
   def get(word: String):Option[String];
 	
@@ -16,6 +18,10 @@ abstract class AbstractDictionary {
   def hasWord(word: String,lang: String):Boolean;
   
   def isEmpty:Boolean;
+  
+  def addRoot(word: String, speechPart: String, lang: String):Option[Long]
+  
+  def roots:Seq[RootWord]
 //-----------------------------------------------------
   def add(tuple: (String,String)): Unit = add(tuple._1,tuple._2);
 	
