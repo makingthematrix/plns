@@ -63,7 +63,7 @@ case class Adjective (val ind:String,val cmp:String,val sup:String,val adverb:Ad
         val from = exceptions.getOrElse(key,fromDecl.getOrElse(decl, null));
         if(from != null){
           val to = adj.exceptions.getOrElse(key,toDecl.getOrElse(decl, null)) 
-          if(to != null) NSTranslator.add(from,rootId1,to,rootId2);
+          if(to != null) NSTranslator.add(new Word(from,lang,rootId1,decl),new Word(to,adj.lang,rootId2,decl))
         }
       })
     })

@@ -8,10 +8,10 @@ case class Adverb(val ind: String,val cmp: String,val sup: String,val cmpIgnored
 	
   override def translateTo(adv: Adverb): Boolean = addRoots(adv) match {
     case Some((rootId1,rootId2)) => {
-      NSTranslator.add(ind,rootId1,adv.ind,rootId2);
+      NSTranslator.add(new Word(ind,lang,rootId1,"ind"),new Word(adv.ind,adv.lang,rootId2,"ind"))
       if(!cmpIgnored){
-    	  NSTranslator.add(cmp,rootId1,adv.cmp,rootId2);
-    	  NSTranslator.add(sup,rootId1,adv.sup,rootId2);
+        NSTranslator.add(new Word(cmp,lang,rootId1,"cmp"),new Word(adv.cmp,adv.lang,rootId2,"cmp"))
+        NSTranslator.add(new Word(sup,lang,rootId1,"sup"),new Word(adv.sup,adv.lang,rootId2,"sup"))
       }
       true
     }

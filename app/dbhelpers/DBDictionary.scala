@@ -6,10 +6,9 @@ import play.api.db.DB
 import play.api.Play.current
 import play.api.Logger
 import logic.AbstractDictionary
-
-case class Root(val id:Long,val root:String,val speechpart:String,val lang:String);
-case class Word(val id:Long,val word:String,val lang:String,val rootid:Long,val caseid:String);
-case class Translation(val id:Long, val wordid1:Long, val wordid2:Long);
+import logic.Root
+import logic.Word
+import logic.Translation
 
 object DBParsers {
   val rootParser = {
@@ -38,6 +37,13 @@ object DBParsers {
       case id~wordid1~wordid2 => Translation(id, wordid1, wordid2)
     }
   }  
+  
+  val wordTupleParser = {
+    get[String]("word1") ~
+    get[String]("word2") map {
+      case word1~word2 => (word1,word2)
+    }
+  }
 }
 
 class DBDictionary extends AbstractDictionary {
@@ -56,14 +62,14 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  override def add(word1:String, word2:String):Unit = DB.withConnection {
+  override def add(word1:Word, word2:Word):Unit = DB.withConnection {
     implicit c => {
       println("addTranslation: " + word1 + " -> " + word2)
       
-      val w1Id = insertOrGetWord(word1,"pl",-1,"")
+      val w1Id = insertOrGetWord(word1.word,word1.lang,word1.rootid,word1.caseid)
       println("word1 added with id: " + w1Id)
       
-      val w2Id = insertOrGetWord(word2,"ns",-1,"")
+      val w2Id = insertOrGetWord(word2.word,word2.lang,word2.rootid,word2.caseid)
       println("word2 added with id: " + w2Id)
       
       SQL("insert into translations (wordid1, wordid2) values ({wordid1},{wordid2})").on('wordid1 -> w1Id,'wordid2 -> w2Id).executeInsert()
@@ -86,17 +92,12 @@ class DBDictionary extends AbstractDictionary {
   }
   
   override def tuples:Seq[(String,String)] = DB.withConnection {
-    implicit c => {
-      println("DBDictionary.translations")
-      val tList = SQL("select * from translations").as(DBParsers.translationParser *)
-      println("translations found: " + tList.size)
-      tList.map{ t => {
-          val word1 = SQL("select word from words where id={id}").on('id -> t.wordid1).apply().head[String]("word")
-          val word2 = SQL("select word from words where id={id}").on('id -> t.wordid2).apply().head[String]("word")
-          (word1,word2)
-        }
-      }
-    }
+    implicit c => SQL("""
+          select w1.word as word1,w2.word as word2 
+          from words w1,translations,words w2 
+          where w1.id=translations.wordid1 
+          and w2.id=translations.wordid2;
+      """).as(DBParsers.wordTupleParser *)
   }
 
   override def words:Seq[String] = DB.withConnection {
@@ -134,13 +135,10 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  override def roots:Seq[logic.RootWord] = DB.withConnection {
-    implicit c => {
-      val rList = SQL("select * from roots").as(DBParsers.rootParser *)
-      rList.map{ r => logic.RootWord(r.root,r.speechpart,r.lang) }
-    }
+  override def roots:Seq[Root] = DB.withConnection {
+    implicit c => SQL("select * from roots").as(DBParsers.rootParser *)
   }
-  
+   
   private def wordId(word: String, lang: String)(implicit c: java.sql.Connection):Option[Long] = {
     val idRowOption = SQL("select id from words where word={word} and lang={lang}")
     					.on('word -> word, 'lang -> lang).apply().headOption
@@ -160,15 +158,15 @@ class DBDictionary extends AbstractDictionary {
   }
   
   private def translationId(wordId1: Long)(implicit c: java.sql.Connection):Option[Long] = {
-    val idRowOption = SQL("select id from translations where wordid1={wordId1}").on('wordid1 -> wordId1).apply().headOption
+    val idRowOption = SQL("select id from translations where wordid1={wordid1}").on('wordid1 -> wordId1).apply().headOption
     idRowOption match {
       case Some(idRow) => Some(idRow[Long]("id"))
       case None => None
     }     
   }
   
-  private def insertOrGetWord(word: String, lang: String, rootId: Long, caseId: String)(implicit c: java.sql.Connection):Long = {
-    wordId(word,lang) match {
+  private def insertOrGetWord(word: String, lang: String, rootId: Long, caseId: String)
+    (implicit c: java.sql.Connection):Long = wordId(word,lang) match {
       case Some(wordId) => wordId
       case None => {
         SQL("insert into words (word, lang, rootid, caseid) values ({word},{lang},{rootId},{caseId})")
@@ -177,5 +175,4 @@ class DBDictionary extends AbstractDictionary {
         wordId(word,lang).get
       }
     }
-  }
 }

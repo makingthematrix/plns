@@ -2,12 +2,22 @@ package logic
 
 import scala.collection.mutable;
 
-case class RootWord(word: String, speechPart: String, lang: String);
+case class Root(val id:Long,val root:String,val speechpart:String,val lang:String){
+  def this(root:String,speechpart:String,lang:String) = this(-1,root,speechpart,lang)
+}
+
+case class Word(val id:Long,val word:String,val lang:String,val rootid:Long,val caseid:String){
+  def this(word:String,lang:String,rootid:Long,caseid:String) = this(-1,word,lang,rootid,caseid)
+}
+
+case class Translation(val id:Long, val wordid1:Long, val wordid2:Long){
+  def this(wordid1:Long,wordid2:Long) = this(-1,wordid1,wordid2)
+}
 
 abstract class AbstractDictionary {
   def get(word: String):Option[String];
 	
-  def add(from: String, to: String): Unit;
+  def add(from: Word, to: Word): Unit;
 	
   def update(from: String, to: String): Unit;
 	
@@ -21,9 +31,9 @@ abstract class AbstractDictionary {
   
   def addRoot(word: String, speechPart: String, lang: String):Option[Long]
   
-  def roots:Seq[RootWord]
+  def roots:Seq[Root]
 //-----------------------------------------------------
-  def add(tuple: (String,String)): Unit = add(tuple._1,tuple._2);
+  def add(tuple: (Word,Word)): Unit = add(tuple._1,tuple._2);
 	
   def update(tuple: (String,String)): Unit = update(tuple._1,tuple._2);
   

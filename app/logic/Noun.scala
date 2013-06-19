@@ -46,7 +46,7 @@ case class Noun(val root: String,val declension: DeclensionPattern,val singIgnor
 	    val from = exceptions.getOrElse(c,fromDecl.getOrElse(c, null));
 	    if(from != null){
 	  	  val to = noun.exceptions.getOrElse(c,toDecl.getOrElse(c, null)) 
-	  	  if(to != null) NSTranslator.add(from,rootId1,to,rootId2);
+	  	  if(to != null) NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,noun.lang,rootId2,c))
 	    }	 
 	  });
       true

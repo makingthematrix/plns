@@ -36,12 +36,14 @@ object NSTranslator {
   );
 	
   lazy val toBe = Array(
-	("być", "byti"), ("był","byl"), ("była","byla"),("było","bylo"),("byli","byli"),("były","byle"),("bycie","bytije"),
+	("być", "byti"), ("bycie","bytije"),
 	("jestem","jesm"),("jesteś","jesi"),("jest","je"),("jesteśmy","jesme"),("jesteście","jeste"),("są","sut"),
 	("będę", "budu"), ("będziesz","budeš"), ("będzie","bude"), ("będziemy","budeme"), ("będziecie","budete"), ("będą","budut"),
 	("będąc","buduč"), ("będący","budučy"), ("będąca","buduča"), ("będące","buduče"), ("bycie","bytije"), ("bądź","budi"),
 	("bądźmy","budime"), ("bądźcie","budite"), ("bym","byh"), ("byś","bys"), ("by","by"), ("byśmy","byhom"), 
-	("byście","byste")
+	("byście","byste"), ("byłem","byl"), ("byłam","byla"), ("byłeś","byl"), ("byłaś","byla"), ("był","byl"),
+	("była","byla"), ("było","bylo"), ("byliśmy","byli"), ("byłyśmy","byle"), ("byliście","byli"), ("byłyście","byle"),
+	("byli","byli"), ("były","byle")
   ); 
 	
   def add(plRoot: String, plPattern: DeclensionPattern, nsRoot: String, nsPattern: DeclensionPattern): Unit = {
@@ -51,7 +53,9 @@ object NSTranslator {
 	  val pl = plDeclension.getOrElse(c, null);
 	  if(pl != null){
 		val ns = nsDeclension.getOrElse(c, null);
-		if(ns != null) dictionary.add(pl,ns);
+		val w1 = new Word(pl,"pl",-1,c)
+		val w2 = new Word(ns,"ns",-1,c)
+		if(ns != null) dictionary.add(w1,w2)
 	  }	 
 	});
   }
@@ -74,18 +78,18 @@ object NSTranslator {
 	
   def addRoot(word: String,speechPart: String,lang: String):Option[Long] = dictionary.addRoot(word, speechPart, lang)
   
-  def add(from: String, rootid1: Long, to: String, rootid2: Long):Unit = dictionary.add(from,to);
+  def add(from: Word, to: Word):Unit = dictionary.add(from,to);
   
-  def list:Seq[RootWord] = dictionary.roots
+  def list:Seq[Root] = dictionary.roots
   
-  def add(from: String, to:String):Unit = dictionary.add(from,to);
-  def update(from: String, to:String):Unit = dictionary.update(from,to);
+  def add(from: String, to:String):Unit = dictionary.add(new Word(from,"pl",-1,""),new Word(to,"ns",-1,""))
+  def update(from: String, to:String):Unit = dictionary.update(from,to)
   
   def isEmpty = dictionary.isEmpty;
   
   def init() = {
-	pronouns.foreach(dictionary.add);
-	toBe.foreach(dictionary.add);
+	pronouns.foreach{ t => add(t._1,t._2) }
+	toBe.foreach{ t => add(t._1,t._2) } 
 	addRoot("być","verb","pl")
 	addRoot("byti","verb","ns")
 	add("mo",PLAdjective.PLURAL_MASCULINE_SOFT,"moj",NSAdjective.PLURAL);

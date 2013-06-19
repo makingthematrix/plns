@@ -1,4 +1,4 @@
-@(list: Seq[logic.RootWord])
+@(list: Seq[logic.Root])
 
 @import helper._
 
@@ -7,7 +7,7 @@
 	<b>Lista słów w słowniku, z pominięciem przyimków, zaimków i partykuł:</b>
 	<ul>
 	@list.map{ t =>
-		<li> @t.word (@t.lang,@t.speechPart) 
+		<li> @t.root (@t.lang,@t.speechpart) 
 	}
 	</ul>
 	Razem: @list.size

@@ -6,7 +6,7 @@ class UnInflected(val word: String,override val lang: String) extends SpeechPart
     
   override def translateTo(un: UnInflected) = addRoots(un) match {
     case Some((rootId1,rootId2)) => {
-      NSTranslator.add(word, rootId1, un.word, rootId2)
+      NSTranslator.add(new Word(word,lang,rootId1,""),new Word(un.word,un.lang,rootId2,""))
       true
     }
     case None => false

@@ -54,14 +54,8 @@ case class Verb (val infRoot: String,val impRoot: String,val conjugation: Conjug
 	    }
 	  }
 	  
-	  NSTranslator.add(from,rootId1,to,rootId2)
+	  NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,verb.lang,rootId2,c))
 	});
-	 // val from = exceptions.getOrElse(c,fromConj.getOrElse(c, null));
-	 // if(from != null){
-	//	val to = verb.exceptions.getOrElse(c,toConj.getOrElse(c, null));
-	//	if(to != null) NSTranslator.add(from,rootId1,to,rootId2);
-	//  } 	 
-	//});
   }
 	
   override def translateTo(verb: Verb): Boolean = addRoots(verb) match {

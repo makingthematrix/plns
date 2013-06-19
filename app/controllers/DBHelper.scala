@@ -6,6 +6,7 @@ import play.api.data._
 import play.api.data.Forms._
 import dbhelpers.DBDictionary
 import logic.SpeechPart
+import logic.NSTranslator
 
 object DBHelper extends Controller {
   private val dict = new DBDictionary()
@@ -34,7 +35,7 @@ object DBHelper extends Controller {
     if(dict.hasWord(word2,"ns")){
       BadRequest("The word " + word2 + " is already in the Novoslovienski dictionary")
     }
-    dict.add(word1,word2)
+    NSTranslator.add(word1,word2)
     Ok("Dodałem: " + word1 + " -> " + word2);
   }
   
