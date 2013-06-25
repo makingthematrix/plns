@@ -53,7 +53,7 @@ object Application extends Controller {
       NSTranslator.init();
       NSTranslator.testInit(); // for tests
     }
-    Ok(views.html.list(NSTranslator.list))
+    Ok(views.html.list(NSTranslator.rootPairs))
   }
 
   val verbForm = Form(

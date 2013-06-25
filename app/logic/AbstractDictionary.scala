@@ -29,9 +29,13 @@ abstract class AbstractDictionary {
   
   def isEmpty:Boolean;
   
-  def addRoot(word: String, speechPart: String, lang: String):Option[Long]
+  def addRoot(root: Root):Option[Long]
+  
+  def addRoots(from: Root,to: Root): (Long,Long);
   
   def roots:Seq[Root]
+  
+  def rootPairs:Seq[(Root,Root)]
 //-----------------------------------------------------
   def add(tuple: (Word,Word)): Unit = add(tuple._1,tuple._2);
 	

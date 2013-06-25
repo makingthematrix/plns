@@ -20,6 +20,8 @@ case class Adjective (val ind:String,val cmp:String,val sup:String,val adverb:Ad
   }
   
   override val speechPart = "adjective"
+    
+  override def toRoot():Root = new Root(mainRoot,speechPart,lang)
   
   val exceptions = new mutable.HashMap[String,String]()
   
@@ -69,14 +71,11 @@ case class Adjective (val ind:String,val cmp:String,val sup:String,val adverb:Ad
     })
   }
   
-  override def translateTo(adj: Adjective): Boolean = addRoots(adj) match {
-    case Some((rootId1,rootId2)) => {
-      if(cmpIgnored || adj.cmpIgnored) translateDegreeTo(adj,"i",rootId1,rootId2)
-      else CaseDescription.degrees.keys.foreach( degree => translateDegreeTo(adj,degree,rootId1,rootId2) )    
-      adverb.translateTo(adj.adverb)
-      true
-    }
-    case None => false
+  override def translateTo(adj: Adjective) {
+    val (rootId1, rootId2) = addRoots(adj)
+    if(cmpIgnored || adj.cmpIgnored) translateDegreeTo(adj,"i",rootId1,rootId2)
+    else CaseDescription.degrees.keys.foreach( degree => translateDegreeTo(adj,degree,rootId1,rootId2) )    
+    adverb.translateTo(adj.adverb)
   }
 }
 

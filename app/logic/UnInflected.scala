@@ -4,12 +4,11 @@ class UnInflected(val word: String,override val lang: String) extends SpeechPart
   override def mainRoot = word
   override val speechPart = "uninflected"
     
-  override def translateTo(un: UnInflected) = addRoots(un) match {
-    case Some((rootId1,rootId2)) => {
-      NSTranslator.add(new Word(word,lang,rootId1,""),new Word(un.word,un.lang,rootId2,""))
-      true
-    }
-    case None => false
+  override def toRoot():Root = new Root(mainRoot,speechPart,lang)
+    
+  override def translateTo(un: UnInflected){
+    val (rootId1,rootId2) = addRoots(un)
+    NSTranslator.add(new Word(word,lang,rootId1,""),new Word(un.word,un.lang,rootId2,""))
   }
 }
 

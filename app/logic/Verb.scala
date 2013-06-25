@@ -10,7 +10,9 @@ case class Verb (val infRoot: String,val impRoot: String,val conjugation: Conjug
 				 override val lang: String) extends SpeechPart[Verb]{
   override def mainRoot = exceptions.getOrElse(INF,infConjugation()(INF));
   override val speechPart = "verb"
-	
+    
+  override def toRoot():Root = new Root(mainRoot,speechPart,lang)
+
   private val exceptions = mutable.Map[Conj.Value,String]();
   
   def except(ex: VerbException): Verb = {
@@ -58,20 +60,17 @@ case class Verb (val infRoot: String,val impRoot: String,val conjugation: Conjug
 	});
   }
 	
-  override def translateTo(verb: Verb): Boolean = addRoots(verb) match {
-    case Some((rootId1,rootId2)) => {
-	  //println("Verb.translateTo, " + infRoot + " -> " + verb.infRoot)
-	  lazy val fromInfConj = infConjugation()
-	  lazy val toInfConj = verb.infConjugation()
-	  translateTo(verb, Verb.infConj, fromInfConj, toInfConj,rootId1,rootId2)
+  override def translateTo(verb: Verb){ 
+    val (rootId1,rootId2) = addRoots(verb)
+    //println("Verb.translateTo, " + infRoot + " -> " + verb.infRoot)
+	lazy val fromInfConj = infConjugation()
+	lazy val toInfConj = verb.infConjugation()
+	translateTo(verb, Verb.infConj, fromInfConj, toInfConj,rootId1,rootId2)
 		
-	  //println("Verb.translateTo, " + impRoot + " -> " + verb.impRoot)
-	  val fromImpConj = impConjugation()
-	  val toImpConj = verb.impConjugation()
-	  translateTo(verb, Verb.impConj, fromImpConj, toImpConj,rootId1,rootId2)
-	  true
-    }
-    case None => false
+	//println("Verb.translateTo, " + impRoot + " -> " + verb.impRoot)
+	val fromImpConj = impConjugation()
+	val toImpConj = verb.impConjugation()
+	translateTo(verb, Verb.impConj, fromImpConj, toImpConj,rootId1,rootId2)
   }
 }
 

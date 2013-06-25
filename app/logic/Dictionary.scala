@@ -7,6 +7,7 @@ class Dictionary extends AbstractDictionary {
   private val map = new mutable.HashMap[String,String];
   private val rootsMap = new mutable.HashMap[String,Root];
   private val rootsIds = new mutable.HashMap[Long,String];
+  private val rootTrans = new mutable.HashMap[Long,Long];
 
   override def get(word: String) = map.get(word)
   
@@ -49,16 +50,37 @@ class Dictionary extends AbstractDictionary {
   
   override def isEmpty = map.isEmpty;
   
-  override def addRoot(word: String, speechPart: String, lang: String):Option[Long] = rootsMap.get(word) match {
+  override def addRoot(root: Root):Option[Long] = rootsMap.get(root.root) match {
     case Some(root) => Some(root.id)
     case None => {
       val id:Long = roots.size + 1
-      val rw = Root(id,word,speechPart,lang)
-      rootsMap += (word -> rw)
-      rootsIds += (id -> word)
+      rootsMap += (root.root -> root)
+      rootsIds += (id -> root.root)
       Some(id)
     }
   }
+  
+  override def addRoots(from: Root,to: Root): (Long,Long) = {
+    val rootId1 = addRoot(from) match {
+      case Some(id) => id
+      case None => throw new IllegalArgumentException("Unable to store root " + from)
+    }
+    val rootId2 = addRoot(to) match {
+      case Some(id) => id
+      case None => throw new IllegalArgumentException("Unable to store root " + to)
+    }
+    rootTrans += (rootId1 -> rootId2)
+    return (rootId1, rootId2)
+  }
 
   override def roots:Seq[Root] = rootsMap.values.toSeq
+  
+  override def rootPairs:Seq[(Root,Root)] = {
+    rootTrans.keys.map(key => {
+        val value = rootTrans(key)
+        val root1 = rootsIds(key)
+        val root2 = rootsIds(value)
+        (rootsMap(root1),rootsMap(root2))
+    }).toSeq
+  }
 }

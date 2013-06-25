@@ -76,11 +76,13 @@ object NSTranslator {
     from.translateTo(to);
   }
 	
-  def addRoot(word: String,speechPart: String,lang: String):Option[Long] = dictionary.addRoot(word, speechPart, lang)
+  def addRoots(from: Root, to: Root):(Long,Long) = dictionary.addRoots(from,to)
   
   def add(from: Word, to: Word):Unit = dictionary.add(from,to);
   
   def list:Seq[Root] = dictionary.roots
+  
+  def rootPairs:Seq[(Root,Root)] = dictionary.rootPairs
   
   def add(from: String, to:String):Unit = dictionary.add(new Word(from,"pl",-1,""),new Word(to,"ns",-1,""))
   def update(from: String, to:String):Unit = dictionary.update(from,to)
@@ -90,8 +92,7 @@ object NSTranslator {
   def init() = {
 	pronouns.foreach{ t => add(t._1,t._2) }
 	toBe.foreach{ t => add(t._1,t._2) } 
-	addRoot("być","verb","pl")
-	addRoot("byti","verb","ns")
+	addRoots(new Root("być","verb","pl"),new Root("byti","verb","ns"));
 	add("mo",PLAdjective.PLURAL_MASCULINE_SOFT,"moj",NSAdjective.PLURAL);
 	add("moj","moj",HARD,false);
 	update("mój","moj");

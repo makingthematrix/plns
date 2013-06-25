@@ -14,6 +14,7 @@ case class Noun(val root: String,val declension: DeclensionPattern,val singIgnor
   override def mainRoot = exceptions.getOrElse(NOMS,decline()(NOMS));
   override val speechPart = "noun";
   
+  override def toRoot():Root = new Root(mainRoot,speechPart,lang)
 	
   private val exceptions = new mutable.HashMap[Decl.Value,String]();
 
@@ -38,21 +39,30 @@ case class Noun(val root: String,val declension: DeclensionPattern,val singIgnor
     else declension.decline(root,Noun.declension)
   }
 	
-  override def translateTo(noun: Noun): Boolean = addRoots(noun) match {
-    case Some((rootId1,rootId2)) => {
-      lazy val fromDecl = decline()
-	  lazy val toDecl = noun.decline();
-	  Noun.declension.foreach(c => {
-	    val from = exceptions.getOrElse(c,fromDecl.getOrElse(c, null));
-	    if(from != null){
-	  	  val to = noun.exceptions.getOrElse(c,toDecl.getOrElse(c, null)) 
-	  	  if(to != null) NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,noun.lang,rootId2,c))
-	    }	 
-	  });
-      true
-    }
-    case None => false
-  } 
+  override def translateTo(noun: Noun){ 
+	val (rootId1,rootId2) = addRoots(noun)
+	lazy val fromDecl = decline()
+	lazy val toDecl = noun.decline();
+	Noun.declension.foreach(c => {
+	  val from = exceptions.get(c) match {
+	    case Some(ex) => ex
+	    case None => fromDecl.get(c) match {
+	      case Some(from) => from
+	      case _ => throw new IllegalArgumentException("The case " + c + " does not exist in the declension of the noun " + this)
+	    }
+	  }
+	    
+	  val to = noun.exceptions.get(c) match {
+	    case Some(ex) => ex
+	    case None => toDecl.get(c) match {
+	      case Some(to) => to
+	      case _ => throw new IllegalArgumentException("The case " + c + " does not exist in the declension of the noun " + noun)
+	    }
+	  }
+	   
+	  NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,noun.lang,rootId2,c))
+	})
+  }
 }
 
 object Noun{
