@@ -37,11 +37,22 @@
 				@input(adverbForm("cmpIgnored")){ (id,name, value, args) =>
     			<input type="checkbox" id="@id" @toHtmlArgs(args)>Ignoruj stopień wyższy</input>
     		}
-   			</div><div class="box">
-   				<h2>Jeśli zakończyłeś edycję:</h2><input type="submit" name="submit" id="submit" value="Dodaj do słownika"/>
+   			</div>
+   		</div><div id="right">
+   			<div class="box">
+   				<table width=400><tr><td colspan=2><center><h2>Odmiana</h2></center></td></tr>
+				</tr><tr>
+					@caseBlock("pl","i")
+				</tr><tr>
+					@caseBlock("pl","c")
+				</tr><tr>
+					@caseBlock("pl","s")
+				</tr>
+				</table>
    			</div>
    		</div>
-		<div id="right">
+   		<p><div id="clear"></div>
+		<div id="left">
 			<div class="box">
 				<h2><center>Przysłówek NS</center></h2>
     			<br><h2>Stopień równy</h2> @input(adverbForm("nsInd")){ (id,name, value, args) =>
@@ -49,36 +60,26 @@
     			}
     			<br><h2>Stopień wyższy</h2> @input(adverbForm("nsCmp")){ (id,name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args)></input>
-    			}
-    			<p>&nbsp;</p>
-    			<p>&nbsp;</p>
-    			<p>&nbsp;</p>
-    			<p>&nbsp;</p>		
+    			}		
   			</div>
+		</div><div id="right">
+			   	<table width=400><tr><td colspan=2><center><h2>Odmiana</h2></center></td></tr>
+				</tr><tr>
+					@caseBlock("ns","i")
+				</tr><tr>
+					@caseBlock("ns","c")
+				</tr><tr>
+					@caseBlock("ns","s")
+				</tr>
+				</table>
 		</div>
 	</div>
 	<div id="clear"></div>
+	<div class="box">
+   		<h2>Jeśli zakończyłeś edycję:</h2><input type="submit" name="submit" id="submit" value="Dodaj do słownika"/>
+   	</div>
 	}
 
-	<center>
-	<div class="box">
-	<table width=400><tr><td colspan=2><p><center><h2>Odmiana</h2></center></p></td></tr>
-		<tr>
-			<td width="50%"><center><h2>Język polski</h2></center></td>
-			<td width="50%"><center><h2>Jezyk novosloviensky</h2></center></td>
-		</tr><tr>
-			@caseBlock("pl","i")
-			@caseBlock("ns","i")
-		</tr><tr>
-			@caseBlock("pl","c")
-			@caseBlock("ns","c")
-		</tr><tr>
-			@caseBlock("pl","s")
-			@caseBlock("ns","s")
-		</tr>
-	</table>
-	</div>
-	</center>
  </div>
 <div id="footer">
 Copyright 2013 Maciej Gorywoda, <a href="mailto:makingthematrix@@gmail.com">makingthematrix@@gmail.com</a>,<a href="http://makingthematrix.wordpress.com" target="_blank">http://makingthematrix.wordpress.com</a> CSS design by <a href="http://www.colorlightstudio.com">Igor Penjivrag</a>

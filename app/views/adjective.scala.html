@@ -48,68 +48,76 @@
   	<div id="wrap">
 	@form(routes.Application.addAdjective,'id -> "adjectiveForm") {
 		<div id="left">
-			<div class="box">
+			<div class="longbox">
 				<h2><center>Przymiotnik PL</center></h2>
-				<br><h2>Stopień równy</h2> @input(adjectiveForm("plInd")){ (id, name, value, args) =>
+				<br><h3>Stopień równy</h3> @input(adjectiveForm("plInd")){ (id, name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value="@pl"></input>
     			}
-    			<br><h2>Stopień wyższy</h2> @input(adjectiveForm("plCmp")){ (id,name, value, args) =>
+    			<br><h3>Stopień wyższy</h3> @input(adjectiveForm("plCmp")){ (id,name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args)></input>
     			}
-				<br><h2>Tryb</h2> @select(adjectiveForm("plMode"), options = options(plModes))
-			</div><div class="box">
-				<h2><center>Przysłówek PL</center></h2>
-				<br><h2>Stopień równy</h2> @input(adjectiveForm("plAdvInd")){ (id,name, value, args) =>
+				<br><h3>Tryb</h3> @select(adjectiveForm("plMode"), options = options(plModes))
+				<p><h2><center>Przysłówek PL</center></h2>
+				<br><h3>Stopień równy</h3> @input(adjectiveForm("plAdvInd")){ (id,name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value="@pl"></input>
     			}
-    			<br><h2>Stopień wyższy</h2> 
+    			<br><h3>Stopień wyższy</h3> 
     			@input(adjectiveForm("plAdvCmp")){ (id,name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args)></input>
     			}
-    			<br><h2>Tryb</h2> @select(adjectiveForm("plAdvMode"), options = options(plModes))
-			</div><div class="box">
-				<h2>Wyjątki PL</h2>
+    			<br><h3>Tryb</h3> @select(adjectiveForm("plAdvMode"), options = options(plModes))
+				<p><h2>Wyjątki PL</h2>
 				<div id="plExceptionsDiv" name="plExceptionsDiv"></div>
 				@input(adjectiveForm("plExceptions")){ (id,name, value, args) =>
     				<input type="hidden" name="@name" id="@id" @toHtmlArgs(args)>
     			}
 				<br><input type="button" id="clearPlExceptions" value="Wyczyść"/>
 				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
-			</div><div class="box">
-				@input(adjectiveForm("cmpIgnored")){ (id,name, value, args) =>
-    			<input type="checkbox" name="@name" id="@id" @toHtmlArgs(args)>Ignoruj stopień wyższy</input>
-    		}
-   			</div><div class="box">
-   				<h2>Jeśli zakończyłeś edycję:</h2><input type="submit" value="Dodaj do słownika"/>
+				<p><h2>Ignoruj stopień wyższy</h2>@input(adjectiveForm("cmpIgnored")){ (id,name, value, args) =>
+    			<input type="checkbox" name="@name" id="@id" @toHtmlArgs(args)></input>
+    			}
    			</div>
-		</div>
-		<div id="right">
-			<div class="box">
+		</div><div id="right"><div class="longbox"><center>
+		<table>	<tr><td colspan=2><p><center><h2>Odmiana</h2></center></p></td></tr>
+		<tr>
+			@caseBlock("pl","m","i")
+			@caseBlock("pl","m","c")
+		</tr><tr>
+			@caseBlock("pl","f","i")
+			@caseBlock("pl","f","c")
+		</tr><tr>
+			@caseBlock("pl","n","i")
+			@caseBlock("pl","n","c")
+		</tr><tr>
+			@caseBlock("pl","p","i")
+			@caseBlock("pl","p","c")
+		</tr><tr>
+			@caseBlock("pl","P","i")
+			@caseBlock("pl","P","c")
+		</tr><tr>
+			@advCaseBlock("pl")
+			<td></td>
+		</tr>
+		</table>
+		</center></div></div>
+		<p><div id="clear"></div><p>
+		<div id="left">
+			<div class="longbox">
 				<h2><center>Przymiotnik NS</center></h2>
-    			<br><h2>Stopień równy</h2> @input(adjectiveForm("nsInd")){ (id,name, value, args) =>
+    			<br><h3>Stopień równy</h3> @input(adjectiveForm("nsInd")){ (id,name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args)></input>
     			}
-    			<br><h2>Stopień wyższy</h2> @input(adjectiveForm("nsCmp")){ (id,name, value, args) =>
+    			<br><h3>Stopień wyższy</h3> @input(adjectiveForm("nsCmp")){ (id,name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args)></input>
     			}
-    			<p>&nbsp;</p>
-    			<p>&nbsp;</p>
-    			<p>&nbsp;</p>
-    			<p>&nbsp;</p>
-    		</div><div class="box">
-    			<h2><center>Przysłówek NS</center></h2>
-    			<br><h2>Stopień równy</h2> @input(adjectiveForm("nsAdvInd")){ (id,name, value, args) =>
+    			<p><h2><center>Przysłówek NS</center></h2>
+    			<br><h2>Stopień równy</h3> @input(adjectiveForm("nsAdvInd")){ (id,name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args)></input>
     			}
-    			<br><h2>Stopień wyższy</h2> @input(adjectiveForm("nsAdvCmp")){ (id,name, value, args) =>
+    			<br><h3>Stopień wyższy</h3> @input(adjectiveForm("nsAdvCmp")){ (id,name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args)></input>
     			}
-    			<p>&nbsp;</p>
-    			<p>&nbsp;</p>
-    			<p>&nbsp;</p>
-    			<p>&nbsp;</p>		
-  			</div><div class="box">
- 				<h2>Wyjątki NS</h2>
+    			<p><h2>Wyjątki NS</h2>
 				<div id="nsExceptionsDiv" name="nsExceptionsDiv"></div>
 				@input(adjectiveForm("nsExceptions")){ (id,name, value, args) =>
     				<input type="hidden" name="@name" id="@id" @toHtmlArgs(args)>
@@ -117,53 +125,34 @@
 				<br><input type="button" id="clearNsExceptions" value="Wyczyść"/>
 				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
 			</div>
-		</div>
-	</div>
-
-	<div id="clear"></div>
-	}
-	<div class="box">
-	<table>	<tr><td colspan=4><p><center><h2>Odmiana</h2></center></p></td></tr>
+		</div><div id="right"><div class="longbox"><center>
+		<table>	<tr><td colspan=2><p><center><h2>Odmiana</h2></center></p></td></tr>
 		<tr>
-			<td width="25%"><center><h2>Język polski</h2></center></td>
-			<td width="25%"><center><h2>Jezyk novosloviensky</h2></center></td>
-			<td width="25%"><center><h2>Język polski</h2></center></td>
-			<td width="25%"><center><h2>Jezyk novosloviensky</h2></center></td>
-		</tr>
-		<tr>
-			@caseBlock("pl","m","i")
 			@caseBlock("ns","m","i")
-			@caseBlock("pl","m","c")
 			@caseBlock("ns","m","c")
 		</tr><tr>
-			@caseBlock("pl","f","i")
 			@caseBlock("ns","f","i")
-			@caseBlock("pl","f","c")
 			@caseBlock("ns","f","c")
 		</tr><tr>
-			@caseBlock("pl","n","i")
 			@caseBlock("ns","n","i")
-			@caseBlock("pl","n","c")
 			@caseBlock("ns","n","c")
 		</tr><tr>
-			@caseBlock("pl","p","i")
 			@caseBlock("ns","p","i")
-			@caseBlock("pl","p","c")
 			@caseBlock("ns","p","c")
 		</tr><tr>
-			@caseBlock("pl","P","i")
-			<td><font size=-1>jak wyżej</font></td>
-			@caseBlock("pl","P","c")
-			<td><font size=-1>jak wyżej</font></td>
-		</tr><tr>
-			@advCaseBlock("pl")
 			@advCaseBlock("ns")
-			<td></td>
 			<td></td>
 		</tr>
 		</table>
+		</center></div></div>
 	</div>
-  </div>
+
+	<p><div id="clear"></div>
+	<div class="left">
+   				<h2>Jeśli zakończyłeś edycję:</h2><input type="submit" value="Dodaj do słownika"/>
+   			</div>
+	}
+
   <div id="footer">
     Copyright 2013 Maciej Gorywoda, <a href="mailto:makingthematrix@@gmail.com">makingthematrix@@gmail.com</a>,<a href="http://makingthematrix.wordpress.com" target="_blank">http://makingthematrix.wordpress.com</a> CSS design by <a href="http://www.colorlightstudio.com">Igor Penjivrag</a>
 	</div>

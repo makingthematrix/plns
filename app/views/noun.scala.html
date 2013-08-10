@@ -47,54 +47,55 @@
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value="@pl"></input>
     			}
 				<br><h2>Wzorzec odmiany</h2> @select(nounForm("plPattern"), options = options(plNounPatterns))
-			</div><div class="longbox">
-				<h2>Wyjątki PL</h2>
+				<p><h2>Wyjątki PL</h2>
 				<div id="plExceptionsDiv" name="plExceptionsDiv"></div>
 				@input(nounForm("plExceptions")){ (id,name, value, args) =>
     				<input type="hidden" name="@name" id="@id" @toHtmlArgs(args)>
     			}
 				<br><input type="button" id="clearPlExceptions" value="Wyczyść"/>
 				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
-			</div><div class="longbox">
-				<h2>Ignoruj odmianę w liczbie: </h2> @select(nounForm("plIgnored"), options = options(ignoredOptions))
-			</div><div class="longbox">
-   				<h2>Jeśli zakończyłeś edycję:</h2><input type="submit" value="Dodaj do słownika"/>
-   			</div>
+				<p><h2>Ignoruj odmianę w liczbie: </h2> @select(nounForm("plIgnored"), options = options(ignoredOptions))
+			</div>
 		</div>
-		<div id="right">
+		<div id="right"><div class="box"><center>
+			<table><tr><td colspan=4><p><center><h2>Odmiana</h2></center></p></td></tr>
+			<tr>
+				@caseBlock("pl")
+			</tr>
+			</table>
+		</center></div></div>
+		<p><div id="clear"></div><p>
+		<div id="left">
 			<div class="longbox">
 				<h2><center>Rzeczownik NS</center></h2>
 				<br><h2>Temat</h2> @input(nounForm("nsRoot")){ (id, name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value=""></input>
     			}
 				<br><h2>Wzorzec odmiany</h2> @select(nounForm("nsPattern"), options = options(nsNounPatterns))
-			</div><div class="longbox">
-				<h2>Wyjątki NS</h2>
+				<p><h2>Wyjątki NS</h2>
 				<div id="nsExceptionsDiv" name="nsExceptionsDiv"></div>
 				@input(nounForm("nsExceptions")){ (id,name, value, args) =>
     				<input type="hidden" name="@name" id="@id" @toHtmlArgs(args)>
     			}
 				<br><input type="button" id="clearNsExceptions" value="Wyczyść"/>
 				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
-			</div><div class="longbox">
-				<h2>Ignoruj odmianę w liczbie: </h2> @select(nounForm("nsIgnored"), options = options(ignoredOptions))
+				<p><h2>Ignoruj odmianę w liczbie: </h2> @select(nounForm("nsIgnored"), options = options(ignoredOptions))
 			</div>
 		</div>
-		<div id="clear"></div>
+		<div id="right"><div class="box"><center>
+			<table><tr><td colspan=4><p><center><h2>Odmiana</h2></center></p></td></tr>
+			<tr>
+				@caseBlock("ns")
+			</tr>
+			</table>
+		</center></div></div>
+		<p><div id="clear"></div><p>
+		<div class="longbox">
+   			<h2>Jeśli zakończyłeś edycję:</h2><input type="submit" value="Dodaj do słownika"/>
+   		</div>
 	}
 	
-	<center>
-	<table width=800><tr><td colspan=4><p><center><h2>Odmiana</h2></center></p></td></tr>
-		<tr>
-			<td width="50%"><center><h2>Język polski</h2></center></td>
-			<td width="50%"><center><h2>Jezyk novosloviensky</h2></center></td>
-		</tr>
-		<tr>
-			@caseBlock("pl")
-			@caseBlock("ns")
-		</tr>
-	</table>
-	</center>
+	
   </div>
   <div id="footer">
     Copyright 2013 Maciej Gorywoda, <a href="mailto:makingthematrix@@gmail.com">makingthematrix@@gmail.com</a>,<a href="http://makingthematrix.wordpress.com" target="_blank">http://makingthematrix.wordpress.com</a> CSS design by <a href="http://www.colorlightstudio.com">Igor Penjivrag</a>

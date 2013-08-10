@@ -4,7 +4,7 @@
 
 @main("Tłumacz PL -> NS - Lista Słówek") {
 	<font size=-1>
-	<b>Lista słów w słowniku, z pominięciem przyimków, zaimków i partykuł:</b>
+	<b>Lista słówek</b>
 	<ul>
 	@list.map{ t =>
 		<li> @t._1.root (@t._1.lang,@t._1.speechpart) -> @t._2.root (@t._2.lang,@t._2.speechpart)  

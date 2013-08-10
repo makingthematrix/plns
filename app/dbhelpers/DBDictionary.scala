@@ -93,7 +93,7 @@ class DBDictionary extends AbstractDictionary {
       val w2Id = insertOrGetWord(word2,"ns",-1,"")
       
       translationId(w1Id) match {
-        case Some(id) => SQL("update translations (id, wordid1, wordid2) set wordid2={wordid2} where id={id}")
+        case Some(id) => SQL("update translations set wordid2={wordid2} where id={id}")
         					.on('wordid2 -> w2Id,'id -> id).executeUpdate()
         case None => SQL("insert into translations (wordid1, wordid2) values ({wordid1},{wordid2})")
         					.on('wordid1 -> w1Id,'wordid2 -> w2Id).executeInsert()

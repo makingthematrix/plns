@@ -64,7 +64,8 @@ object Application extends Controller {
             "nsInfRoot" -> nonEmptyText,
             "nsImpRoot" -> nonEmptyText,
             "nsPattern" -> nonEmptyText,
-            "nsExceptions" -> optional(text)
+            "nsExceptions" -> optional(text),
+            "prefixes" -> text
     ) 
     (VerbPair.apply)
     (VerbPair.unapply) 
@@ -82,7 +83,7 @@ object Application extends Controller {
   
   def verb(pl:String) = Action {
     val root = pl;
-    Ok(views.html.verb(root,verbForm))
+    Ok(views.html.verb(root,verbForm,VerbPair.allPrefixes))
   }
   
   def addVerb = Action {
@@ -232,10 +233,10 @@ object Application extends Controller {
   };
   
   private def add[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = {
-    val pl = pair.pl
-    val ns = pair.ns
-    NSTranslator.add(pl,ns);
-    Ok("Dodałem " + pl.mainRoot + " -> " + ns.mainRoot)    
+    val results = pair.add()
+    val sb = StringBuilder.newBuilder
+    results.foreach( tuple => sb.append("Dodałem ").append(tuple._1).append(" -> ").append(tuple._2).append('\n'))
+    Ok(sb.toString)    
   }
   
   private def printFormErrors[T](formWithErrors: Form[T]): SimpleResult[String] = {

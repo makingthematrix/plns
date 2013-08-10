@@ -166,8 +166,7 @@ blockquote{
 	width: 350px;
 	float:left;
 	display: block;
-        margin-left: 20px;
-	display: inline;
+        margin: 10px;
 }
 
 #longleft {
@@ -192,6 +191,7 @@ blockquote{
 	border: 1px solid #E1E1E1;
 	padding:10px 10px 15px 10px;
 	float: right;
+	margin-right: 140px;
 }
 
 #left .box h2 {
@@ -227,7 +227,7 @@ blockquote{
 	width: 315px;
 	float: right;
 	display:block;
-	margin-top: 10px;
+	margin: 10px;
 }
 
 #longright {

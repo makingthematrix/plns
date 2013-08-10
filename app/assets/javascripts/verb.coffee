@@ -16,6 +16,8 @@ fillCase = (id, root, suffix, exceptions) ->
   if word == ''
     word = "#{root}#{suffix}"
   $('#'+id).html(word)
+  if id=="plINF" then $('.plPref').html(word)
+  else if id=="nsINF" then $('.nsPref').html(word)
 
 getCase = (lang, c) ->
   id = getId(lang,c)

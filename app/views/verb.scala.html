@@ -1,4 +1,4 @@
-@(pl: String, verbForm: Form[VerbPair])
+@(pl: String, verbForm: Form[VerbPair], allPrefixes: Seq[(String,String)])
 
 @import helper._
 @import logic.CaseDescription.tenses
@@ -84,73 +84,34 @@
 		<div id="left">
 			<div class="longbox">
 				<h2><center>Czasownik PL</center></h2>
-				<br><h2>Temat 1</h2> @input(verbForm("plInfRoot")){ (id, name, value, args) =>
+				<br><h3>Temat 1</h3> @input(verbForm("plInfRoot")){ (id, name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value="@pl"></input>
     			}
-    			<br><h2>Temat 2</h2> @input(verbForm("plImpRoot")){ (id, name, value, args) =>
+    			<br><h3>Temat 2</h3> @input(verbForm("plImpRoot")){ (id, name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value="@pl"></input>
     			}
-    			<br><h2>Wzorzec odmiany</h2> @select(verbForm("plPattern"), options = options(plVerbPatterns))
-    		</div><div class="longbox">
-				<h2>Wyjątki PL</h2>
+    			<br><h3>Wzorzec odmiany</h3> @select(verbForm("plPattern"), options = options(plVerbPatterns))
+    			<p><h3>Wyjątki PL</h2>
 				<div id="plExceptionsDiv" name="plExceptionsDiv"></div>
 				@input(verbForm("plExceptions")){ (id,name, value, args) =>
     				<input type="hidden" name="@name" id="@id" @toHtmlArgs(args)>
     			}
 				<br><input type="button" id="clearPlExceptions" value="Wyczyść"/>
 				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
-			</div><div class="longbox">
-   				<h2>Jeśli zakończyłeś edycję:</h2><input type="submit" value="Dodaj do słownika"/>
-   			</div>
-		</div>
-		<div id="right">
-			<div class="longbox">
-				<h2><center>Czasownik NS</center></h2>
-				<br><h2>Temat 1</h2> @input(verbForm("nsInfRoot")){ (id, name, value, args) =>
-    				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value=""></input>
-    			}
-    			<br><h2>Temat 2</h2> @input(verbForm("nsImpRoot")){ (id, name, value, args) =>
-    				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value=""></input>
-    			}
-    			<br><h2>Wzorzec odmiany</h2> @select(verbForm("nsPattern"), options = options(nsVerbPatterns))
-    		</div><div class="longbox">
-				<h2>Wyjątki NS</h2>
-				<div id="nsExceptionsDiv" name="nsExceptionsDiv"></div>
-				@input(verbForm("nsExceptions")){ (id,name, value, args) =>
-    				<input type="hidden" name="@name" id="@id" @toHtmlArgs(args)>
-    			}
-				<br><input type="button" id="clearNsExceptions" value="Wyczyść"/>
-				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
 			</div>
-		</div>
-	<div id="clear"></div>
-	}
-	
-	<center>
-	<table width=800><tr><td colspan=4><p><center><h2>Odmiana</h2></center></p></td></tr>
-		<tr>
-			<td width="25%"><center><h2>Język polski</h2></center></td>
-			<td width="25%"><center><h2>Jezyk novosloviensky</h2></center></td>
-			<td width="25%"><center><h2>Język polski</h2></center></td>
-			<td width="25%"><center><h2>Jezyk novosloviensky</h2></center></td>
-		</tr>
+		</div><div id="right"><div class="longbox"><center>
+		<table><tr><td colspan=2><p><center><h2>Odmiana</h2></center></p></td></tr>
 		<tr>			
 			@caseInfinitive("pl")
-			@caseInfinitive("ns")
-			<td></td>
 			<td></td>
 		</tr>
 		<tr>
 			@caseTense2("pl","PRES")
-			@caseTense2("ns","PRES")
 			@caseTense3("pl","PAST","M")
-			@caseTense3("ns","PAST","M")
 		</tr>
 		<tr>
 			@caseImperative("pl")
-			@caseImperative("ns")
 			@caseTense3("pl","PAST","F")
-			@caseTense3("ns","PAST","F")
 		</tr>
 		<tr>
 			<td>
@@ -158,6 +119,43 @@
 				@passive("pl")
 				@noun("pl")
 			</td>
+		</tr>
+	</table>
+		</center></div></div>
+		<p><div id="clear"></div>
+		<div id="left">
+			<div class="longbox">
+				<h2><center>Czasownik NS</center></h2>
+				<br><h3>Temat 1</h3> @input(verbForm("nsInfRoot")){ (id, name, value, args) =>
+    				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value=""></input>
+    			}
+    			<br><h3>Temat 2</h3> @input(verbForm("nsImpRoot")){ (id, name, value, args) =>
+    				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value=""></input>
+    			}
+    			<br><h3>Wzorzec odmiany</h3> @select(verbForm("nsPattern"), options = options(nsVerbPatterns))
+    			<p><h3>Wyjątki NS</h3>
+				<div id="nsExceptionsDiv" name="nsExceptionsDiv"></div>
+				@input(verbForm("nsExceptions")){ (id,name, value, args) =>
+    				<input type="hidden" name="@name" id="@id" @toHtmlArgs(args)>
+    			}
+				<br><input type="button" id="clearNsExceptions" value="Wyczyść"/>
+				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
+			</div>
+		</div><div id="right"><div class="longbox"><center>
+		<table><tr><td colspan=2><p><center><h2>Odmiana</h2></center></p></td></tr>
+		<tr>			
+			@caseInfinitive("ns")
+			<td></td>
+		</tr>
+		<tr>
+			@caseTense2("ns","PRES")
+			@caseTense3("ns","PAST","M")
+		</tr>
+		<tr>
+			@caseImperative("ns")
+			@caseTense3("ns","PAST","F")
+		</tr>
+		<tr>
 			<td>
 				@active("ns")
 				@passive("ns")
@@ -165,7 +163,24 @@
 			</td>
 		</tr>
 	</table>
-	</center>
+		</center></div></div>
+	<p><div id="clear"></div>
+		<div class="left">
+   			<h2>Jeśli zakończyłeś edycję:</h2><input type="submit" value="Dodaj do słownika"/>
+   		</div><div class="right">
+   			<h2>Na bazie tłumaczenia <span class="plPref"></span> -&gt; <span class="nsPref"></span> możesz wygenerować następujące czasowniki:</h2>
+   			<ul>
+   			@for(prefix <- allPrefixes){
+   				@if(prefix._1 == ""){
+   					<li><input type="checkbox" value="@{prefix._1}:@{prefix._2}" checked="true"><span class="plPref"></span> -&gt; <span class="nsPref"></span>
+   				} else {
+   					<li><input type="checkbox" value="@{prefix._1}:@{prefix._2}">@{prefix._1}<span class="plPref"></span> -&gt; @{prefix._2}<span class="nsPref"></span>
+   				}
+   			}
+   			</ul> 
+   		</div>
+	}
+	
   </div>
   <div id="footer">
     Copyright 2013 Maciej Gorywoda, <a href="mailto:makingthematrix@@gmail.com">makingthematrix@@gmail.com</a>,<a href="http://makingthematrix.wordpress.com" target="_blank">http://makingthematrix.wordpress.com</a> CSS design by <a href="http://www.colorlightstudio.com">Igor Penjivrag</a>
