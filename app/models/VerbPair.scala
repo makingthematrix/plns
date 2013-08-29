@@ -41,17 +41,11 @@ case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plE
     (pair.pl,pair.ns)
   }  
   
-  private def prefixesAsSeq:Seq[(String,String)] = prefixes match {
-    case "" => Nil
-    case str => str.split(",").map( t => {
-      val tab = t.split(":")
-      (tab(0),tab(1))
-    })
-  }
-  
   override def add():Seq[(String,String)] = {
-    prefixesAsSeq.map( tuple => {
+    println("VerbPair.add")
+    VerbPair.prefixesAsSeq(prefixes).map( tuple => {
       val (plPrefix,nsPrefix) = tuple
+      println("prefixes: ( " + plPrefix + " , " + nsPrefix + " )")
       val (plWord,nsWord) = if(plPrefix.isEmpty()) (this.pl,this.ns) else prefixPair(plPrefix,nsPrefix)
       NSTranslator.add(plWord,nsWord);
       (plWord.mainRoot,nsWord.mainRoot)
@@ -83,7 +77,23 @@ object VerbPair {
     case None => None
   }
   
+  private def prefixesAsSeq(prefixes: String):Seq[(String,String)] = prefixes match {
+    case "" => Seq(("",""))
+    case ":" => Seq(("",""))
+    case str if str.contains(",") =>  {
+      val tab = str.split(',')
+      val chunks = tab.map(prefixesAsSeq(_))
+      chunks.toSeq.flatten
+    }
+    case prefix if prefix.contains(":") => {
+      val arr = prefix.split(':') 
+      Seq((arr(0),arr(1)))
+    }
+    case other => throw new IllegalArgumentException("VerbPair.prefixesAsSeq, unable to parse: " + other)
+  }
+  
   private def parse(exceptions: String):Seq[VerbException] = parse(exceptions,"")
   
-  val allPrefixes = Seq(("",""),("po","po"),("za","s") )
+  val allPrefixes = Seq(("",""),("po","po"),("za","s"),("w","v"),("s","iz"),
+      ("za","za"),("do","do"),("prze","pre"),("przy","pri"),("u","u"),("od","ot"),("wy","vy") )
 }

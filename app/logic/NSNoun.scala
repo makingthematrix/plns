@@ -92,4 +92,10 @@ object NSNoun extends NounGenerator("ns") {
 
     patternMap.put(this.id, this);
   }
+ 
+  def participle(noun: String) = {
+	val root = noun.substring(0, noun.length()-1)
+	new Noun(root,SOFT_NEUTER,false,false,"ns")
+  }
+  
 }

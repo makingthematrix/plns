@@ -5,8 +5,7 @@ import logic.PLAdjective
 import logic.NSAdjective
 import logic.AdjectiveException
 import logic.Decl
-import logic.PlMode
-import logic.PlMode._
+import logic.PLMode._
 import play.api.libs.json.Writes
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json

@@ -60,7 +60,11 @@ abstract class ConjugationPattern(val lang: String, val id: String, val example:
 	
   def conjugate(root: String, cases: Seq[Conj.Value]): Map[Conj.Value,String] = 
 	suffices.filter(t => cases.contains(t._1)).mapValues(root+_);
-	
+
+  def conjugate(root: String, c: Conj.Value): Map[Conj.Value,String] = suffices.get(c) match {
+    case Some(suffix) => Map(c -> (root + suffix))
+    case None => throw new IllegalArgumentException("The case " + c + " does not exist in the conjugation")
+  }
+  
   implicit def template():ConjugationTemplate = ConjugationTemplate(lang,id,example,suffices);
-	
 }

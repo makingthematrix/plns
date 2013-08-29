@@ -4,20 +4,20 @@ import Decl._
 import models.AdjectiveTemplate
 
 
-object PlMode extends Enumeration {
-  type PlAdjectiveMode = Value;
+object PLMode extends Enumeration {
+  type PLAdjectiveMode = Value;
   val HARD, SOFT = Value;
   
-  implicit def toString(v: PlMode.Value) = v.toString()
+  implicit def toString(v: PLMode.Value) = v.toString()
   
-  implicit def parse(str: String): PlMode.Value = str.toLowerCase() match {
+  implicit def parse(str: String): PLMode.Value = str.toLowerCase() match {
     case "hard" => HARD;
     case "soft" => SOFT;
     case _ => println("Unrecognized adjective mode: " + str); HARD;
   }
 }
 
-import PlMode._
+import PLMode._
 
 object PLAdjective {
 	val MASCULINE_HARD = new DeclensionPattern("pl","MASCULINE_HARD","twardy") { // "twardy"
@@ -95,10 +95,10 @@ object PLAdjective {
 	lazy val softModeMap = Adjective.declMap(MASCULINE_SOFT,FEMININE_SOFT,NEUTER_SOFT,
 	                             PLURAL_MASCULINE_SOFT,PLURAL_NONMASCULINE_SOFT);
 	
-	def word(ind:String,mode:PlMode.Value): Adjective = word(ind,null,ind,null,mode,mode,true); // testing purposes only
-	def word(ind:String,cmp:String,mode:PlMode.Value): Adjective = word(ind,cmp,ind,cmp,mode,mode,false); // testing purposes only
+	def word(ind:String,mode:PLMode.Value): Adjective = word(ind,null,ind,null,mode,mode,true); // testing purposes only
+	def word(ind:String,cmp:String,mode:PLMode.Value): Adjective = word(ind,cmp,ind,cmp,mode,mode,false); // testing purposes only
 	
-	def word(ind:String,cmp:String,advInd:String,advCmp:String,mode: PlMode.Value, advMode: PlMode.Value, cmpIgnored: Boolean): Adjective 
+	def word(ind:String,cmp:String,advInd:String,advCmp:String,mode: PLMode.Value, advMode: PLMode.Value, cmpIgnored: Boolean): Adjective 
 	  = mode match {
 	  case HARD => new Adjective(ind,cmp+"sz","naj"+cmp+"sz",
 	                             PLAdverb.word(advInd, advCmp, advMode,cmpIgnored),
@@ -108,7 +108,9 @@ object PLAdjective {
 	                             softModeMap,hardModeMap,cmpIgnored,"pl");
 	}
 	
-	def template(mode: PlMode.Value) = mode match {
+	def participle(ind:String) = new Adjective(ind,null,null,null,hardModeMap,null,true,"pl");
+	
+	def template(mode: PLMode.Value) = mode match {
 	  case HARD => new AdjectiveTemplate("pl",HARD,"sz",MASCULINE_HARD.template, FEMININE_HARD.template, NEUTER_HARD.template, 
 	      PLURAL_MASCULINE_HARD.template, PLURAL_NONMASCULINE_HARD.template);
 	  case SOFT => new AdjectiveTemplate("pl",SOFT,"sz",MASCULINE_SOFT.template, FEMININE_SOFT.template, NEUTER_SOFT.template, 

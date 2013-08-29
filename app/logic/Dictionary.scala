@@ -23,9 +23,10 @@ class Dictionary extends AbstractDictionary {
   }
   
   override def add(from: Word, to: Word){
-	println(from + " -> " + to);
+	println("Dictionary.add, " + from + " -> " + to);
 	val w = from.word.toLowerCase();
 	if(!map.contains(w)){
+	  println("no such word yet in the map - adding")
 	  map += (w -> to.word.toLowerCase());
 	  addRoots2Words(from)
 	  addRoots2Words(to)

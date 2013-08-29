@@ -114,4 +114,16 @@ object PLNoun extends NounGenerator("pl"){
 		
 		patternMap.put(this.id, this);
 	}
+	
+	def participle(noun: String) = {
+	  val root = noun.substring(0, noun.length()-1)
+	  val genpException = if(noun.endsWith("nie")){
+	    noun.substring(0, noun.length()-3) + "ń"
+	  } else if(noun.endsWith("cie")){
+	    noun.substring(0, noun.length()-3) + "ć"
+	  } else throw new IllegalArgumentException("The noun's suffix does not fit the Polish noun participle: " + noun)
+	  
+	  val participle = new Noun(root,SOFT_NEUTER,false,false,"pl")
+	  participle.except(GENP, genpException)
+	}
 }

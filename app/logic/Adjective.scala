@@ -75,7 +75,7 @@ case class Adjective (val ind:String,val cmp:String,val sup:String,val adverb:Ad
     val (rootId1, rootId2) = addRoots(adj)
     if(cmpIgnored || adj.cmpIgnored) translateDegreeTo(adj,"i",rootId1,rootId2)
     else CaseDescription.degrees.keys.foreach( degree => translateDegreeTo(adj,degree,rootId1,rootId2) )    
-    adverb.translateTo(adj.adverb)
+    if(adverb != null) adverb.translateTo(adj.adverb)
   }
 }
 

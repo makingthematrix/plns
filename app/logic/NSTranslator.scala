@@ -1,17 +1,17 @@
 package logic
 
 import Decl._
-import PlMode._
+import PLMode._
 import scala.collection.mutable;
 import models.AdjectivePair
 
 object NSTranslator {
   private var dictionary:AbstractDictionary = DictionaryFactory.DB_DICT;
   
-  def changeDictionary(name: String) = name match {
-    case "debug" => dictionary = DictionaryFactory.DEBUG_DICT;
-    case "db" => dictionary = DictionaryFactory.DB_DICT;
-    case _ =>
+  def changeDictionary(name: String):AbstractDictionary = name match {
+    case "debug" => dictionary = DictionaryFactory.DEBUG_DICT; dictionary;
+    case "db" => dictionary = DictionaryFactory.DB_DICT; dictionary
+    case str => throw new IllegalArgumentException("Dictionary unknown: " + str)
   }
   
   def example(str: String) = {
@@ -19,7 +19,7 @@ object NSTranslator {
     println("'" + str + "' -> '" + translation + "'");
     untranslated.foreach(println);
   }
-  
+   
   lazy val pronouns = Array(
     ("ja","ja"), ("ty","ty"), ("on","on"), ("ona","ona"), ("ono", "ono"), ("my","my"), ("wy","vy"), ("oni","oni"), ("one","oni"),
 	("mnie","mne"), ("ciebie","tebe"), ("siebie", "sebe"), ("jego","jego"), ("niego", "njego"), ("jej","jej"), ("niej","njej"), 
@@ -60,19 +60,20 @@ object NSTranslator {
 	});
   }
   	
-  def addAdjective(plInd: String, plCmp: String,nsInd: String, nsCmp: String,mode: PlMode.Value, isRoot: Boolean): Unit =  {
+  def addAdjective(plInd: String, plCmp: String,nsInd: String, nsCmp: String,mode: PLMode.Value, isRoot: Boolean): Unit =  {
 	val pl = PLAdjective.word(plInd, plCmp, plInd, plCmp, mode, mode, false);
 	val ns = NSAdjective.word(nsInd, nsCmp);
 	pl.translateTo(ns);
   }
 
-  def addAdjective(plRoot: String, nsRoot: String,mode: PlMode.Value, isRoot: Boolean): Unit =  {
+  def addAdjective(plRoot: String, nsRoot: String,mode: PLMode.Value, isRoot: Boolean): Unit =  {
 	val pl = PLAdjective.word(plRoot, mode);
 	val ns = NSAdjective.word(nsRoot);
 	pl.translateTo(ns);
   }
   	
   def add[T <: SpeechPart[T]] (from: T,to: T):Unit = {
+    println("NSTranslator.add, from: " + from + ", to: " + to)
     from.translateTo(to);
   }
 	
@@ -111,7 +112,7 @@ object NSTranslator {
   
   def translate(source: String): (String,Array[String]) = dictionary.translate(source);
   
-  private def add(pl: String, ns: String, mode: PlMode.Value, isRoot: Boolean = true) = addAdjective(pl,ns,mode,isRoot);
+  private def add(pl: String, ns: String, mode: PLMode.Value, isRoot: Boolean = true) = addAdjective(pl,ns,mode,isRoot);
   private def plNoun(root: String, pattern: DeclensionPattern): Noun = PLNoun.word(root,pattern);
   private def nsNoun(root: String, pattern: DeclensionPattern): Noun = NSNoun.word(root,pattern);
   private def plVerb(root1: String, pattern: ConjugationPattern): Verb = PLVerb.word(root1,pattern);
@@ -120,11 +121,11 @@ object NSTranslator {
   private def nsVerb(root1: String, pattern: ConjugationPattern): Verb = NSVerb.word(root1,pattern);
   private def nsVerb(root1: String, root2: String, pattern: ConjugationPattern): Verb = 
     NSVerb.word(root1,root2,pattern);
-  private def plAdjective(root: String, mode: PlMode.Value) = PLAdjective.word(root, mode)
+  private def plAdjective(root: String, mode: PLMode.Value) = PLAdjective.word(root, mode)
   private def nsAdjective(root: String) = NSAdjective.word(root)
-  private def plAdverb(root: String, mode: PlMode.Value) = PLAdverb.word(root, mode, false)
+  private def plAdverb(root: String, mode: PLMode.Value) = PLAdverb.word(root, mode, false)
   private def nsAdverb(root: String) = NSAdverb.word1(root)
-  private def plAdverb(ind: String, cmp: String, pattern: PlMode.Value) = PLAdverb.word(ind, cmp, pattern, false)
+  private def plAdverb(ind: String, cmp: String, pattern: PLMode.Value) = PLAdverb.word(ind, cmp, pattern, false)
   private def nsAdverb(ind: String, cmp: String) = NSAdverb.word(ind, cmp, false)
   private def plWord(word: String) = UnInflected.word(word,"pl");
   private def nsWord(word: String) = UnInflected.word(word,"ns");
