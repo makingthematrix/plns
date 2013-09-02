@@ -38,10 +38,15 @@ case class Verb (val infRoot: String,val impRoot: String,val conjugation: Conjug
     case Some(ex) => ex
 	case None => conj.get(c) match {
 	  case Some(from) => from
-	  case _ => throw new IllegalArgumentException("The case " + c + " does not exist in the conjugation of the verb " + this)
+	  case _ => throw new IllegalArgumentException("The case " + c + " does not exist in the conjugation of the verb " + this.mainRoot)
     }
   }
 	
+  private def getConjugatedWord(c: Conj.Value,word: String) = exceptions.get(c) match {
+    case Some(ex) => ex
+	case None => word
+  }
+  
   private def translateTo(verb: Verb, cases: Seq[Conj.Value], 
 		  				  fromConj: Map[Conj.Value,String], 
 		  				  toConj: Map[Conj.Value,String],
@@ -72,47 +77,80 @@ case class Verb (val infRoot: String,val impRoot: String,val conjugation: Conjug
 	});
   }
   
+  private def condTranslate(verb: Verb,rootId1: Long, rootId2: Long){
+    println("Verb.translateTo, " + impRoot + " -> " + verb.impRoot)
+	Verb.impConj.foreach(c => {
+	  val from = getConjugatedWord(c,this.impConjugation)
+	  val to = verb.getConjugatedWord(c,verb.impConjugation)
+	  NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,verb.lang,rootId2,c))
+	});
+  }
+  
+  private def getRoot(c: Conj.Value) = 
+    if(Verb.infConj.contains(c)) infRoot
+    else if(Verb.impConj.contains(c)) impRoot
+    else throw new IllegalArgumentException("The case " + c + " does not belong to any conjugation.")
+  
   private def participle(c: Conj.Value) = {
-	val word = getConjugatedWord(c,conjugation.conjugate(impRoot,c))
+	val word = conjugate(c)
 	lang match {
 	  case "pl" => PLAdjective.participle(word)
 	  case "ns" => NSAdjective.participle(word)
 	}
   }
 	
-  override def translateTo(verb: Verb){ 
-    val (rootId1,rootId2) = addRoots(verb)
+  private def conjugate(c: Conj.Value) = getConjugatedWord(c,conjugation.conjugate(getRoot(c),c))
+  
+  private val vowels = Set('a','e','i','o','u','y')
+  
+  private def perfectParticiple = {
+    val root = getRoot(PERFECT)
+    val suffix = if(vowels.contains(root.charAt(root.length-1))) "vši" else "ši"
+    root + suffix
+  }
+  
+  override def translateTo(verb: Verb,rootId1: Long,rootId2: Long){ 
     infTranslate(verb,rootId1,rootId2)	
 	impTranslate(verb,rootId1,rootId2)
+	condTranslate(verb,rootId1,rootId2)
 	
 	// active
 	if(!ignoreActive){
 	  val fromActive = participle(ACTIVE)
 	  val toActive = verb.participle(ACTIVE)
-	  fromActive.translateTo(toActive)
+	  fromActive.translateTo(toActive,rootId1,rootId2)
   	}
 	// passive
 	val fromPassive = participle(PASSIVE)
 	val toPassive = verb.participle(PASSIVE)
-	fromPassive.translateTo(toPassive)
+	fromPassive.translateTo(toPassive,rootId1,rootId2)
+	
+	// perfect
+	val fromPerfect = this.perfectParticiple
+	val toPerfect = verb.perfectParticiple
+	NSTranslator.add(new Word(fromPerfect,"pl",rootId1,PERFECT),new Word(toPerfect,"ns",rootId2,PERFECT))
 	
 	// noun
-	val fromNoun = getConjugatedWord(NOUN,conjugation.conjugate(impRoot,NOUN))
+	val fromNoun = conjugate(NOUN)
 	val plNoun = PLNoun.participle(fromNoun)
-	val toNoun = verb.getConjugatedWord(NOUN,verb.conjugation.conjugate(verb.impRoot,NOUN))
+	val toNoun = verb.conjugate(NOUN)
 	val nsNoun = NSNoun.participle(toNoun)
-	plNoun.translateTo(nsNoun)
+	plNoun.translateTo(nsNoun,rootId1,rootId2)
   }
 }
 
 object Verb {
   val infConj = Seq(INF, PAST1SM, PAST1SF, PAST2SM, PAST2SF, PAST3SM, PAST3SF, PAST3SN,
-					   PAST1PM, PAST1PF, PAST2PM, PAST2PF, PAST3PM, PAST3PF);
-  val impConj = Seq(PRES1S, PRES2S, PRES3S,PRES1P, PRES2P, PRES3P,ACTIVE, IMP2S, IMP1P, IMP2P);
-  // NOUN - this form is not added automatically, but the GUI may ask the user if they want to open addNoun with this form
-  // PASSIVE - as above, but with addAdjective
-  // from active - the original form ("-ąc") is added, but the derivate forms ("-ący","-ąca",etc.) are only proposed, as above, with addAdjective
+					   PAST1PM, PAST1PF, PAST2PM, PAST2PF, PAST3PM, PAST3PF, PASSIVE, PERFECT, NOUN);
+  val impConj = Seq(PRES1S, PRES2S, PRES3S,PRES1P, PRES2P, PRES3P,ACTIVE, IMP2S, IMP1P, IMP2P);  
+  val condConj = Seq(COND1SM, COND1SF, COND2SM, COND2SF, COND3SM, COND3SF, COND3SN,
+					   COND1PM, COND1PF, COND2PM, COND2PF, COND3PM, COND3PF);
   
+  def getConjugation(c: Conj.Value) = 
+    if(infConj.contains(c)) infConj 
+    else if(impConj.contains(c)) impConj
+    else if(condConj.contains(c)) condConj
+    else throw new IllegalArgumentException("The case " + c + " does not belong to any conjugation.")
 }
 
 abstract class VerbGenerator(val lang: String) {

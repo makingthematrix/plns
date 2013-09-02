@@ -15,6 +15,10 @@ case class Translation(val id:Long, val wordid1:Long, val wordid2:Long){
 }
 
 abstract class AbstractDictionary {
+  def clear:Unit;
+  
+  def size:Int;
+  
   def get(word: String):Option[String];
 	
   def add(from: Word, to: Word): Unit;
@@ -102,6 +106,4 @@ abstract class AbstractDictionary {
   private val startsUppercasePattern = """^[A-ZĄĆĘŁŃÓŚŹŻ]{1}[a-ząćęłńóśźż].*$""".r;
   private val letterPattern = """^[a-zA-ZĄĆĘŁŃÓŚŹŻąćęłńóśźż\-]{1}$""".r;
   private val wordPattern = """^[a-zA-ZĄĆĘŁŃÓŚŹŻąćęłńóśźż\-].*$""".r;
-  
-
 }

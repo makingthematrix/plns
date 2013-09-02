@@ -14,12 +14,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "aliśmy", PAST1PF -> "ałyśmy", PAST2PM -> "aliście", PAST2PF -> "ałyście", 
 	      PAST3PM -> "ali", PAST3PF -> "ały", 
 	      PASTIMP -> "ano",
-	      ACTIVE -> "ając", PASSIVE -> "an", 
-	      IMP2S -> "aj", IMP1P -> "ajmy", IMP2P -> "ajcie", // czyt|aj, czyt|ajmy, czyt|ajcie
-	      COND1SM -> "ałbym", COND1SF -> "ałabym", COND2SM -> "ałbyś", COND2SF -> "ałabyś", 
-	      COND3SM -> "ałby", COND3SF -> "ałaby", COND3SN -> "ałoby", 
-	      COND1PM -> "alibyśmy", COND1PF -> "ałybyśmy", COND2PM -> "alibyście", COND2PF -> "ałybyście", 
-	      COND3PM -> "aliby", COND3PF -> "ałyby" 
+	      ACTIVE -> "ając", PASSIVE -> "an", PERFECT -> "awszy", // czyt|ając|y, czyt|an|y, czyt|awszy
+	      IMP2S -> "aj", IMP1P -> "ajmy", IMP2P -> "ajcie" // czyt|aj, czyt|ajmy, czyt|ajcie
 	  );
 	  
 	  patternMap.put(this.id, this);
@@ -37,12 +33,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "eliśmy", PAST1PF -> "ałyśmy", PAST2PM -> "eliście", PAST2PF -> "ałyście", 
 	      PAST3PM -> "eli", PAST3PF -> "ały", 
 	      PASTIMP -> "ano",
-	      ACTIVE -> "ąc", PASSIVE -> "an", 
-	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie",
-	      COND1SM -> "ałbym", COND1SF -> "ałabym", COND2SM -> "ałbyś", COND2SF -> "ałabyś", 
-	      COND3SM -> "ałby", COND3SF -> "ałaby", COND3SN -> "ałoby", 
-	      COND1PM -> "elibyśmy", COND1PF -> "ałybyśmy", COND2PM -> "elibyście", COND2PF -> "ałybyście", 
-	      COND3PM -> "eliby", COND3PF -> "ałyby" 
+	      ACTIVE -> "ąc", PASSIVE -> "an", PERFECT -> "awszy",
+	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie"
 	  );	 
 	  
 	  patternMap.put(this.id, this);
@@ -61,12 +53,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "aliśmy", PAST1PF -> "ałyśmy", PAST2PM -> "aliście", PAST2PF -> "ałyście", 
 	      PAST3PM -> "ali", PAST3PF -> "ały", // malow|aliśmy, malowałyśmy, malowaliście, malowałyście, malowali, malowały
 	      PASTIMP -> "ano",
-	      ACTIVE -> "ąc", PASSIVE -> "an", // ciągn|ąc, malow|an
-	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie", // ciągn, ciągn|my, ciągn|cie
-	      COND1SM -> "ałbym", COND1SF -> "ałabym", COND2SM -> "ałbyś", COND2SF -> "ałabyś", 
-	      COND3SM -> "ałby", COND3SF -> "ałaby", COND3SN -> "ałoby", 
-	      COND1PM -> "alibyśmy", COND1PF -> "ałybyśmy", COND2PM -> "alibyście", COND2PF -> "ałybyście", 
-	      COND3PM -> "aliby", COND3PF -> "ałyby"
+	      ACTIVE -> "ąc", PASSIVE -> "an", PERFECT -> "awszy", // ciągn|ąc, malow|an
+	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie" // ciągn, ciągn|my, ciągn|cie
 	  );
 	  
 	  patternMap.put(this.id, this);
@@ -84,12 +72,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "nęliśmy", PAST1PF -> "nęłyśmy", PAST2PM -> "nęliście", PAST2PF -> "nęłyście", 
 	      PAST3PM -> "nęli", PAST3PF -> "nęły", // ciąg|nęliśmy, ciąg|nęłyśmy, ciąg|nęliście, ciąg|nęłyście, ciąg|nęli, ciąg|nęły
 	      PASTIMP -> "niono", // ciąg|niono
-	      ACTIVE -> "nąc", PASSIVE -> "nięt", // ciąg|nąc, ciąg|nięt(y/a/o)
-	      IMP2S -> "nij", IMP1P -> "nijmy", IMP2P -> "nijcie", // ciąg|nij, ciąg|nijmy, ciąg|nijcie
-	      COND1SM -> "nąłbym", COND1SF -> "nęłabym", COND2SM -> "nąłbyś", COND2SF -> "nęłabyś", 
-	      COND3SM -> "nąłby", COND3SF -> "nęłaby", COND3SN -> "nęłoby", 
-	      COND1PM -> "nęlibyśmy", COND1PF -> "nęłybyśmy", COND2PM -> "nęlibyście", COND2PF -> "nęłybyście", 
-	      COND3PM -> "nęliby", COND3PF -> "nęłyby"
+	      ACTIVE -> "nąc", PASSIVE -> "nięt", PERFECT -> "nąwszy", // ciąg|nąc, ciąg|nięt(y/a/o)
+	      IMP2S -> "nij", IMP1P -> "nijmy", IMP2P -> "nijcie" // ciąg|nij, ciąg|nijmy, ciąg|nijcie
 	  );
 	  
 	  patternMap.put(this.id, this);
@@ -107,12 +91,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "nęliśmy", PAST1PF -> "nęłyśmy", PAST2PM -> "nęliście", PAST2PF -> "nęłyście", 
 	      PAST3PM -> "nęli", PAST3PF -> "nęły", // pły|nęliśmy, pły|nęłyśmy, pły|nęliście, pły|nęłyście, pły|nęli, pły|nęły
 	      PASTIMP -> "nięto", // pły|nięto
-	      ACTIVE -> "nąc", PASSIVE -> "nięt", // pły|nąc, pły|nięt(y/a/o)
-	      IMP2S -> "ń", IMP1P -> "ńmy", IMP2P -> "ńcie", // pły|ń, pły|ńmy, pły|ńcie
-	      COND1SM -> "nąłbym", COND1SF -> "nęłabym", COND2SM -> "nąłbyś", COND2SF -> "nęłabyś", 
-	      COND3SM -> "nąłby", COND3SF -> "nęłaby", COND3SN -> "nęłoby", 
-	      COND1PM -> "nęlibyśmy", COND1PF -> "nęłybyśmy", COND2PM -> "nęlibyście", COND2PF -> "nęłybyście", 
-	      COND3PM -> "nęliby", COND3PF -> "nęłyby"
+	      ACTIVE -> "nąc", PASSIVE -> "nięt", PERFECT -> "nąwszy", // pły|nąc, pły|nięt(y/a/o)
+	      IMP2S -> "ń", IMP1P -> "ńmy", IMP2P -> "ńcie" // pły|ń, pły|ńmy, pły|ńcie
 	  );
 	  
 	  patternMap.put(this.id, this);
@@ -130,12 +110,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "liśmy", PAST1PF -> "łyśmy", PAST2PM -> "liście", PAST2PF -> "łyście", 
 	      PAST3PM -> "li", PAST3PF -> "ły", // chud|liśmy, chud|łyśmy, chud|liście, chud|łyście, chud|li, chud|ły
 	      PASTIMP -> "nięto", // chud|nięto
-	      ACTIVE -> "nąc", PASSIVE -> "nięt", // chud|nąc, chud|nięt(y/a/o)
-	      IMP2S -> "nij", IMP1P -> "nijmy", IMP2P -> "nijcie", // chud|nij, chud|nijmy, chud|nijcie
-	      COND1SM -> "łbym", COND1SF -> "łabym", COND2SM -> "łbyś", COND2SF -> "łabyś", 
-	      COND3SM -> "łby", COND3SF -> "łaby", COND3SN -> "łoby", 
-	      COND1PM -> "libyśmy", COND1PF -> "łybyśmy", COND2PM -> "libyście", COND2PF -> "łybyście", 
-	      COND3PM -> "liby", COND3PF -> "łyby"
+	      ACTIVE -> "nąc", PASSIVE -> "nięt", PERFECT -> "nąwszy", // chud|nąc, chud|nięt(y/a/o)
+	      IMP2S -> "nij", IMP1P -> "nijmy", IMP2P -> "nijcie" // chud|nij, chud|nijmy, chud|nijcie
 	  );
 	  
 	  patternMap.put(this.id, this);
@@ -153,12 +129,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "iliśmy", PAST1PF -> "iłyśmy", PAST2PM -> "iliście", PAST2PF -> "iłyście", 
 	      PAST3PM -> "ili", PAST3PF -> "iły", // rob|iliśmy, robiłyśmy, robiliście, robiłyście, robili, robiły
 	      PASTIMP -> "iono", // rob|iono
-	      ACTIVE -> "iąc", PASSIVE -> "ion", // rob|iąc, rob|ion
-	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie", // rób, rób|my, rób|cie
-	      COND1SM -> "iłbym", COND1SF -> "iłabym", COND2SM -> "iłbyś", COND2SF -> "iłabyś", 
-	      COND3SM -> "iłby", COND3SF -> "iłaby", COND3SN -> "iłoby", 
-	      COND1PM -> "ilibyśmy", COND1PF -> "iłybyśmy", COND2PM -> "ilibyście", COND2PF -> "iłybyście", 
-	      COND3PM -> "iliby", COND3PF -> "iłyby"
+	      ACTIVE -> "iąc", PASSIVE -> "ion", PERFECT -> "iwszy", // rob|iąc, rob|ion
+	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie" // rób, rób|my, rób|cie
 	  );
 	  
 	  patternMap.put(this.id, this);
@@ -176,12 +148,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "yliśmy", PAST1PF -> "yłyśmy", PAST2PM -> "yliście", PAST2PF -> "yłyście", 
 	      PAST3PM -> "yli", PAST3PF -> "yły", // wierz|iliśmy, wierziłyśmy, wierziliście, wierziłyście, wierzili, wierziły
 	      PASTIMP -> "ono", // wierz|iono
-	      ACTIVE -> "ąc", PASSIVE -> "on", // wierz|ąc, wierz|on
-	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie", // wierz, wierz|my, wierz|cie
-	      COND1SM -> "yłbym", COND1SF -> "yłabym", COND2SM -> "yłbyś", COND2SF -> "yłabyś", 
-	      COND3SM -> "yłby", COND3SF -> "yłaby", COND3SN -> "yłoby", 
-	      COND1PM -> "ylibyśmy", COND1PF -> "yłybyśmy", COND2PM -> "ylibyście", COND2PF -> "yłybyście", 
-	      COND3PM -> "yliby", COND3PF -> "yłyby"
+	      ACTIVE -> "ąc", PASSIVE -> "on", PERFECT -> "ywszy", // wierz|ąc, wierz|on
+	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie" // wierz, wierz|my, wierz|cie
 	  );
 	  
 	  patternMap.put(this.id, this);
@@ -199,12 +167,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "ieliśmy", PAST1PF -> "iałyśmy", PAST2PM -> "ieliście", PAST2PF -> "iałyście", 
 	      PAST3PM -> "ieli", PAST3PF -> "iały", 
 	      PASTIMP -> "iano",
-	      ACTIVE -> "ąc", PASSIVE -> "ian", 
-	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie",
-	      COND1SM -> "iałbym", COND1SF -> "iałabym", COND2SM -> "iałbyś", COND2SF -> "iałabyś", 
-	      COND3SM -> "iałby", COND3SF -> "iałaby", COND3SN -> "iałoby", 
-	      COND1PM -> "ielibyśmy", COND1PF -> "iałybyśmy", COND2PM -> "ielibyście", COND2PF -> "iałybyście", 
-	      COND3PM -> "ieliby", COND3PF -> "iałyby" 
+	      ACTIVE -> "ąc", PASSIVE -> "ian", PERFECT -> "iawszy", 
+	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie"
 	  );	 
 	  
 	  patternMap.put(this.id, this);
@@ -222,12 +186,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "eliśmy", PAST1PF -> "ałyśmy", PAST2PM -> "eliście", PAST2PF -> "ałyście", 
 	      PAST3PM -> "eli", PAST3PF -> "ały", 
 	      PASTIMP -> "ano",
-	      ACTIVE -> "ąc", PASSIVE -> "an", 
-	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie",
-	      COND1SM -> "ałbym", COND1SF -> "ałabym", COND2SM -> "ałbyś", COND2SF -> "ałabyś", 
-	      COND3SM -> "ałby", COND3SF -> "ałaby", COND3SN -> "ałoby", 
-	      COND1PM -> "elibyśmy", COND1PF -> "ałybyśmy", COND2PM -> "elibyście", COND2PF -> "ałybyście", 
-	      COND3PM -> "eliby", COND3PF -> "ałyby" 
+	      ACTIVE -> "ąc", PASSIVE -> "an", PERFECT -> "awszy",
+	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie"
 	  );	 
 	  
 	  patternMap.put(this.id, this);
@@ -245,12 +205,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "liśmy", PAST1PF -> "łyśmy", PAST2PM -> "liście", PAST2PF -> "łyście", 
 	      PAST3PM -> "li", PAST3PF -> "ły", // pi|liśmy, pi|łyśmy, pi|liście, pi|łyście, pi|li, pi|ły
 	      PASTIMP -> "to", // pi|to
-	      ACTIVE -> "jąc", PASSIVE -> "t", // pi|jąc, pi|t
-	      IMP2S -> "j", IMP1P -> "jmy", IMP2P -> "jcie", // pi|j, pi|jmy, pi|jcie
-	      COND1SM -> "łbym", COND1SF -> "łabym", COND2SM -> "łbyś", COND2SF -> "łabyś", 
-	      COND3SM -> "łby", COND3SF -> "łaby", COND3SN -> "łoby", 
-	      COND1PM -> "libyśmy", COND1PF -> "łybyśmy", COND2PM -> "libyście", COND2PF -> "łybyście", 
-	      COND3PM -> "liby", COND3PF -> "łyby"
+	      ACTIVE -> "jąc", PASSIVE -> "t", PERFECT -> "ywszy", // pi|jąc, pi|t
+	      IMP2S -> "j", IMP1P -> "jmy", IMP2P -> "jcie" // pi|j, pi|jmy, pi|jcie
 	  );
 	  
 	  patternMap.put(this.id, this);
@@ -268,12 +224,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "liśmy", PAST1PF -> "łyśmy", PAST2PM -> "liście", PAST2PF -> "łyście", 
 	      PAST3PM -> "li", PAST3PF -> "ły", // la|liśmy, la|łyśmy, la|liście, la|łyście, la|li, la|ły
 	      PASTIMP -> "no", // la|no
-	      ACTIVE -> "jąc", PASSIVE -> "n", // le|jąc, la|n
-	      IMP2S -> "j", IMP1P -> "jmy", IMP2P -> "jcie", // le|j, le|jmy, le|jcie
-	      COND1SM -> "łbym", COND1SF -> "łabym", COND2SM -> "łbyś", COND2SF -> "łabyś", 
-	      COND3SM -> "łby", COND3SF -> "łaby", COND3SN -> "łoby", 
-	      COND1PM -> "libyśmy", COND1PF -> "łybyśmy", COND2PM -> "libyście", COND2PF -> "łybyście", 
-	      COND3PM -> "liby", COND3PF -> "łyby"
+	      ACTIVE -> "jąc", PASSIVE -> "n", PERFECT -> "awszy", // le|jąc, la|n
+	      IMP2S -> "j", IMP1P -> "jmy", IMP2P -> "jcie" // le|j, le|jmy, le|jcie
 	  );
 	  
 	  patternMap.put(this.id, this);
@@ -291,12 +243,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "ęliśmy", PAST1PF -> "ęłyśmy", PAST2PM -> "ęliście", PAST2PF -> "ęłyście", 
 	      PAST3PM -> "ęli", PAST3PF -> "ęły", // wzi|ęliśmy, wzi|ęłyśmy, wzi|ęliście, wzi|ęłyście, wzi|ęli, wzi|ęły
 	      PASTIMP -> "ęto", // wzi|ęto
-	      ACTIVE -> "mąc", PASSIVE -> "ęt", // weź|mąc, wzi|ęt
-	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie", // weź|, weź|my, weź|cie
-	      COND1SM -> "ąłbym", COND1SF -> "ęłabym", COND2SM -> "ąłbyś", COND2SF -> "ęłabyś", 
-	      COND3SM -> "ąłby", COND3SF -> "ęłaby", COND3SN -> "ęłoby", 
-	      COND1PM -> "ęlibyśmy", COND1PF -> "ęłybyśmy", COND2PM -> "ęlibyście", COND2PF -> "ęłybyście", 
-	      COND3PM -> "ęliby", COND3PF -> "ęłyby"
+	      ACTIVE -> "mąc", PASSIVE -> "ęt", PERFECT -> "ąwszy",// weź|mąc, wzi|ęt
+	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie" // weź|, weź|my, weź|cie
 	  );
 	  
 	  patternMap.put(this.id, this);
@@ -314,12 +262,8 @@ object PLVerb extends VerbGenerator("pl") {
 	      PAST1PM -> "liśmy", PAST1PF -> "łyśmy", PAST2PM -> "liście", PAST2PF -> "łyście", 
 	      PAST3PM -> "li", PAST3PF -> "ły", // wieź|liśmy, wioz|łyśmy, wieź|liście, wioz|łyście, wieź|li, wioz|ły
 	      PASTIMP -> "ono", // wiezi|ono
-	      ACTIVE -> "ąc", PASSIVE -> "on", // wioz|ąc, wioz|on
-	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie", // wieź|, wieź|my, wieź|cie
-	      COND1SM -> "łbym", COND1SF -> "łabym", COND2SM -> "łbyś", COND2SF -> "łabyś", 
-	      COND3SM -> "łby", COND3SF -> "łaby", COND3SN -> "łoby", 
-	      COND1PM -> "libyśmy", COND1PF -> "łybyśmy", COND2PM -> "libyście", COND2PF -> "łybyście", 
-	      COND3PM -> "liby", COND3PF -> "łyby"
+	      ACTIVE -> "ąc", PASSIVE -> "on", PERFECT -> "ąwszy", // wioz|ąc, wioz|on
+	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie" // wieź|, wieź|my, wieź|cie
 	  );
 	  
 	  patternMap.put(this.id, this);

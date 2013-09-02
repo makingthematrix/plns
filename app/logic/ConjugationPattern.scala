@@ -15,6 +15,7 @@ object Conj extends Enumeration {
 	COND1PM, COND1PF, COND2PM, COND2PF, COND3PM, COND3PF, // pracowalibyśmy, pracowałybyśmy, pracowalibyście, pracowałybyście, pracowaliby, pracowałyby
 	ACTIVE, // pracuj|ąc 
 	PASSIVE, // pracow|an 
+	PERFECT, // pracow|awszy
 	NOUN // pracow|anie
 	 = Value;
 	
@@ -41,11 +42,25 @@ object Conj extends Enumeration {
 	case "past2pf" => PAST2PF 
 	case "past3pm" => PAST3PM 
 	case "past3pf" => PAST3PF 
+	case "cond1sm" => COND1SM 
+	case "cond1sf" => COND1SF 
+	case "cond2sm" => COND2SM 
+	case "cond2sf" => COND2SF 
+	case "cond3sm" => COND3SM 
+	case "cond3sf" => COND3SF 
+	case "cond3sn" => COND3SN 
+	case "cond1pm" => COND1PM 
+	case "cond1pf" => COND1PF 
+	case "cond2pm" => COND2PM 
+	case "cond2pf" => COND2PF 
+	case "cond3pm" => COND3PM 
+	case "cond3pf" => COND3PF 
 	case "imp2s" => IMP2S 
 	case "imp1p" => IMP1P 
 	case "imp2p" => IMP2P
 	case "active" => ACTIVE 
 	case "passive" => PASSIVE 
+	case "perfect" => PERFECT
 	case "noun" => NOUN 
     case _ => throw new IllegalArgumentException("Unrecognized conjugation mode: " + str)
   }
@@ -61,8 +76,8 @@ abstract class ConjugationPattern(val lang: String, val id: String, val example:
   def conjugate(root: String, cases: Seq[Conj.Value]): Map[Conj.Value,String] = 
 	suffices.filter(t => cases.contains(t._1)).mapValues(root+_);
 
-  def conjugate(root: String, c: Conj.Value): Map[Conj.Value,String] = suffices.get(c) match {
-    case Some(suffix) => Map(c -> (root + suffix))
+  def conjugate(root: String, c: Conj.Value) = suffices.get(c) match {
+    case Some(suffix) => "" + root + suffix
     case None => throw new IllegalArgumentException("The case " + c + " does not exist in the conjugation")
   }
   

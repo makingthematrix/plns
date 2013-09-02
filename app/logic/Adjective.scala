@@ -71,8 +71,7 @@ case class Adjective (val ind:String,val cmp:String,val sup:String,val adverb:Ad
     })
   }
   
-  override def translateTo(adj: Adjective) {
-    val (rootId1, rootId2) = addRoots(adj)
+  override def translateTo(adj: Adjective, rootId1: Long, rootId2: Long) {
     if(cmpIgnored || adj.cmpIgnored) translateDegreeTo(adj,"i",rootId1,rootId2)
     else CaseDescription.degrees.keys.foreach( degree => translateDegreeTo(adj,degree,rootId1,rootId2) )    
     if(adverb != null) adverb.translateTo(adj.adverb)

@@ -57,6 +57,22 @@ object DBParsers {
 }
 
 class DBDictionary extends AbstractDictionary {
+  override def size:Int = DB.withConnection {
+    implicit c => {
+      val cRow = SQL("select count(*) as c from translations").apply().head
+      cRow[Int]("c")
+    }  
+  }
+  
+  override def clear:Unit = DB.withConnection {
+    implicit c => {
+      SQL("delete * from roottrans").execute()
+      SQL("delete * from translations").execute()
+      SQL("delete * from words").execute()
+      SQL("delete * from roots").execute()
+    }
+  }
+  
   override def get(word:String):Option[String] = DB.withConnection { 
     implicit c => {
       println("DBDictionary.get, word: " + word)

@@ -84,4 +84,7 @@ class Dictionary extends AbstractDictionary {
         (rootsMap(root1),rootsMap(root2))
     }).toSeq
   }
+  
+  override def size:Int = map.size
+  override def clear:Unit = map.clear
 }

@@ -34,3 +34,4 @@ CREATE TABLE roottrans (
 DROP TABLE roots;
 DROP TABLE words;
 DROP TABLE translations;
+DROP TABLE roottrans;

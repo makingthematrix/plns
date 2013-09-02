@@ -14,12 +14,8 @@ object NSVerb extends VerbGenerator("ns"){
 	    PAST1PM -> "li", PAST1PF -> "li", PAST2PM -> "li", PAST2PF -> "li", 
 	    PAST3PM -> "li", PAST3PF -> "li", // ima|li
 	    PASTIMP -> "no", // ima|no
-	    ACTIVE -> "uč", PASSIVE -> "n", // imaj|uč, ima|n
-	    IMP2S -> "", IMP1P -> "me", IMP2P -> "te", // imaj, imaj|me, imaj|te,
-	    COND1SM -> "l byh", COND1SF -> "la bym", COND2SM -> "l bys", COND2SF -> "la bys", 
-	    COND3SM -> "l by", COND3SF -> "la by", COND3SN -> "lo by", 
-	    COND1PM -> "li byhom", COND1PF -> "li byhom", COND2PM -> "li byste", COND2PF -> "li byste", 
-	    COND3PM -> "li by", COND3PF -> "li by" 
+	    ACTIVE -> "uč", PASSIVE -> "n", PERFECT -> "vši", // imaj|uč, ima|n
+	    IMP2S -> "", IMP1P -> "me", IMP2P -> "te" // imaj, imaj|me, imaj|te,
 	  );
 	  
 	  patternMap.put(this.id, this);
@@ -37,12 +33,8 @@ object NSVerb extends VerbGenerator("ns"){
 	    PAST1PM -> "li", PAST1PF -> "li", PAST2PM -> "li", PAST2PF -> "li", 
 	    PAST3PM -> "li", PAST3PF -> "li", // vari|li
 	    PASTIMP -> "no", // vari|no
-	    ACTIVE -> "juč", PASSIVE -> "en", // var|juč, varien
-	    IMP2S -> "", IMP1P -> "me", IMP2P -> "te", // var, var|me, var|te
-	    COND1SM -> "l byh", COND1SF -> "la bym", COND2SM -> "l bys", COND2SF -> "la bys", 
-	    COND3SM -> "l by", COND3SF -> "la by", COND3SN -> "lo by", 
-	    COND1PM -> "li byhom", COND1PF -> "li byhom", COND2PM -> "li byste", COND2PF -> "li byste", 
-	    COND3PM -> "li by", COND3PF -> "li by"  
+	    ACTIVE -> "juč", PASSIVE -> "en", PERFECT -> "vši", // var|juč, varien
+	    IMP2S -> "", IMP1P -> "me", IMP2P -> "te" // var, var|me, var|te  
 	  );
 	  
 	  patternMap.put(this.id, this);

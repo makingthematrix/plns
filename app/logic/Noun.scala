@@ -39,8 +39,7 @@ case class Noun(val root: String,val declension: DeclensionPattern,val singIgnor
     else declension.decline(root,Noun.declension)
   }
 	
-  override def translateTo(noun: Noun){ 
-	val (rootId1,rootId2) = addRoots(noun)
+  override def translateTo(noun: Noun, rootId1: Long, rootId2: Long){ 
 	lazy val fromDecl = decline()
 	lazy val toDecl = noun.decline();
 	Noun.declension.foreach(c => {
