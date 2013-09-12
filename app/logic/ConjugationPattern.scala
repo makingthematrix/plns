@@ -70,12 +70,11 @@ import Conj._;
 
 abstract class ConjugationPattern(val lang: String, val id: String, val example: String) {
   def suffices:Map[Conj.Value,String]
+  def adjParticiple(word: String):Adjective
+  def nounParticiple(word: String):Noun
 	
-  def conjugate(root: String): Map[Conj.Value,String] = suffices.mapValues(root+_);
-	
-  def conjugate(root: String, cases: Seq[Conj.Value]): Map[Conj.Value,String] = 
-	suffices.filter(t => cases.contains(t._1)).mapValues(root+_);
-
+  def conjugate(root: String, cases: Set[Conj.Value]): Map[Conj.Value,String] = cases.map(c => (c -> conjugate(root,c))).toMap
+  
   def conjugate(root: String, c: Conj.Value) = suffices.get(c) match {
     case Some(suffix) => "" + root + suffix
     case None => throw new IllegalArgumentException("The case " + c + " does not exist in the conjugation")

@@ -2,8 +2,29 @@ package logic
 
 import Conj._;
 
+abstract class PLConjugationPattern(id: String, example: String) extends ConjugationPattern("ns",id,example){
+  private def conjugateConditional(root: String, c: Conj.Value) = {
+    println("PLConjugationPattern.conjugateConditional, case is " + c + ", lang is " + lang)
+    val conditional = PLVerb.getCopula(c)
+    println("conditional is " + conditional)
+    val pastC = Verb.cond2Past(c)
+    println("past case is " + pastC)
+    val condRoot = super.conjugate(root, pastC)
+    println("cond. root is " + condRoot)
+    condRoot + conditional
+  }
+
+  override def conjugate(root: String, c: Conj.Value):String = {
+    if(Verb.condConj.contains(c)) conjugateConditional(root,c)
+    else super.conjugate(root, c)
+  }
+  
+  override def adjParticiple(word: String) = PLAdjective.participle(word)
+  override def nounParticiple(word: String) = PLNoun.participle(word)
+}
+
 object PLVerb extends VerbGenerator("pl") {
-  	val I = new ConjugationPattern("pl","I","czytać"){ // czyt|ać
+  	val I = new PLConjugationPattern("I","czytać"){ // czyt|ać
 	  override def suffices() = Map(
 	      INF -> "ać", // czyt|ać 
 	      NOUN -> "anie", // czyt|anie
@@ -22,7 +43,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// czyt, czyt
   	
-  	val II = new ConjugationPattern("pl","II","słyszeć"){ // słysz|eć
+  	val II = new PLConjugationPattern("II","słyszeć"){ // słysz|eć
 	  override def suffices() = Map(
 	      INF -> "eć", // słysz|eć 
 	      NOUN -> "enie", // słysz|enie
@@ -42,7 +63,7 @@ object PLVerb extends VerbGenerator("pl") {
 	// słysz, słysz
 	
 
-	val IV = new ConjugationPattern("pl","IV","malować"){ // malow|a|ć
+	val IV = new PLConjugationPattern("IV","malować"){ // malow|a|ć
 	  override def suffices() = Map(
 	      INF -> "ać", // malow|a|ć 
 	      NOUN -> "anie", // malow|a|nie
@@ -61,7 +82,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// malow, maluj
 	
-	val Va = new ConjugationPattern("pl","Va","ciągnać"){ // ciąg|nąć
+	val Va = new PLConjugationPattern("Va","ciągnać"){ // ciąg|nąć
 	  override def suffices() = Map(
 	      INF -> "nąć", // ciąg|nąć 
 	      NOUN -> "nięcie", // ciąg|nięcie
@@ -80,7 +101,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// ciąg, ciąg
 
-	val Vb = new ConjugationPattern("pl","Vb","płynąć"){ // pły|nąć
+	val Vb = new PLConjugationPattern("Vb","płynąć"){ // pły|nąć
 	  override def suffices() = Map(
 	      INF -> "nąć", // pły|nąć 
 	      NOUN -> "nięcie", // pły|nięcie
@@ -99,7 +120,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// pły, pły
 
-	val Vc = new ConjugationPattern("pl","Vc","chudnąć"){ // chud|nąć
+	val Vc = new PLConjugationPattern("Vc","chudnąć"){ // chud|nąć
 	  override def suffices() = Map(
 	      INF -> "nąć", // chud|nąć 
 	      NOUN -> "nięcie",  // chud|nięcie
@@ -118,7 +139,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// chud, chud
 	
-	val VIa = new ConjugationPattern("pl","VIa","robić"){ // rob|ić
+	val VIa = new PLConjugationPattern("VIa","robić"){ // rob|ić
 	  override def suffices() = Map(
 	      INF -> "ić", // rob|ić 
 	      NOUN -> "ienie", // rob|ienie
@@ -137,7 +158,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// rob, rob
 	
-	val VIb = new ConjugationPattern("pl","VIb","wierzyć"){ // wierz|yć
+	val VIb = new PLConjugationPattern("VIb","wierzyć"){ // wierz|yć
 	  override def suffices() = Map(
 	      INF -> "yć", // wierz|yć 
 	      NOUN -> "enie", // wierz|enie
@@ -156,7 +177,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// wierz, wierz
 	
-	val VIIa = new ConjugationPattern("pl","VIIa","widzieć"){ // widz|ieć
+	val VIIa = new PLConjugationPattern("VIIa","widzieć"){ // widz|ieć
 	  override def suffices() = Map(
 	      INF -> "ieć", // widz|ieć 
 	      NOUN -> "enie", // widz|enie
@@ -175,7 +196,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// widz, widz
 	
-	val VIIb = new ConjugationPattern("pl","VIIb","leżeć"){ // leż|eć
+	val VIIb = new PLConjugationPattern("VIIb","leżeć"){ // leż|eć
 	  override def suffices() = Map(
 	      INF -> "eć", // leż|eć 
 	      NOUN -> "enie", // leż|enie
@@ -194,7 +215,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// leż, leż
 	
-	val Xa = new ConjugationPattern("pl","Xa","pić"){ // pi|ć
+	val Xa = new PLConjugationPattern("Xa","pić"){ // pi|ć
 	  override def suffices() = Map(
 	      INF -> "ć", // pi|ć 
 	      NOUN -> "cie", // pi|cie
@@ -213,7 +234,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// pi, pi
 		 
-	val Xb = new ConjugationPattern("pl","Xb","lać"){ // la|ć
+	val Xb = new PLConjugationPattern("Xb","lać"){ // la|ć
 	  override def suffices() = Map(
 	      INF -> "ć", // la|ć 
 	      NOUN -> "nie", // la|nie
@@ -232,7 +253,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// la, le
 	
-	val Xc = new ConjugationPattern("pl","Xc","wziąć"){ // wzi|ąć
+	val Xc = new PLConjugationPattern("Xc","wziąć"){ // wzi|ąć
 	  override def suffices() = Map(
 	      INF -> "ąć", // wzi|ąć 
 	      NOUN -> "ęcie", // wzi|ęcie
@@ -251,7 +272,7 @@ object PLVerb extends VerbGenerator("pl") {
 	}
 	// wzi, weź
 	
-	val XI = new ConjugationPattern("pl","Xc","wieźć"){ // wieź|ć
+	val XI = new PLConjugationPattern("Xc","wieźć"){ // wieź|ć
 	  override def suffices() = Map(
 	      INF -> "ć", // wieź|ć 
 	      NOUN -> "enie", // wiezi|enie
@@ -269,4 +290,57 @@ object PLVerb extends VerbGenerator("pl") {
 	  patternMap.put(this.id, this);
 	}
 	// wioz, wieź
+	
+	override def getCopula(c: Conj.Value) = c match {
+	  case PRES1S => "jestem"
+	  case PRES2S => "jesteś"
+	  case PRES3S => "jest"
+	  case PRES1P => "jesteśmy"
+	  case PRES2P => "jesteście"
+	  case PRES3P => "są"
+	  case PAST1SM => "byłem"
+	  case PAST1SF => "byłam"
+	  case PAST2SM => "byłeś"
+	  case PAST2SF => "byłaś"
+	  case PAST3SM => "był"
+	  case PAST3SF => "była"
+	  case PAST3SN => "było"
+	  case PAST1PM => "byliśmy"
+	  case PAST1PF => "byłyśmy"
+	  case PAST2PM => "byliście"
+	  case PAST2PF => "byłyście"
+	  case PAST3PM => "byli"
+	  case PAST3PF => "były"
+	  case PASTIMP => "byto"
+	  case IMP2S => "bądź"
+	  case IMP1P => "bądźmy" 
+	  case IMP2P => "bądźcie"
+	  case COND1SM => "bym"
+	  case COND1SF => "bym"
+	  case COND2SM => "byś"
+	  case COND2SF => "byś"
+	  case COND3SM => "by"
+	  case COND3SF => "by"
+	  case COND3SN => "by"
+	  case COND1PM => "byśmy"
+	  case COND1PF => "byśmy"
+	  case COND2PM => "byście"
+	  case COND2PF => "byście"
+	  case COND3PM => "by"
+	  case COND3PF => "by"
+	  case ACTIVE => "będąc" 
+	  case PASSIVE => "byt"
+	  case NOUN => "bycie"
+	}
+	
+	override def getCopulaFuture(c: Conj.Value) = c match {
+	  case PRES1S => "będę"
+	  case PRES2S => "będziesz"
+	  case PRES3S => "będzie"
+	  case PRES1P => "będziemy"
+	  case PRES2P => "będziecie"
+	  case PRES3P => "będą"
+	}
+	
+	val ppRootEndings = Set()
 }

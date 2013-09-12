@@ -36,7 +36,7 @@ object NSAdjective {
   
   def word(ind:String):Adjective = word(ind,ind);
   
-  def participle(ind:String):Adjective = new Adjective(ind,null,null,null,declMap,declMap,true,"ns");
+  def participle(ind:String):Adjective = new Adjective(ind,null,null,null,declMap,null,true,"ns");
   
   def word(ind:String,cmp:String):Adjective = word(ind,cmp,ind,cmp,false);
   
