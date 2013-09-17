@@ -5,6 +5,7 @@ import logic.PLVerb
 import logic.NSVerb
 import logic.VerbException
 import logic.NSTranslator
+import scala.collection.mutable;
             
 case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plExceptions: Option[String],
                     nsInfRoot: String, nsImpRoot: String, nsPattern: String, nsExceptions: Option[String],
@@ -12,8 +13,10 @@ case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plE
 				   )
   extends SpeechPartPair[Verb] {
   
+  private var perfective = false;
+  
   def pl:Verb = {
-    val word = PLVerb.word(plInfRoot, plImpRoot, plPattern)
+    val word = PLVerb.word(plInfRoot, plImpRoot, plPattern, perfective)
 	plExceptions match {
       case Some(str) => VerbPair.parse(str).foreach(word.except)
       case None => 
@@ -22,7 +25,7 @@ case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plE
   }
   
   def ns:Verb = {
-    val word = NSVerb.word(nsInfRoot, nsImpRoot, nsPattern)
+    val word = NSVerb.word(nsInfRoot, nsImpRoot, nsPattern, perfective)
 	nsExceptions match {
       case Some(str) => VerbPair.parse(str).foreach(word.except)
       case None => 
@@ -30,27 +33,30 @@ case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plE
 	return word    
   }
   
-  private def prefixPair(plPrefix:String,nsPrefix:String):(Verb,Verb) = {
+  private def prefixPair(plPrefix:String,nsPrefix:String,perfective:Boolean):(Verb,Verb) = {
     val plInf = plPrefix + plInfRoot;
     val plImp = plPrefix + plImpRoot;
     val plEx = VerbPair.prefixExceptions(plExceptions,plPrefix)
     val nsInf = nsPrefix + nsInfRoot;
     val nsImp = nsPrefix + nsImpRoot;
     val nsEx = VerbPair.prefixExceptions(nsExceptions,nsPrefix)
-    val pair = VerbPair(plInf,plImp,plPattern,plEx,nsInf,nsImp,nsPattern,nsEx,"")
+    val prefixes = if(perfective) "P:" else ":"
+    val pair = VerbPair(plInf,plImp,plPattern,plEx,nsInf,nsImp,nsPattern,nsEx,prefixes)
+    pair.perfective = perfective
     (pair.pl,pair.ns)
   }  
   
-  override def add():Seq[(String,String)] = {
-    println("VerbPair.add")
-    VerbPair.prefixesAsSeq(prefixes).map( tuple => {
-      val (plPrefix,nsPrefix) = tuple
-      println("prefixes: ( " + plPrefix + " , " + nsPrefix + " )")
-      val (plWord,nsWord) = if(plPrefix.isEmpty()) (this.pl,this.ns) else prefixPair(plPrefix,nsPrefix)
-      NSTranslator.add(plWord,nsWord);
-      (plWord.mainRoot,nsWord.mainRoot)
-    })
-  }
+  override def add():Seq[(String,String)] = VerbPair.prefixesAsSeq(prefixes).map( tuple => {
+    val (t,nsPrefix) = tuple
+    val (perfective,plPrefix) = if(t.startsWith("P")) (true,t.substring(1)) else (false,t)
+    println("prefixes: ( " + plPrefix + " , " + nsPrefix + " )," + perfective)
+    val (plWord,nsWord) = if(plPrefix.isEmpty()) {
+      this.perfective = perfective
+      (this.pl,this.ns) 
+    } else prefixPair(plPrefix,nsPrefix,perfective)
+    NSTranslator.add(plWord,nsWord);
+    (plWord.mainRoot,nsWord.mainRoot)
+  })
 }
 
 object VerbPair {

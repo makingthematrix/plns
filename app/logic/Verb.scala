@@ -4,10 +4,23 @@ import Conj._;
 import PLMode._
 import scala.collection.mutable;
 
+private object ConjugationType extends Enumeration {
+  type conjugationType = Value
+  val INF, IMP, COND = Value
+  
+  implicit def toString(t: ConjugationType.Value):String = t.toString()
+  
+  implicit def parse(str: String) = str.toLowerCase() match {
+    case "inf" => INF
+    case "imp" => IMP
+    case "cond" => COND
+  }
+}
+
 case class VerbException(val conjCase: Conj.Value, val word: String);
 
-case class Verb (val infRoot: String,val impRoot: String,val conjugation: ConjugationPattern,
-				 override val lang: String,val ignoreActive: Boolean) extends SpeechPart[Verb]{
+class Verb (val infRoot: String, val impRoot: String, val conjugation: ConjugationPattern, 
+				 override val lang: String, val perfective: Boolean) extends SpeechPart[Verb] {
   override def mainRoot = exceptions.getOrElse(INF,infConjugation(INF));
   override val speechPart = "verb"
     
@@ -30,9 +43,9 @@ case class Verb (val infRoot: String,val impRoot: String,val conjugation: Conjug
     return this
   }
 
-  private def infConjugation = conjugation.conjugate(infRoot, Verb.infConj)
-  private def impConjugation = conjugation.conjugate(impRoot, Verb.impConj)
-  private def condConjugation = conjugation.conjugate(infRoot, Verb.condConj)
+  private def infConjugation = conjugation.conjugate(infRoot, Verb.infConjCases)
+  private def impConjugation = conjugation.conjugate(impRoot, Verb.impConjCases)
+  private def condConjugation = conjugation.conjugate(infRoot, Verb.condConjCases)
   
   private def getConjugatedWord(c: Conj.Value,conj: Map[Conj.Value,String]) = exceptions.get(c) match {
     case Some(ex) => ex
@@ -47,48 +60,28 @@ case class Verb (val infRoot: String,val impRoot: String,val conjugation: Conjug
 	case None => word
   }
   
-  private def infTranslate(verb: Verb,rootId1: Long, rootId2: Long){
-    println("Verb.infTranslate, " + infRoot + " -> " + verb.infRoot)
-    lazy val thisConjugation = this.infConjugation
-    lazy val thatConjugation = verb.infConjugation
-	Verb.infConj.foreach(c => {
+  private def translateConjugation(t: ConjugationType.Value,verb: Verb,rootId1: Long, rootId2: Long){
+    lazy val (thisConjugation,cases) = this.conjugationType(t)
+    lazy val (thatConjugation,_) = verb.conjugationType(t)
+    cases.foreach(c => {
 	  val from = getConjugatedWord(c,thisConjugation)
 	  val to = verb.getConjugatedWord(c,thatConjugation)
 	  NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,verb.lang,rootId2,c))
 	});
   }
   
-  private def impTranslate(verb: Verb,rootId1: Long, rootId2: Long){
-    println("Verb.translateTo, " + impRoot + " -> " + verb.impRoot)
-    lazy val thisConjugation = this.impConjugation
-    lazy val thatConjugation = verb.impConjugation
-	Verb.impConj.foreach(c => {
-	  val from = getConjugatedWord(c,thisConjugation)
-	  val to = verb.getConjugatedWord(c,thatConjugation)
-	  NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,verb.lang,rootId2,c))
-	});
-  }
-  
-  private def condTranslate(verb: Verb,rootId1: Long, rootId2: Long){
-    println("Verb.condTranslate")
-    val thisConjugation = this.condConjugation
-    thisConjugation.foreach(t => println("thisConjugation: " + t))
-    val thatConjugation = verb.condConjugation
-    thatConjugation.foreach(t => println("thatConjugation: " + t))
-	Verb.condConj.foreach(c => {
-	  println("case is " + c)
-	  val from = getConjugatedWord(c,thisConjugation)
-	  println("from is " + from)
-	  val to = verb.getConjugatedWord(c,thatConjugation)
-	  println("to is " + to)
-	  NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,verb.lang,rootId2,c))
-	});
+  private def conjugationType(t: ConjugationType.Value) = t match {
+    case ConjugationType.INF => (this.infConjugation,Verb.infConjCases)
+    case ConjugationType.IMP => (this.impConjugation,Verb.impConjCases)
+    case ConjugationType.COND => (this.condConjugation,Verb.condConjCases)
   }
   
   private def getRoot(c: Conj.Value) = 
-    if(Verb.infConj.contains(c)) infRoot
-    else if(Verb.impConj.contains(c)) impRoot
-    else if(Verb.condConj.contains(c)) infRoot
+    if(Verb.infConjCases.contains(c)) infRoot
+    else if(Verb.impConjCases.contains(c)) impRoot
+    else if(Verb.condConjCases.contains(c)) infRoot
+    else if(c == NOUN) infRoot
+    else if(c == PERFECT) infRoot
     else throw new IllegalArgumentException("The case " + c + " does not belong to any conjugation.")
 	
   private def conjugate(c: Conj.Value) = getConjugatedWord(c,conjugation.conjugate(getRoot(c),c))
@@ -104,25 +97,36 @@ case class Verb (val infRoot: String,val impRoot: String,val conjugation: Conjug
 	val to = verb.conjugation.nounParticiple(verb.conjugate(NOUN))
 	from.translateTo(to,rootId1,rootId2)
   }
+
+  private def perfectParticiple(verb: Verb, rootId1: Long, rootId2: Long): Unit = {
+	val word1 = conjugation.conjugate(infRoot, PERFECT)
+	val word2 = verb.conjugation.conjugate(verb.infRoot, PERFECT)
+	val from = getConjugatedWord(PERFECT,word1)
+	val to = verb.getConjugatedWord(PERFECT,word2)
+	NSTranslator.add(new Word(from,lang,rootId1,PERFECT),new Word(to,verb.lang,rootId2,PERFECT))
+  }
   
-  override def translateTo(verb: Verb,rootId1: Long,rootId2: Long){ 
-    infTranslate(verb,rootId1,rootId2)	
-	impTranslate(verb,rootId1,rootId2)
-	condTranslate(verb,rootId1,rootId2)
+  override def translateTo(verb: Verb, rootId1: Long, rootId2: Long){ 
+    translateConjugation(ConjugationType.INF,verb,rootId1,rootId2)	
+	translateConjugation(ConjugationType.IMP,verb,rootId1,rootId2)
+	translateConjugation(ConjugationType.COND,verb,rootId1,rootId2)
 	
-	if(!ignoreActive) adjParticiple(verb,rootId1,rootId2,ACTIVE)
+	if(!perfective) adjParticiple(verb,rootId1,rootId2,ACTIVE)
+	else perfectParticiple(verb, rootId1, rootId2)
+
 	adjParticiple(verb,rootId1,rootId2,PASSIVE)
 	nounParticiple(verb,rootId1,rootId2)
   }
+  
 }
 
 object Verb {
-  val infConj = Set(INF, PAST1SM, PAST1SF, PAST2SM, PAST2SF, PAST3SM, PAST3SF, PAST3SN,
-					   PAST1PM, PAST1PF, PAST2PM, PAST2PF, PAST3PM, PAST3PF, PASSIVE, PERFECT, NOUN)
-  val impConj = Set(PRES1S, PRES2S, PRES3S,PRES1P, PRES2P, PRES3P,ACTIVE, IMP2S, IMP1P, IMP2P)  
-  val condConj = Set(COND1SM, COND1SF, COND2SM, COND2SF, COND3SM, COND3SF, COND3SN,
+  val infConjCases = Set(INF, PAST1SM, PAST1SF, PAST2SM, PAST2SF, PAST3SM, PAST3SF, PAST3SN,
+					   PAST1PM, PAST1PF, PAST2PM, PAST2PF, PAST3PM, PAST3PF, PASSIVE)
+  val impConjCases = Set(PRES1S, PRES2S, PRES3S,PRES1P, PRES2P, PRES3P,ACTIVE, IMP2S, IMP1P, IMP2P)  
+  val condConjCases = Set(COND1SM, COND1SF, COND2SM, COND2SF, COND3SM, COND3SF, COND3SN,
 					   COND1PM, COND1PF, COND2PM, COND2PF, COND3PM, COND3PF)
-  val pastConj = Set(PAST1SM, PAST1SF, PAST2SM, PAST2SF, PAST3SM, PAST3SF, PAST3SN,
+  val pastConjCases = Set(PAST1SM, PAST1SF, PAST2SM, PAST2SF, PAST3SM, PAST3SF, PAST3SN,
 					   PAST1PM, PAST1PF, PAST2PM, PAST2PF, PAST3PM, PAST3PF)
   
   val cond2Past = Map(
@@ -158,26 +162,21 @@ object Verb {
   )
 					   
   def getConjugation(c: Conj.Value) = 
-    if(infConj.contains(c)) infConj 
-    else if(impConj.contains(c)) impConj
-    else if(condConj.contains(c)) condConj
+    if(infConjCases.contains(c)) infConjCases 
+    else if(impConjCases.contains(c)) impConjCases
+    else if(condConjCases.contains(c)) condConjCases
     else throw new IllegalArgumentException("The case " + c + " does not belong to any conjugation.")
 }
 
 abstract class VerbGenerator(val lang: String) {
   protected val patternMap = scala.collection.mutable.HashMap[String,ConjugationPattern]();
   
-  def word(infRoot: String, impRoot:String, conj: ConjugationPattern):Verb = new Verb(infRoot,impRoot,conj,lang,false);
-  def word(infRoot: String, conj: ConjugationPattern):Verb = word(infRoot,infRoot,conj);
-  def word(infRoot: String, impRoot:String, patternId: String):Verb = word(infRoot,impRoot,patternMap(patternId));
-  def word(infRoot: String, patternId: String):Verb = word(infRoot,infRoot,patternId);
-  
+  def word(infRoot: String, impRoot:String, patternId: String,perfective: Boolean):Verb
+    = new Verb(infRoot,impRoot,patternMap(patternId),lang,perfective);
+
   def examples = patternMap.values.map(d => d.example)
   def ids = patternMap.keys
-  def idsExamples = {
-    val map = patternMap.map( t=> (t._1,"" + t._1 + ":" + t._2.example) )
-    map.toMap
-  }
+  def idsExamples = patternMap.map( t=> (t._1,"" + t._1 + ":" + t._2.example) ).toMap
   def patterns = patternMap.values
   
   def getCopula(c: Conj.Value):String

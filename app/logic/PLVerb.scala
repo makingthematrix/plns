@@ -15,7 +15,7 @@ abstract class PLConjugationPattern(id: String, example: String) extends Conjuga
   }
 
   override def conjugate(root: String, c: Conj.Value):String = {
-    if(Verb.condConj.contains(c)) conjugateConditional(root,c)
+    if(Verb.condConjCases.contains(c)) conjugateConditional(root,c)
     else super.conjugate(root, c)
   }
   

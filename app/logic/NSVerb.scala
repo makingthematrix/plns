@@ -22,8 +22,8 @@ abstract class NSConjugationPattern(id: String, example: String) extends Conjuga
   }
 
   override def conjugate(root: String, c: Conj.Value):String = {
-    if(Verb.condConj.contains(c)) conjugateConditional(root,c)
-    else if(Verb.pastConj.contains(c)) conjugatePast(root,c)
+    if(Verb.condConjCases.contains(c)) conjugateConditional(root,c)
+    else if(Verb.pastConjCases.contains(c)) conjugatePast(root,c)
     else super.conjugate(root, c)
   }
   

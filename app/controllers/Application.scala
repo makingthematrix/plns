@@ -13,7 +13,7 @@ import logic.PLAdjective
 import logic.NSAdverb
 import play.api.libs.json._
 import models.AdjectivePair
-import logic.PlMode._
+import logic.PLMode._
 import logic.NSAdjective
 import logic.CaseDescription
 import logic.SpeechPart
@@ -36,11 +36,8 @@ object Application extends Controller {
     implicit request => {
     	val (source,_) = translateForm.bindFromRequest.get;
     	val (target,untranslated) = if(source == "") ("",Array[String]()) else {
-    	  if(NSTranslator.isEmpty){
-    		  NSTranslator.init();
-    		  NSTranslator.testInit(); // for tests
-    	  } else println("NSTranslator not empty")
-    	  NSTranslator.translate(source);
+    	  if(NSTranslator.isEmpty) NSTranslator.init()
+    	  NSTranslator.translate(source)
     	}
     	Ok(views.html.index(new TranslationPair(source,target),untranslated,translateForm));
     }
@@ -49,10 +46,7 @@ object Application extends Controller {
   val translateForm = Form( tuple("source" -> text, "target" -> text) );
   
   def list = Action { 
-    if(NSTranslator.isEmpty){
-      NSTranslator.init();
-      NSTranslator.testInit(); // for tests
-    }
+    if(NSTranslator.isEmpty) NSTranslator.init()
     Ok(views.html.list(NSTranslator.rootPairs))
   }
 

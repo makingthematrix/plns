@@ -18,8 +18,8 @@ class VerbSuite {
   }
   
   @Test
-  def shouldContainActiveCase(){
-    val word = PLVerb.word("mów", "mów", "VIa")
+  def shouldContainImperfectiveAspect(){
+    val word = PLVerb.word("mów", "mów", "VIa",false)
     word.conjugation.suffices.get(Conj.ACTIVE) match {
       case Some(str) => assertEquals("iąc",str)
       case None => fail()
@@ -30,7 +30,7 @@ class VerbSuite {
   def shouldGenerateTranslation(){
     setUp()
     try {
-      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,"")
+      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,":")
       assertEquals(None,dict.get("mówić"))
       vp.add()
       assertEquals(Option("govoriti"),dict.get("mówić"))
@@ -53,10 +53,28 @@ class VerbSuite {
   } 
   
   @Test
+  def shouldSetPerfectivesWithPrefixes(){
+    setUp()
+    try{
+      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,":,Pprze:pre")
+      assertEquals(None,dict.get("mówić"))
+      vp.add()
+      assertEquals(Option("govoriti"),dict.get("mówić"))
+      assertEquals(Option("pregovoriti"),dict.get("przemówić")) 
+      assertEquals(Option("govorjučy"),dict.get("mówiący"))
+      assertEquals(None,dict.get("przemówiący"))
+      assertEquals(Option("pregovorivšy"),dict.get("przemówiwszy"))
+      assertEquals(None,dict.get("mówiwszy"))
+    } finally {
+      tearDown()
+    }
+  }
+  
+  @Test
   def shouldGenerateParticiples(){
     setUp()
     try {
-      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,":,po:po")
+      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,":,Ppo:po")
       assertEquals(None,dict.get("mówić"))
       vp.add()
       assertEquals(Option("govoriti"),dict.get("mówić"))
@@ -75,7 +93,7 @@ class VerbSuite {
   def shouldGenerateConditionals(){
     setUp()
     try {
-      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,"")
+      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,":")
       assertEquals(None,dict.get("mówić"))
       vp.add()
       assertEquals(Option("govoril byh"),dict.get("mówiłbym"))
@@ -93,7 +111,7 @@ class VerbSuite {
   def shouldGenerateLongPastTense(){
     setUp()
     try {
-      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,"")
+      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,":")
       assertEquals(None,dict.get("mówić"))
       vp.add()
       assertEquals(Option("jesm govoril"),dict.get("mówiłem"))
