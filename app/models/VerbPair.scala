@@ -10,9 +10,7 @@ import scala.collection.mutable;
 case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plExceptions: Option[String],
                     nsInfRoot: String, nsImpRoot: String, nsPattern: String, nsExceptions: Option[String],
                     prefixes: String
-				   )
-  extends SpeechPartPair[Verb] {
-  
+				   ) extends SpeechPartPair[Verb] {
   private var perfective = false;
   
   def pl:Verb = {
@@ -21,7 +19,7 @@ case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plE
       case Some(str) => VerbPair.parse(str).foreach(word.except)
       case None => 
 	}
-	return word
+	word
   }
   
   def ns:Verb = {
@@ -30,7 +28,7 @@ case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plE
       case Some(str) => VerbPair.parse(str).foreach(word.except)
       case None => 
 	}
-	return word    
+	word    
   }
   
   private def prefixPair(plPrefix:String,nsPrefix:String,perfective:Boolean):(Verb,Verb) = {
@@ -46,17 +44,18 @@ case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plE
     (pair.pl,pair.ns)
   }  
   
-  override def add():Seq[(String,String)] = VerbPair.prefixesAsSeq(prefixes).map( tuple => {
-    val (t,nsPrefix) = tuple
-    val (perfective,plPrefix) = if(t.startsWith("P")) (true,t.substring(1)) else (false,t)
-    println("prefixes: ( " + plPrefix + " , " + nsPrefix + " )," + perfective)
-    val (plWord,nsWord) = if(plPrefix.isEmpty()) {
+  private def add(plPrefix: String,nsPrefix: String):(String,String) = {
+    val (realPlPrefix,perfective) = if(plPrefix.isEmpty() || !plPrefix.startsWith("P")) (plPrefix,false)
+    							    else (plPrefix.substring(1),true) 
+    val (plWord,nsWord) = if(realPlPrefix.isEmpty()) {
       this.perfective = perfective
       (this.pl,this.ns) 
-    } else prefixPair(plPrefix,nsPrefix,perfective)
+    } else prefixPair(realPlPrefix,nsPrefix,perfective)
     NSTranslator.add(plWord,nsWord);
     (plWord.mainRoot,nsWord.mainRoot)
-  })
+  }
+  
+  override def add():Seq[(String,String)] = VerbPair.prefixesAsSeq(prefixes).map( tuple => add(tuple._1,tuple._2) )
 }
 
 object VerbPair {

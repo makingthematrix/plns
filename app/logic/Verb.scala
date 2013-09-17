@@ -24,7 +24,7 @@ class Verb (val infRoot: String, val impRoot: String, val conjugation: Conjugati
   override def mainRoot = exceptions.getOrElse(INF,infConjugation(INF));
   override val speechPart = "verb"
     
-  override def toRoot():Root = new Root(mainRoot,speechPart,lang)
+  override def toRoot() = new Root(mainRoot,speechPart,lang)
 
   private val exceptions = mutable.Map[Conj.Value,String]();
   
@@ -67,7 +67,7 @@ class Verb (val infRoot: String, val impRoot: String, val conjugation: Conjugati
 	  val from = getConjugatedWord(c,thisConjugation)
 	  val to = verb.getConjugatedWord(c,thatConjugation)
 	  NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,verb.lang,rootId2,c))
-	});
+	})
   }
   
   private def conjugationType(t: ConjugationType.Value) = t match {
@@ -161,11 +161,11 @@ object Verb {
 	  PAST3PF -> PRES3P
   )
 					   
-  def getConjugation(c: Conj.Value) = 
+  def casesSet(c: Conj.Value) = 
     if(infConjCases.contains(c)) infConjCases 
     else if(impConjCases.contains(c)) impConjCases
     else if(condConjCases.contains(c)) condConjCases
-    else throw new IllegalArgumentException("The case " + c + " does not belong to any conjugation.")
+    else throw new IllegalArgumentException("The case " + c + " does not belong to any set of cases.")
 }
 
 abstract class VerbGenerator(val lang: String) {
