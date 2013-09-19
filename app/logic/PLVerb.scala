@@ -2,15 +2,11 @@ package logic
 
 import Conj._;
 
-abstract class PLConjugationPattern(id: String, example: String) extends ConjugationPattern("ns",id,example){
+abstract class PLConjugationPattern(id: String, example: String) extends ConjugationPattern("pl",id,example){
   private def conjugateConditional(root: String, c: Conj.Value) = {
-    println("PLConjugationPattern.conjugateConditional, case is " + c + ", lang is " + lang)
     val conditional = PLVerb.getCopula(c)
-    println("conditional is " + conditional)
     val pastC = Verb.cond2Past(c)
-    println("past case is " + pastC)
     val condRoot = super.conjugate(root, pastC)
-    println("cond. root is " + condRoot)
     condRoot + conditional
   }
 

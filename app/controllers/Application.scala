@@ -59,7 +59,8 @@ object Application extends Controller {
             "nsImpRoot" -> nonEmptyText,
             "nsPattern" -> nonEmptyText,
             "nsExceptions" -> optional(text),
-            "prefixes" -> text
+            "prefixes" -> text,
+            "perfective" -> boolean
     ) 
     (VerbPair.apply)
     (VerbPair.unapply) 

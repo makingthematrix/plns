@@ -113,11 +113,4 @@ object NSTranslator {
   def translate(source: String): (String,Array[String]) = dictionary.translate(source);
   
   private def add(pl: String, ns: String, mode: PLMode.Value, isRoot: Boolean = true) = addAdjective(pl,ns,mode,isRoot);
-
-  
-  def all() = {
-  }
-  
-
-
 }

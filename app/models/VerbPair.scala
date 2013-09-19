@@ -7,12 +7,9 @@ import logic.VerbException
 import logic.NSTranslator
 import scala.collection.mutable;
             
-case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plExceptions: Option[String],
-                    nsInfRoot: String, nsImpRoot: String, nsPattern: String, nsExceptions: Option[String],
-                    prefixes: String
-				   ) extends SpeechPartPair[Verb] {
-  private var perfective = false;
-  
+case class VerbPair(val plInfRoot: String,val plImpRoot: String,val plPattern: String,val plExceptions: Option[String],
+                    val nsInfRoot: String,val nsImpRoot: String,val nsPattern: String,val nsExceptions: Option[String],
+                    val prefixes: String,val perfective: Boolean) extends SpeechPartPair[Verb] {
   def pl:Verb = {
     val word = PLVerb.word(plInfRoot, plImpRoot, plPattern, perfective)
 	plExceptions match {
@@ -38,19 +35,16 @@ case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plE
     val nsInf = nsPrefix + nsInfRoot;
     val nsImp = nsPrefix + nsImpRoot;
     val nsEx = VerbPair.prefixExceptions(nsExceptions,nsPrefix)
-    val prefixes = if(perfective) "P:" else ":"
-    val pair = VerbPair(plInf,plImp,plPattern,plEx,nsInf,nsImp,nsPattern,nsEx,prefixes)
-    pair.perfective = perfective
+    val prefixes = (if(perfective) VerbPair.perfectiveMarker else "") + ":"
+    val pair = VerbPair(plInf,plImp,plPattern,plEx,nsInf,nsImp,nsPattern,nsEx,prefixes,perfective)
     (pair.pl,pair.ns)
   }  
   
   private def add(plPrefix: String,nsPrefix: String):(String,String) = {
-    val (realPlPrefix,perfective) = if(plPrefix.isEmpty() || !plPrefix.startsWith("P")) (plPrefix,false)
+    val (realPlPrefix,perfective) = if(plPrefix.isEmpty() || !plPrefix.startsWith(VerbPair.perfectiveMarker)) (plPrefix,false)
     							    else (plPrefix.substring(1),true) 
-    val (plWord,nsWord) = if(realPlPrefix.isEmpty()) {
-      this.perfective = perfective
-      (this.pl,this.ns) 
-    } else prefixPair(realPlPrefix,nsPrefix,perfective)
+    val (plWord,nsWord) = if(realPlPrefix.isEmpty()) (this.pl,this.ns) 
+    					  else prefixPair(realPlPrefix,nsPrefix,perfective)
     NSTranslator.add(plWord,nsWord);
     (plWord.mainRoot,nsWord.mainRoot)
   }
@@ -61,15 +55,11 @@ case class VerbPair(plInfRoot: String, plImpRoot: String, plPattern: String, plE
 object VerbPair {
   // exceptions should be in the format "case1:word1,case2:word2,..."
   private def parse(exceptions: String,prefix:String) = {
-    val log = play.Logger.of("application")
-    log.info("parsing exceptions!: " + exceptions)
     exceptions.split(",").map(str => {
-      log.debug("trying to parse exception: " + str)
-      println(str)
       val t = str.split(":");
       val key = t(0)
       val word = t(1)
-      new VerbException(key,prefix+word);
+      VerbException(key,prefix+word);
     });
   }
   
@@ -101,4 +91,6 @@ object VerbPair {
   
   val allPrefixes = Seq(("",""),("po","po"),("za","s"),("w","v"),("s","iz"),
       ("za","za"),("do","do"),("prze","pre"),("przy","pri"),("u","u"),("od","ot"),("wy","vy") )
+  
+  val perfectiveMarker = "*"
 }

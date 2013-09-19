@@ -23,69 +23,66 @@ case class VerbException(val conjCase: Conj.Value, val word: String);
 
 class Verb (val infRoot: String, val impRoot: String, val conjugation: ConjugationPattern, 
 				 override val lang: String, val perfective: Boolean) extends SpeechPart[Verb] {
-  override def mainRoot = conjugate(INF)
   override val speechPart = "verb"
+  override def mainRoot = conjugate(INF)
   override def toRoot() = new Root(mainRoot,speechPart,lang)
-
-  private val exceptions = mutable.Map[Conj.Value,String]()
   
-  def except(ex: VerbException): Verb = {
+  override def translateTo(verb: Verb, rootId1: Long, rootId2: Long){ 
+    translateConjugation(TYPE_INF,verb,rootId1,rootId2)	
+	translateConjugation(TYPE_IMP,verb,rootId1,rootId2)
+	translateConjugation(TYPE_COND,verb,rootId1,rootId2)
+	
+	if(perfective) perfectParticiple(verb, rootId1, rootId2) 
+	else adjParticiple(verb,rootId1,rootId2,ACTIVE)
+	
+	adjParticiple(verb,rootId1,rootId2,PASSIVE)
+	nounParticiple(verb,rootId1,rootId2)
+  }
+  
+   def except(ex: VerbException): Verb = {
 	exceptions.put(ex.conjCase,ex.word)
-	return this
+	this
   }
     
   def except(conjCase: Conj.Value, word: String): Verb = {
     exceptions.put(conjCase, word)
-    return this
+    this
   }
   
   def except(conjCases: Seq[Conj.Value], word:String): Verb = {
     conjCases.foreach{ exceptions.put(_,word) }
-    return this
+    this
   }
-
-  private def infConjugation = conjugation.conjugate(infRoot, Verb.infConjCases)
-  private def impConjugation = conjugation.conjugate(impRoot, Verb.impConjCases)
-  private def condConjugation = conjugation.conjugate(infRoot, Verb.condConjCases)
   
-  private def getConjugatedWord(c: Conj.Value,conj: Map[Conj.Value,String]) = exceptions.get(c) match {
-    case Some(ex) => ex
-	case None => conj.get(c) match {
-	  case Some(from) => from
-	  case _ => throw new IllegalArgumentException("The case " + c + " does not exist in the conjugation of the verb " + this.mainRoot)
-    }
-  }
+  private val exceptions = mutable.Map[Conj.Value,String]()
+  
+  private lazy val infConjugation = conjugation.conjugate(infRoot, Verb.infConjCases)
+  private lazy val impConjugation = conjugation.conjugate(impRoot, Verb.impConjCases)
+  private lazy val condConjugation = conjugation.conjugate(infRoot, Verb.condConjCases)
 	
-  private def getConjugatedWord(c: Conj.Value,word: String) = exceptions.get(c) match {
-    case Some(ex) => ex
-	case None => word
-  }
-  
-  private def translateConjugation(t: ConjugationType.Value,verb: Verb,rootId1: Long, rootId2: Long){
-    lazy val thisConjugation = this.conjugationByType(t)
-    lazy val thatConjugation = verb.conjugationByType(t)
-    Verb.casesSet(t).foreach(c => {
-	  val from = getConjugatedWord(c,thisConjugation)
-	  val to = verb.getConjugatedWord(c,thatConjugation)
-	  NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,verb.lang,rootId2,c))
-	})
-  }
-  
   private def conjugationByType(t: ConjugationType.Value) = t match {
     case TYPE_INF => this.infConjugation
     case TYPE_IMP => this.impConjugation
     case TYPE_COND => this.condConjugation
   }
   
-  private def getRoot(c: Conj.Value) = 
-    if(Verb.infConjCases.contains(c)) infRoot
-    else if(Verb.impConjCases.contains(c)) impRoot
-    else if(Verb.condConjCases.contains(c)) infRoot
-    else if(c == NOUN) infRoot
-    else if(c == PERFECT) infRoot
-    else throw new IllegalArgumentException("The case " + c + " does not belong to any conjugation.")
-	
+  private def getConjugatedWord(c: Conj.Value,word: String) = exceptions.get(c) match {
+    case Some(ex) => ex
+	case None => word
+  }
+  
+  private def getRoot(c: Conj.Value) = if(Verb.impConjCases.contains(c)) impRoot else infRoot
   private def conjugate(c: Conj.Value) = getConjugatedWord(c,conjugation.conjugate(getRoot(c),c))
+  
+  private def translateConjugation(t: ConjugationType.Value,verb: Verb,rootId1: Long, rootId2: Long){
+    lazy val thisConjugation = this.conjugationByType(t)
+    lazy val thatConjugation = verb.conjugationByType(t)
+    Verb.casesSet(t).foreach(c => {
+	  val from = getConjugatedWord(c,thisConjugation(c))
+	  val to = verb.getConjugatedWord(c,thatConjugation(c))
+	  NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,verb.lang,rootId2,c))
+	})
+  }
   
   private def adjParticiple(verb: Verb,rootId1: Long,rootId2: Long,c: Conj.Value) = { 
     val from = conjugation.adjParticiple(conjugate(c))
@@ -105,18 +102,6 @@ class Verb (val infRoot: String, val impRoot: String, val conjugation: Conjugati
 	val from = getConjugatedWord(PERFECT,word1)
 	val to = verb.getConjugatedWord(PERFECT,word2)
 	NSTranslator.add(new Word(from,lang,rootId1,PERFECT),new Word(to,verb.lang,rootId2,PERFECT))
-  }
-  
-  override def translateTo(verb: Verb, rootId1: Long, rootId2: Long){ 
-    translateConjugation(TYPE_INF,verb,rootId1,rootId2)	
-	translateConjugation(TYPE_IMP,verb,rootId1,rootId2)
-	translateConjugation(TYPE_COND,verb,rootId1,rootId2)
-	
-	if(perfective) perfectParticiple(verb, rootId1, rootId2) else adjParticiple(verb,rootId1,rootId2,ACTIVE)
-	// zrobić unittest, czy adjParticiple odmienia przysłówkowy imiesłów -ąc
-	
-	adjParticiple(verb,rootId1,rootId2,PASSIVE)
-	nounParticiple(verb,rootId1,rootId2)
   }
   
 }
