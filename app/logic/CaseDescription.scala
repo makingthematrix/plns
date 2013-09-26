@@ -64,7 +64,8 @@ object CaseDescription{
     "IMP" -> "tryb rozkazujący",
     "ACTIVE" -> "imiesłów czynny",
     "PASSIVE" -> "imiesłów bierny",
-    "NOUN" -> "rzeczownik"
+    "NOUN" -> "rzeczownik",
+    "PERFECT" -> "imiesłów uprzedni"
   )
   
   lazy val personsShort:Map[String,String] = Map(

@@ -1,6 +1,8 @@
-cases = ["INF", "PAST1SM", "PAST1SF", "PAST2SM", "PAST2SF", "PAST3SM", "PAST3SF", "PAST3SN", "PAST1PM", "PAST1PF", "PAST2PM", "PAST2PF", "PAST3PM", "PAST3PF","PRES1S","PRES2S","PRES3S","PRES1P","PRES2P","PRES3P","ACTIVE","IMP2S","IMP1P","IMP2P","PASSIVE", "NOUN"]
-infCases = ["INF", "PAST1SM", "PAST1SF", "PAST2SM", "PAST2SF", "PAST3SM", "PAST3SF", "PAST3SN", "PAST1PM", "PAST1PF", "PAST2PM", "PAST2PF", "PAST3PM", "PAST3PF", "PASSIVE", "NOUN" ]
+cases = ["INF", "PAST1SM", "PAST1SF", "PAST2SM", "PAST2SF", "PAST3SM", "PAST3SF", "PAST3SN", "PAST1PM", "PAST1PF", "PAST2PM", "PAST2PF", "PAST3PM", "PAST3PF","PRES1S","PRES2S","PRES3S","PRES1P","PRES2P","PRES3P","ACTIVE","IMP2S","IMP1P","IMP2P","PASSIVE", "NOUN", "PERFECT"]
+infCases = ["INF", "PAST1SM", "PAST1SF", "PAST2SM", "PAST2SF", "PAST3SM", "PAST3SF", "PAST3SN", "PAST1PM", "PAST1PF", "PAST2PM", "PAST2PF", "PAST3PM", "PAST3PF", "PASSIVE", "NOUN", "PERFECT" ]
 impCases = ["PRES1S","PRES2S","PRES3S","PRES1P","PRES2P","PRES3P","ACTIVE","IMP2S","IMP1P","IMP2P"]
+prefixes = ["_","po_po","za_s","w_v","s_iz","za_za","do_do","prze_pre","przy_pri","u_u","od_ot","wy_vy"]
+perfectiveMarker="*"
 
 plPatterns = {}
 nsPatterns = {}
@@ -214,13 +216,39 @@ initInput = (lang) ->
         showPopup(e,lang,c)
       $('#'+id+'_unexcept').click ->
         unexcept(lang,c)
-        
+
+initPrefixes = ->
+  for pre in prefixes
+    $('#'+pre+'_prefix').attr('checked',pre == '_')
+    $('#'+pre+'_perfective').attr('checked',pre != '_')
+    $('#'+pre+'_perfective').attr('disabled',pre != '_')
+    do(pre) ->
+      $('#'+pre+'_prefix').change ->
+        if $('#'+pre+'_prefix').is(':checked')
+        	$('#'+pre+'_perfective').attr('disabled',false)
+        else
+        	$('#'+pre+'_perfective').attr('disabled',true)
+    
 initInputs = ->
   initInput('pl') 
   initInput('ns')
+  initPrefixes()
 
 $('#statusbar').click ->
   hidePopup()
+
+$('#submitButton').click ->
+  prefixesStr = ''
+    
+  for pre in prefixes
+    if $('#'+pre+'_prefix').is(':checked')
+      t = pre
+      if $('#'+pre+'_perfective').is(':checked')
+        t = perfectiveMarker + t
+      prefixesStr += t + ','
+  
+  $('#prefixes').val(prefixesStr)
+  $('#verbForm').submit()
 
 $ ->
   initInputs()

@@ -26,6 +26,7 @@ class Verb (val infRoot: String, val impRoot: String, val conjugation: Conjugati
   override val speechPart = "verb"
   override def mainRoot = conjugate(INF)
   override def toRoot() = new Root(mainRoot,speechPart,lang)
+  override def toString = toRoot().toString
   
   override def translateTo(verb: Verb, rootId1: Long, rootId2: Long){ 
     translateConjugation(TYPE_INF,verb,rootId1,rootId2)	
@@ -39,7 +40,7 @@ class Verb (val infRoot: String, val impRoot: String, val conjugation: Conjugati
 	nounParticiple(verb,rootId1,rootId2)
   }
   
-   def except(ex: VerbException): Verb = {
+  def except(ex: VerbException): Verb = {
 	exceptions.put(ex.conjCase,ex.word)
 	this
   }

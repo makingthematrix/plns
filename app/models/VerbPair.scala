@@ -9,8 +9,10 @@ import scala.collection.mutable;
             
 case class VerbPair(val plInfRoot: String,val plImpRoot: String,val plPattern: String,val plExceptions: Option[String],
                     val nsInfRoot: String,val nsImpRoot: String,val nsPattern: String,val nsExceptions: Option[String],
-                    val prefixes: String,val perfective: Boolean) extends SpeechPartPair[Verb] {
+                    val prefixes: Option[String]) extends SpeechPartPair[Verb] {
+  
   def pl:Verb = {
+    val perfective = prefixes.getOrElse("").startsWith(VerbPair.perfectiveMarker)
     val word = PLVerb.word(plInfRoot, plImpRoot, plPattern, perfective)
 	plExceptions match {
       case Some(str) => VerbPair.parse(str).foreach(word.except)
@@ -20,6 +22,7 @@ case class VerbPair(val plInfRoot: String,val plImpRoot: String,val plPattern: S
   }
   
   def ns:Verb = {
+    val perfective = prefixes.getOrElse("").startsWith(VerbPair.perfectiveMarker)
     val word = NSVerb.word(nsInfRoot, nsImpRoot, nsPattern, perfective)
 	nsExceptions match {
       case Some(str) => VerbPair.parse(str).foreach(word.except)
@@ -35,21 +38,24 @@ case class VerbPair(val plInfRoot: String,val plImpRoot: String,val plPattern: S
     val nsInf = nsPrefix + nsInfRoot;
     val nsImp = nsPrefix + nsImpRoot;
     val nsEx = VerbPair.prefixExceptions(nsExceptions,nsPrefix)
-    val prefixes = (if(perfective) VerbPair.perfectiveMarker else "") + ":"
-    val pair = VerbPair(plInf,plImp,plPattern,plEx,nsInf,nsImp,nsPattern,nsEx,prefixes,perfective)
+    val prefixes = (if(perfective) VerbPair.perfectiveMarker else "") + VerbPair.prefixSplitMarker
+    val pair = VerbPair(plInf,plImp,plPattern,plEx,nsInf,nsImp,nsPattern,nsEx,Some(prefixes))
     (pair.pl,pair.ns)
   }  
   
   private def add(plPrefix: String,nsPrefix: String):(String,String) = {
-    val (realPlPrefix,perfective) = if(plPrefix.isEmpty() || !plPrefix.startsWith(VerbPair.perfectiveMarker)) (plPrefix,false)
-    							    else (plPrefix.substring(1),true) 
+    val (realPlPrefix,perfective) = if(!plPrefix.startsWith(VerbPair.perfectiveMarker)) (plPrefix,false)
+    							    else (plPrefix.substring(1),true)
     val (plWord,nsWord) = if(realPlPrefix.isEmpty()) (this.pl,this.ns) 
     					  else prefixPair(realPlPrefix,nsPrefix,perfective)
     NSTranslator.add(plWord,nsWord);
     (plWord.mainRoot,nsWord.mainRoot)
   }
   
-  override def add():Seq[(String,String)] = VerbPair.prefixesAsSeq(prefixes).map( tuple => add(tuple._1,tuple._2) )
+  override def add():Seq[(String,String)] = prefixes match {
+    case Some(pre) => VerbPair.prefixesAsSeq(pre).map( tuple => add(tuple._1,tuple._2) )
+    case None => Seq(add("",""))
+  }
 }
 
 object VerbPair {
@@ -66,7 +72,7 @@ object VerbPair {
   private def prefixExceptions(exceptions:Option[String],prefix:String):Option[String] = exceptions match {
     case Some(str) =>
       val parsed = VerbPair.parse(str,prefix)
-      val serialized = parsed.map(ve => "" + ve.conjCase + ":" + ve.word)
+      val serialized = parsed.map(ve => "" + ve.conjCase + prefixSplitMarker + ve.word)
       val reduced = serialized.reduce( (t1,t2) => t1 + "," + t2)
       Some(reduced)
     case None => None
@@ -74,14 +80,14 @@ object VerbPair {
   
   private def prefixesAsSeq(prefixes: String):Seq[(String,String)] = prefixes match {
     case "" => Seq(("",""))
-    case ":" => Seq(("",""))
+    case `prefixSplitMarker` => Seq(("",""))
     case str if str.contains(",") =>  {
-      val tab = str.split(',')
+      val tab = str.split(",")
       val chunks = tab.map(prefixesAsSeq(_))
       chunks.toSeq.flatten
     }
-    case prefix if prefix.contains(":") => {
-      val arr = prefix.split(':') 
+    case prefix if prefix.contains(prefixSplitMarker) => {
+      val arr = prefix.split(prefixSplitMarker) 
       Seq((arr(0),arr(1)))
     }
     case other => throw new IllegalArgumentException("VerbPair.prefixesAsSeq, unable to parse: " + other)
@@ -93,4 +99,5 @@ object VerbPair {
       ("za","za"),("do","do"),("prze","pre"),("przy","pri"),("u","u"),("od","ot"),("wy","vy") )
   
   val perfectiveMarker = "*"
+  val prefixSplitMarker = "_"
 }

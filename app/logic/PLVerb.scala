@@ -327,6 +327,7 @@ object PLVerb extends VerbGenerator("pl") {
 	  case ACTIVE => "będąc" 
 	  case PASSIVE => "byt"
 	  case NOUN => "bycie"
+	  case PERFECT => "bywszy"
 	}
 	
 	override def getCopulaFuture(c: Conj.Value) = c match {

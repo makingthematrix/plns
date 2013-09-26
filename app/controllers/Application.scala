@@ -59,8 +59,7 @@ object Application extends Controller {
             "nsImpRoot" -> nonEmptyText,
             "nsPattern" -> nonEmptyText,
             "nsExceptions" -> optional(text),
-            "prefixes" -> text,
-            "perfective" -> boolean
+            "prefixes" -> optional(text)
     ) 
     (VerbPair.apply)
     (VerbPair.unapply) 
@@ -78,7 +77,7 @@ object Application extends Controller {
   
   def verb(pl:String) = Action {
     val root = pl;
-    Ok(views.html.verb(root,verbForm,VerbPair.allPrefixes))
+    Ok(views.html.verb(root,verbForm))
   }
   
   def addVerb = Action {

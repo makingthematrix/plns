@@ -19,7 +19,8 @@ object ConjugationTemplate {
     		    "PAST1PM" -> ct.get("PAST1PM"), "PAST1PF" -> ct.get("PAST1PF"), "PAST2PM" -> ct.get("PAST2PM"), "PAST2PF" -> ct.get("PAST2PF"), 
     		    "PAST3PM" -> ct.get("PAST3PM"), "PAST3PF" -> ct.get("PAST3PF"),
     		    "IMP2S" -> ct.get("IMP2S"), "IMP1P" -> ct.get("IMP1P"), "IMP2P" -> ct.get("IMP2P"), 
-    		    "ACTIVE" -> ct.get("ACTIVE"), "PASSIVE" -> ct.get("PASSIVE"), "NOUN" -> ct.get("NOUN"));
+    		    "ACTIVE" -> ct.get("ACTIVE"), "PASSIVE" -> ct.get("PASSIVE"), "NOUN" -> ct.get("NOUN"),
+    		    "PERFECT" -> ct.get("PERFECT"))
   }
 }
  
