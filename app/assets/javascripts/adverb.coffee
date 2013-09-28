@@ -84,7 +84,6 @@ refresh = ->
     refreshPlResult()
     refreshNsResult()
 
-$ ?= require 'jquery' # For Node.js compatibility
 $ ->
   refresh()
   $('#nsInd').focus()

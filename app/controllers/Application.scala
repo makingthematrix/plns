@@ -233,7 +233,7 @@ object Application extends Controller {
     Ok(sb.toString)    
   }
   
-  private def printFormErrors[T](formWithErrors: Form[T]): SimpleResult[String] = {
+  private def printFormErrors[T](formWithErrors: Form[T]) = {
     val sb = new StringBuilder("Errors: <br>\n")
     formWithErrors.errors.foreach( error => {
       sb.append(error).append("<br>\n")

@@ -328,6 +328,7 @@ object PLVerb extends VerbGenerator("pl") {
 	  case PASSIVE => "byt"
 	  case NOUN => "bycie"
 	  case PERFECT => "bywszy"
+	  case _ => ""
 	}
 	
 	override def getCopulaFuture(c: Conj.Value) = c match {
@@ -337,6 +338,7 @@ object PLVerb extends VerbGenerator("pl") {
 	  case PRES1P => "będziemy"
 	  case PRES2P => "będziecie"
 	  case PRES3P => "będą"
+	  case _ => ""
 	}
 	
 	val ppRootEndings = Set()

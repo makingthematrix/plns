@@ -28,7 +28,7 @@ object DBHelper extends Controller {
     }
   }
   
-  private def add(word1: String,word2: String):SimpleResult[String] = {
+  private def add(word1: String,word2: String) = {
     if(dict.hasWord(word1,"pl")){
       BadRequest("The word " + word1 + " is already in the Polish dictionary")
     }
@@ -39,26 +39,6 @@ object DBHelper extends Controller {
     Ok("Dodałem: " + word1 + " -> " + word2);
   }
   
-  /*
-  private def add[T <: SpeechPart[T]] (from: T,to: T, isRoot: Boolean = true):SimpleResult[String] = {
-    val (fromRootId,toRootId) = if(isRoot){
-      println("Main roots: " + from.mainRoot + " -> " + to.mainRoot);
-      if(DictionaryDBHelper.hasRoot(from.mainRoot,"pl")){
-        BadRequest("The root " + from.mainRoot + " is already in the Polish dictionary")
-      }
-      if(DictionaryDBHelper.hasRoot(to.mainRoot,"ns")){
-        BadRequest("The word " + to.mainRoot + " is already in the Novoslovienski dictionary")
-      }
-      
-      val fromRootId = DictionaryDBHelper.addRoot(from.mainRoot,from.typeName,"pl")
-      val toRootId = DictionaryDBHelper.addRoot(to.mainRoot,to.typeName,"ns")
-      (fromRootId,toRootId)
-    } else {
-      (-1,1)
-    }
-    from.translateTo(to);
-  }
-  */
   def listTranslations = Action {
     implicit request => {
       println("listTranslations")
@@ -81,7 +61,7 @@ object DBHelper extends Controller {
     }
   }
   
-  private def printFormErrors[T](formWithErrors: Form[T]): SimpleResult[String] = {
+  private def printFormErrors[T](formWithErrors: Form[T]) = {
     val sb = new StringBuilder("Errors: <br>\n")
     formWithErrors.errors.foreach( error => {
       sb.append(error).append("<br>\n")

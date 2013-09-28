@@ -22,16 +22,10 @@ CREATE TABLE translations (
 	wordid1 integer NOT NULL,
 	wordid2 integer NOT NULL
 );
- 
-CREATE TABLE roottrans (
-	id serial primary key,
-	rootid1 integer NOT NULL,
-	rootid2 integer NOT NULL
-);
+
  
 # --- !Downs
  
 DROP TABLE roots;
 DROP TABLE words;
 DROP TABLE translations;
-DROP TABLE roottrans;
