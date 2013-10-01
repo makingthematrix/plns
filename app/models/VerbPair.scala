@@ -100,4 +100,8 @@ object VerbPair {
   
   val perfectiveMarker = "*"
   val prefixSplitMarker = "_"
+    
+  def pp(from: String,to: String):String = pp(from,to,false)
+  def pp(from: String,to: String,perfective: Boolean):String = 
+    (if(perfective) perfectiveMarker else "") + from + prefixSplitMarker + to
 }

@@ -4,7 +4,7 @@ import logic.Adverb
 import logic.PLAdverb
 import logic.PLAdjective
 import logic.NSAdverb
-import logic.PlMode
+import logic.PLMode
 
 case class AdverbPair(plInd: String,plCmp: Option[String],plMode: String,
 					  nsInd: String,nsCmp: Option[String], cmpIgnored: Option[String]) 

@@ -1,11 +1,7 @@
 @(pl: String, verbForm: Form[VerbPair])
 
 @import helper._
-@import logic.CaseDescription.tenses
-@import logic.CaseDescription.genders
-@import logic.CaseDescription.personsShort
-@import logic.CaseDescription.personsSeq
-@import logic.CaseDescription.impPersonsSeq
+@import logic.CaseDescription._
 @import logic.CaseDescription
 @import Application.plVerbPatterns
 @import Application.nsVerbPatterns
@@ -155,8 +151,8 @@
 	<p><div id="clear"></div>
 		<table width="100%"><tr><td width="50%">
     		<input type="hidden" name="prefixes" id="prefixes" value=""></input>
-   			<br><h2>Jeśli zakończyłeś edycję:</h2><input id="submitButton" type="button" value="Dodaj do słownika"/>
   			<br><h2>Na bazie tłumaczenia <span class="plPref"></span> -&gt; <span class="nsPref"></span> możesz wygenerować następujące czasowniki:</h2>
+   			<br><h2>Jeśli zakończyłeś edycję:</h2><input id="submitButton" type="button" value="Dodaj do słownika"/>
    			</td><td width="50%"><table>
    			@for(prefix <- allPrefixes){
    				<tr>
