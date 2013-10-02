@@ -6,60 +6,132 @@ import logic.NSVerb
 import logic.VerbException
 import logic.NSTranslator
 import scala.collection.mutable;
-            
-case class VerbPair(val plInfRoot: String,val plImpRoot: String,val plPattern: String,val plExceptions: Option[String],
-                    val nsInfRoot: String,val nsImpRoot: String,val nsPattern: String,val nsExceptions: Option[String],
+
+/**
+ * Holds all data needed for generating translations of all cases of a set of verbs.
+ * @constructor creates a verb pair
+ * @param plInfStem the stem for TYPE_INF and TYPE_COND cases of the main verb in the source language
+ * @param plImpStem the stem for TYPE_IMP cases of the main verb in the source language
+ * @param plPattern the id of the verb's conjugation pattern in the source language
+ * @param plExceptions a string composed of exceptions from the regular conjugation in the source language, if there are any, or None
+ * @param nsInfStem the stem for TYPE_INF and TYPE_COND cases of the main verb in the target language
+ * @param nsImpStem the stem for TYPE_IMP cases of the main verb in the target language
+ * @param nsPattern the id of the verb's conjugation pattern in the target language
+ * @param nsExceptions a string composed of exceptions from the regular conjugation in the target language, if there are any, or None
+ * @param prefixes a string composed of prefixes of derived verbs and markers if these verbs are in the perfective aspect
+ */
+case class VerbPair(val plInfStem: String,val plImpStem: String,val plPattern: String,val plExceptions: Option[String],
+                    val nsInfStem: String,val nsImpStem: String,val nsPattern: String,val nsExceptions: Option[String],
                     val prefixes: Option[String]) extends SpeechPartPair[Verb] {
   
-  def pl:Verb = {
+  /**
+   * Build a Verb of the source language based on the available data
+   */
+  override def pl:Verb = {
+    // if the prefixes string starts with the perfective marker, it means that the verb is in the perfective aspect
     val perfective = prefixes.getOrElse("").startsWith(VerbPair.perfectiveMarker)
-    val word = PLVerb.word(plInfRoot, plImpRoot, plPattern, perfective)
+    // create the Verb of the source language
+    val word = PLVerb.word(plInfStem, plImpStem, plPattern, perfective)
+    // add exceptions
 	plExceptions match {
-      case Some(str) => VerbPair.parse(str).foreach(word.except)
+      case Some(str) => VerbPair.parse(str,"").foreach(word.except)
       case None => 
 	}
+    // return the Verb
 	word
   }
   
-  def ns:Verb = {
+  /**
+   * Build a Verb of the target language based on the available data
+   */
+  override def ns:Verb = {
     val perfective = prefixes.getOrElse("").startsWith(VerbPair.perfectiveMarker)
-    val word = NSVerb.word(nsInfRoot, nsImpRoot, nsPattern, perfective)
+    // create the Verb of the target language
+    val word = NSVerb.word(nsInfStem, nsImpStem, nsPattern, perfective)
 	nsExceptions match {
-      case Some(str) => VerbPair.parse(str).foreach(word.except)
+      case Some(str) => VerbPair.parse(str,"").foreach(word.except)
       case None => 
 	}
 	word    
   }
   
-  private def prefixPair(plPrefix:String,nsPrefix:String,perfective:Boolean):(Verb,Verb) = {
-    val plInf = plPrefix + plInfRoot;
-    val plImp = plPrefix + plImpRoot;
-    val plEx = VerbPair.prefixExceptions(plExceptions,plPrefix)
-    val nsInf = nsPrefix + nsInfRoot;
-    val nsImp = nsPrefix + nsImpRoot;
-    val nsEx = VerbPair.prefixExceptions(nsExceptions,nsPrefix)
-    val prefixes = (if(perfective) VerbPair.perfectiveMarker else "") + VerbPair.prefixSplitMarker
-    val pair = VerbPair(plInf,plImp,plPattern,plEx,nsInf,nsImp,nsPattern,nsEx,Some(prefixes))
-    (pair.pl,pair.ns)
-  }  
-  
-  private def add(plPrefix: String,nsPrefix: String):(String,String) = {
-    val (realPlPrefix,perfective) = if(!plPrefix.startsWith(VerbPair.perfectiveMarker)) (plPrefix,false)
-    							    else (plPrefix.substring(1),true)
-    val (plWord,nsWord) = if(realPlPrefix.isEmpty()) (this.pl,this.ns) 
-    					  else prefixPair(realPlPrefix,nsPrefix,perfective)
-    NSTranslator.add(plWord,nsWord);
-    (plWord.mainRoot,nsWord.mainRoot)
-  }
-  
+  /**
+   * Build a sequence of pairs of verbs (source,target), one pair of verbs for each pair of prefixes, 
+   * and add them to the dictionary
+   * @return a sequence of pairs of main roots; one for each pair of prefixes
+   */
   override def add():Seq[(String,String)] = prefixes match {
     case Some(pre) => VerbPair.prefixesAsSeq(pre).map( tuple => add(tuple._1,tuple._2) )
     case None => Seq(add("",""))
   }
+  
+  /**
+   * For the given pair of prefixes, build a pair of verbs, one of the source and one of the target language,
+   * and add them to the dictionary
+   * @param plPrefix a prefix for the source verb - may be empty and may contain the perfective marker
+   * @param nsPrefix a prefix for the target verb - may be empty
+   * @return a pair of main roots of these verbs
+   */
+  private def add(plPrefix: String,nsPrefix: String):(String,String) = {
+    // if plPrefix contains the perfective marker, we have to extract it
+    val (realPlPrefix,perfective) = if(!plPrefix.startsWith(VerbPair.perfectiveMarker)) (plPrefix,false)
+    							    else (plPrefix.substring(1),true)
+    // if this is the main verb (ie. no prefixes) just generate the verbs,
+    // otherwise create a VerbPair for the verbs with the prefixes and only then generate the verbs
+    val (plWord,nsWord) = if(realPlPrefix.isEmpty()) (this.pl,this.ns) 
+    					  else prefixPair(realPlPrefix,nsPrefix,perfective)
+    // add the verbs to the dictionary
+    NSTranslator.add(plWord,nsWord);
+    // return the main roots
+    (plWord.mainRoot,nsWord.mainRoot)
+  }
+  
+  /**
+   * if the prefix pair is non-empty, create a verb pair where the prefixes will be fixed to their stems
+   * and use it to generate a pair of verbs
+   * @param plPrefix a prefix for the source verb - must not be empty and not contain the perfective marker
+   * @param nsPrefix a prefix for the target verb - must not be empty
+   * @param perfective indicates that the new verbs will be in the perfective aspect
+   */
+  private def prefixPair(plPrefix:String,nsPrefix:String,perfective:Boolean):(Verb,Verb) = {
+    if(plPrefix.isEmpty()) 
+      throw new IllegalArgumentException("VerbPair.prefixPair for ("+plInfStem+"->"+nsInfStem+"): " +
+          "the method was called even though plPrefix is empty")
+    else if(plPrefix == VerbPair.perfectiveMarker)
+      throw new IllegalArgumentException("VerbPair.prefixPair for ("+plInfStem+"->"+nsInfStem+"): " +
+          "the method was called even though plPrefix contains only the perfective marker")
+    if(nsPrefix.isEmpty()) 
+      throw new IllegalArgumentException("VerbPair.prefixPair for ("+plInfStem+"->"+nsInfStem+"): " +
+          "the method was called even though nsPrefix is empty")
+    else if(nsPrefix == VerbPair.perfectiveMarker)
+      throw new IllegalArgumentException("VerbPair.prefixPair for ("+plInfStem+"->"+nsInfStem+"): " +
+          "the method was called even though nsPrefix contains only the perfective marker")
+    
+    val plInf = plPrefix + plInfStem
+    val plImp = plPrefix + plImpStem
+    val plEx = VerbPair.prefixExceptions(plExceptions,plPrefix)
+    
+    val nsInf = nsPrefix + nsInfStem
+    val nsImp = nsPrefix + nsImpStem
+    val nsEx = VerbPair.prefixExceptions(nsExceptions,nsPrefix)
+    
+    // the new prefixes string will either be empty or contain only the perfective marker,
+    // so the new pair will not try to add any new prefixes to the stem - which already has a prefix fixed to it
+    val prefixes = VerbPair.pp("","",perfective)//(if(perfective) VerbPair.perfectiveMarker else "") + VerbPair.prefixSplitMarker
+    // create the new VerbPair
+    val pair = VerbPair(plInf,plImp,plPattern,plEx,nsInf,nsImp,nsPattern,nsEx,Some(prefixes))
+    // generate a pair of verbs with prefixes
+    (pair.pl,pair.ns)
+  }  
+  
 }
 
 object VerbPair {
-  // exceptions should be in the format "case1:word1,case2:word2,..."
+  /**
+   * split the exceptions string into a sequence of VerbExceptions. Add a prefix to each if necessary
+   * @param exceptions should be in the format "case1:word1,case2:word2,..."
+   * @param prefix a prefix which should be fixed to each generated VerbException
+   */
   private def parse(exceptions: String,prefix:String) = {
     exceptions.split(",").map(str => {
       val t = str.split(":");
@@ -69,6 +141,14 @@ object VerbPair {
     });
   }
   
+  /**
+   * insert the prefix before each exception in the string
+   * used when we have exceptions for the main verb and we know that the prefixed verb will have the same exceptions
+   * - but each of such derived exceptions will have the given prefix
+   * @param exceptions a string of exceptions, or None
+   * @param prefix which needs to be added to each exception
+   * @return a string of prefixed exceptions, or None
+   */
   private def prefixExceptions(exceptions:Option[String],prefix:String):Option[String] = exceptions match {
     case Some(str) =>
       val parsed = VerbPair.parse(str,prefix)
@@ -78,6 +158,12 @@ object VerbPair {
     case None => None
   }
   
+  /**
+   * takes the string of prefixes and perfective markers and parse them into prefixes pairs
+   * ie. "_,*prze_pre" -> Seq(("",""),("*prze","pre"))
+   * @param prefixes a string composed of prefixes pairs and perfective markers
+   * @return a sequence of pairs of prefixes
+   */
   private def prefixesAsSeq(prefixes: String):Seq[(String,String)] = prefixes match {
     case "" => Seq(("",""))
     case `prefixSplitMarker` => Seq(("",""))
@@ -93,15 +179,17 @@ object VerbPair {
     case other => throw new IllegalArgumentException("VerbPair.prefixesAsSeq, unable to parse: " + other)
   }
   
-  private def parse(exceptions: String):Seq[VerbException] = parse(exceptions,"")
-  
+  // all popular prefixes of verbs
   val allPrefixes = Seq(("",""),("po","po"),("za","s"),("w","v"),("s","iz"),
       ("za","za"),("do","do"),("prze","pre"),("przy","pri"),("u","u"),("od","ot"),("wy","vy") )
   
   val perfectiveMarker = "*"
   val prefixSplitMarker = "_"
-    
+
+  /** A shorthand to create a string composed of a prefix pair */
   def pp(from: String,to: String):String = pp(from,to,false)
+  
+  /** A shorthand to create a string composed of a prefix pair and a perfective marker */
   def pp(from: String,to: String,perfective: Boolean):String = 
     (if(perfective) perfectiveMarker else "") + from + prefixSplitMarker + to
 }

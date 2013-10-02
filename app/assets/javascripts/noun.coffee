@@ -5,10 +5,8 @@ casesPl = ["NOMP","GENP","DATP","ACCP","VOCP","LOCP","INSP" ]
 plPatterns = {}
 nsPatterns = {}
 
-isIgnored = (lang, plural) ->
-  plIgnored = $('#plIgnored').val()
-  nsIgnored = $('#nsIgnored').val()
-  ignoredValue = if lang=="pl" then plIgnored else nsIgnored
+isIgnored = (plural) ->
+  ignoredValue = $('#plIgnored').val()
   if plural
     ignoredValue == "plural"
   else
@@ -17,13 +15,13 @@ isIgnored = (lang, plural) ->
 getId = (lang, c) ->
   lang + c
 
-fillCase = (id, root, suffix, exceptions) ->
+fillCase = (id, stem, suffix, exceptions) ->
   word = ''
   if exceptions
     if exceptions[id]
       word = exceptions[id]
   if word == ''
-    word = "#{root}#{suffix}"
+    word = "#{stem}#{suffix}"
   $('#'+id).html(word)
 
 getCase = (lang, c) ->
@@ -34,56 +32,54 @@ getCase = (lang, c) ->
   val = $('#'+id).html()
   return val
   
-fill = (lang, root, suffices, exceptions) ->
-  if not isIgnored(lang,false)
+fill = (lang, stem, suffices, exceptions) ->
+  if not isIgnored(false)
     for c in casesSing 
       id = getId(lang,c)
       suffix = suffices[c]
-      fillCase(id,root,suffix,exceptions)
+      fillCase(id,stem,suffix,exceptions)
   else
     for c in casesSing
       id = getId(lang,c)
       fillCase(id,'---','',null)
       
-  if not isIgnored(lang,true)
+  if not isIgnored(true)
     for c in casesPl
       id = getId(lang,c)
       suffix = suffices[c]
-      fillCase(id,root,suffix,exceptions)
+      fillCase(id,stem,suffix,exceptions)
   else
     for c in casesPl
       id = getId(lang,c)
       fillCase(id,'---','',null)
               
 refreshPlResult = ->
-  root = $('#plRoot').val()
+  stem = $('#plStem').val()
   patternName = $('#plPattern').val()
   suffices = plPatterns[patternName]
-  fill('pl',root,suffices,plExceptions)
+  fill('pl',stem,suffices,plExceptions)
 
 refreshNsResult = ->
-  root = $('#nsRoot').val()
+  stem = $('#nsStem').val()
   patternName = $('#nsPattern').val()
   suffices = nsPatterns[patternName]
-  fill('ns',root,suffices,nsExceptions)
+  fill('ns',stem,suffices,nsExceptions)
 
-$('#plRoot').keyup (e) -> 
+$('#plStem').keyup (e) -> 
   if(e.which == 13) 
     false
   else 
     refreshPlResult()
  
-$('#plIgnored').change ->
+$('#ignored').change ->
   refreshPlResult()
+  refreshNsResult()
     
-$('#nsRoot').keyup (e) -> 
+$('#nsStem').keyup (e) -> 
   if(e.which == 13) 
     false
   else 
     refreshNsResult()
-
-$('#nsIgnored').change ->
-  refreshNsResult()
 
 $('#plPattern').change -> 
   refreshPlResult()
@@ -236,4 +232,4 @@ $ ->
   initInputs()
   refresh()
   hidePopup()
-  $('#nsRoot').focus()
+  $('#nsStem').focus()

@@ -43,7 +43,7 @@
 		<div id="left">
 			<div class="longbox">
 				<h2><center>Rzeczownik PL</center></h2>
-				<br><h2>Temat</h2> @input(nounForm("plRoot")){ (id, name, value, args) =>
+				<br><h2>Temat</h2> @input(nounForm("plStem")){ (id, name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value="@pl"></input>
     			}
 				<br><h2>Wzorzec odmiany</h2> @select(nounForm("plPattern"), options = options(plNounPatterns))
@@ -54,7 +54,7 @@
     			}
 				<br><input type="button" id="clearPlExceptions" value="Wyczyść"/>
 				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
-				<p><h2>Ignoruj odmianę w liczbie: </h2> @select(nounForm("plIgnored"), options = options(ignoredOptions))
+				<p><h2>Ignoruj odmianę w liczbie: </h2> @select(nounForm("ignored"), options = options(ignoredOptions))
 			</div>
 		</div>
 		<div id="right"><div class="box"><center>
@@ -68,7 +68,7 @@
 		<div id="left">
 			<div class="longbox">
 				<h2><center>Rzeczownik NS</center></h2>
-				<br><h2>Temat</h2> @input(nounForm("nsRoot")){ (id, name, value, args) =>
+				<br><h2>Temat</h2> @input(nounForm("nsStem")){ (id, name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value=""></input>
     			}
 				<br><h2>Wzorzec odmiany</h2> @select(nounForm("nsPattern"), options = options(nsNounPatterns))
@@ -79,7 +79,6 @@
     			}
 				<br><input type="button" id="clearNsExceptions" value="Wyczyść"/>
 				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
-				<p><h2>Ignoruj odmianę w liczbie: </h2> @select(nounForm("nsIgnored"), options = options(ignoredOptions))
 			</div>
 		</div>
 		<div id="right"><div class="box"><center>

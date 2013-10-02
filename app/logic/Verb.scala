@@ -167,10 +167,8 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
    *  @param rootId1 the id of the Root object of that verb in the DB [@todo: this should be VerbPair id] 
    */  
   private def perfectParticiple(verb: Verb, rootId1: Long, rootId2: Long){
-	val word1 = conjugation.conjugate(infStem, PERFECT)
-	val word2 = verb.conjugation.conjugate(verb.infStem, PERFECT)
-	val from = getConjugatedWord(PERFECT,word1)
-	val to = verb.getConjugatedWord(PERFECT,word2)
+    val from = conjugate(PERFECT)
+    val to = verb.conjugate(PERFECT)
 	NSTranslator.add(new Word(from,lang,rootId1,PERFECT),new Word(to,verb.lang,rootId2,PERFECT))
   }
   

@@ -51,12 +51,12 @@ object Application extends Controller {
   }
 
   val verbForm = Form(
-    mapping("plInfRoot" -> nonEmptyText,
-            "plImpRoot" -> nonEmptyText,
+    mapping("plInfStem" -> nonEmptyText,
+            "plImpStem" -> nonEmptyText,
     		"plPattern" -> nonEmptyText,
     		"plExceptions" -> optional(text),
-            "nsInfRoot" -> nonEmptyText,
-            "nsImpRoot" -> nonEmptyText,
+            "nsInfStem" -> nonEmptyText,
+            "nsImpStem" -> nonEmptyText,
             "nsPattern" -> nonEmptyText,
             "nsExceptions" -> optional(text),
             "prefixes" -> optional(text)
@@ -91,14 +91,13 @@ object Application extends Controller {
   }
   
   val nounForm = Form(
-    mapping("plRoot" -> nonEmptyText,
+    mapping("plStem" -> nonEmptyText,
     		"plPattern" -> nonEmptyText,
     		"plExceptions" -> optional(text),
-    		"plIgnored" -> nonEmptyText,
-            "nsRoot" -> nonEmptyText,
+    		"nsStem" -> nonEmptyText,
             "nsPattern" -> nonEmptyText,
             "nsExceptions" -> optional(text),
-            "nsIgnored" -> nonEmptyText
+            "ignored" -> nonEmptyText
     ) 
     (NounPair.apply)
     (NounPair.unapply) 
