@@ -28,5 +28,6 @@ case class NounPair(plStem: String,plPattern: String,plExceptions: Option[String
 }
 
 object NounPair { 
+  /** @todo: design the localization module */
   val ignoredOptions = Map("none" -> "nie ignoruj", "singular" -> "pojedynczej", "plural" -> "mnogiej")
 }

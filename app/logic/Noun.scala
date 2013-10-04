@@ -6,9 +6,9 @@ import scala.collection.mutable;
 
 class Noun(val stem: String,val declension: DeclensionPattern,val ignored: IgnoredNumber.Value,
            override val lang: String) extends SpeechPart[Noun] {
-  override val speechPart = "noun";
+  override val speechPart = "noun"
   override def mainRoot = decline(NOMS);
-  override def toRoot():Root = new Root(mainRoot,speechPart,lang)
+  override def toRoot() = new Root(mainRoot,speechPart,lang)
 
   override def translateTo(noun: Noun, rootId1: Long, rootId2: Long){ 
 	lazy val thisDeclension = declensionByIgnored()

@@ -6,7 +6,7 @@ plPatterns = {}
 nsPatterns = {}
 
 isIgnored = (plural) ->
-  ignoredValue = $('#plIgnored').val()
+  ignoredValue = $('#ignored').val()
   if plural
     ignoredValue == "plural"
   else
