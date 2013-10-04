@@ -3,7 +3,7 @@ package logic
 import models.ConjugationTemplate
 
 object Conj extends Enumeration {
-  type Conj = Value;
+  type Conj = Value
   val INF, // pracow|ać
 	PRES1S, PRES2S, PRES3S, // pracuj|ę, pracuj|esz, pracuj|e 
 	PRES1P, PRES2P, PRES3P, // pracuj|emy, pracuj|ecie, prac|ują
@@ -17,11 +17,11 @@ object Conj extends Enumeration {
 	PASSIVE, // pracow|an 
 	PERFECT, // pracow|awszy
 	NOUN // pracow|anie
-	 = Value;
+	 = Value
 	
-  implicit def toString(v: Conj.Value):String = v.toString()
+  implicit def toString(v: Conj.Value) = v.toString()
   
-  implicit def parse(str: String): Conj.Value = str.toLowerCase() match {
+  implicit def parse(str: String) = str.toLowerCase() match {
     case "inf" => INF
 	case "pres1s" => PRES1S 
 	case "pres2s" => PRES2S 

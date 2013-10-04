@@ -148,7 +148,7 @@ object Application extends Controller {
   );
   
   val plModes = List[String](HARD,SOFT);
-  val declSing = Noun.singDeclension.map(d => d.toString());
+  val declSing = Noun.singularDeclension.map(d => d.toString());
   val declPl = Noun.pluralDeclension.map(d => d.toString());
   
   def adjective(pl:String) = Action {

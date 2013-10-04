@@ -1,6 +1,7 @@
 package logic
 
-import Decl._;
+import Decl._
+import IgnoredNumber._
 
 object PLNoun extends NounGenerator("pl"){
 	val HARD_MASCULINE_PERSON = new DeclensionPattern("pl","HARD_MASCULINE_PERSON","brat") { // "brat"
@@ -115,15 +116,16 @@ object PLNoun extends NounGenerator("pl"){
 		patternMap.put(this.id, this);
 	}
 	
-	def participle(noun: String) = {
-	  val root = noun.substring(0, noun.length()-1)
-	  val genpException = if(noun.endsWith("nie")){
-	    noun.substring(0, noun.length()-3) + "ń"
-	  } else if(noun.endsWith("cie")){
-	    noun.substring(0, noun.length()-3) + "ć"
-	  } else throw new IllegalArgumentException("The noun's suffix does not fit the Polish noun participle: " + noun)
+	def participle(word: String) = {
+	  val stem = word.substring(0, word.length()-1)
+	  val participle = new Noun(stem,SOFT_NEUTER,NONE,"pl")
 	  
-	  val participle = new Noun(root,SOFT_NEUTER,false,false,"pl")
+	  val genpException = if(word.endsWith("nie")){
+	    word.substring(0, word.length()-3) + "ń"
+	  } else if(word.endsWith("cie")){
+	    word.substring(0, word.length()-3) + "ć"
+	  } else throw new IllegalArgumentException("The noun's suffix does not fit the Polish noun participle: " + word)
+	  
 	  participle.except(GENP, genpException)
 	}
 }

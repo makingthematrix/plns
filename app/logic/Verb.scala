@@ -6,16 +6,6 @@ import ConjugationType._
 import scala.collection.mutable
 
 /**
- * A simple data structure for the conjugation case and the exceptional form of the verb in this case.
- * So far we don't need it to have a verb-id or anything like that, because it is never used outside of its verb's scope.
- * 
- * @constructor create a verb's exception
- * @param conjCase the conjugation case
- * @param word the exception form for this case
- */
-case class VerbException(val conjCase: Conj.Value, val word: String);
-
-/**
  * The Verb class; encapsulates logic for generating of verb cases, participles and verb-derived nouns 
  * @constructor creates a new verb
  * @param infStem the stem for TYPE_INF and TYPE_COND cases
@@ -30,7 +20,6 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
   override val speechPart = "verb"
   override def mainRoot = conjugate(INF)
   override def toRoot() = new Root(mainRoot,speechPart,lang)
-  override def toString = toRoot().toString
   
   /** generates cases for TYPE_INF, TYPE_IMP and TYPE_COND, the passive participle and the noun and add them all to the dictionar
    *  @param verb a verb of another language which this one should be translated to
@@ -48,15 +37,6 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
 	if(perfective) perfectParticiple(verb, rootId1, rootId2) 
 	else adjParticiple(verb,rootId1,rootId2,ACTIVE)
 	
-  }
-  
-  /**
-   * adds a verb exception
-   * @param ex the new verb exception for the case ex.conjCase
-   */
-  def except(ex: VerbException): Verb = {
-	exceptions.put(ex.conjCase,ex.word)
-	this
   }
   
   /**
@@ -130,7 +110,7 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
     lazy val thisConjugation = this.conjugationByType(t)
     lazy val thatConjugation = verb.conjugationByType(t)
     // for each case belonging to this conjugation type conjugate both verbs in their respective languages and add them to the dictionary
-    Verb.casesSet(t).foreach(c => {
+    Verb.casesTypeMap(t).foreach(c => {
 	  val from = getConjugatedWord(c,thisConjugation(c))
 	  val to = verb.getConjugatedWord(c,thatConjugation(c))
 	  NSTranslator.add(new Word(from,lang,rootId1,c),new Word(to,verb.lang,rootId2,c))
@@ -185,7 +165,7 @@ object Verb {
   val pastConjCases = Set(PAST1SM, PAST1SF, PAST2SM, PAST2SF, PAST3SM, PAST3SF, PAST3SN,
 					   PAST1PM, PAST1PF, PAST2PM, PAST2PF, PAST3PM, PAST3PF)
   
-  val casesSet = Map(
+  val casesTypeMap = Map(
       TYPE_INF -> infConjCases,
       TYPE_IMP -> impConjCases,
       TYPE_COND -> condConjCases

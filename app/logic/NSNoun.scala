@@ -1,6 +1,7 @@
 package logic
 
-import Decl._;
+import Decl._
+import IgnoredNumber._
 
 object NSNoun extends NounGenerator("ns") {
   val HARD_MASCULINE_PERSON = new DeclensionPattern("ns","HARD_MASCULINE_PERSON","brat") { // "brat"
@@ -93,9 +94,9 @@ object NSNoun extends NounGenerator("ns") {
     patternMap.put(this.id, this);
   }
  
-  def participle(noun: String) = {
-	val root = noun.substring(0, noun.length()-1)
-	new Noun(root,SOFT_NEUTER,false,false,"ns")
+  def participle(word: String) = {
+	val stem = word.substring(0, word.length()-1)
+	new Noun(stem,SOFT_NEUTER,NONE,"ns")
   }
   
 }

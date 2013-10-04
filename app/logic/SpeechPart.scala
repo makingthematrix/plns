@@ -1,6 +1,8 @@
 package logic
 
-trait SpeechPart[T <: SpeechPart[T]] {
+import scala.collection.mutable
+
+abstract class SpeechPart[T <: SpeechPart[T]] {
   def translateTo(speechPart: T,rootId1: Long,rootId2: Long)
   def mainRoot: String
   val speechPart: String
@@ -10,8 +12,10 @@ trait SpeechPart[T <: SpeechPart[T]] {
 	
   def addRoots(t: T):(Long,Long) = NSTranslator.addRoots(this.toRoot(), t.toRoot())
   
-  def translateTo(verb: T){ 
-    val (rootId1,rootId2) = addRoots(verb)
-    translateTo(verb,rootId1,rootId2)
+  def translateTo(t: T){ 
+    val (rootId1,rootId2) = addRoots(t)
+    translateTo(t,rootId1,rootId2)
   }
+  
+  override def toString = toRoot().toString
 }

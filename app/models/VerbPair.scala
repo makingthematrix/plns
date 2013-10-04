@@ -3,7 +3,6 @@ package models
 import logic.Verb
 import logic.PLVerb
 import logic.NSVerb
-import logic.VerbException
 import logic.NSTranslator
 import scala.collection.mutable;
 
@@ -32,9 +31,9 @@ case class VerbPair(val plInfStem: String,val plImpStem: String,val plPattern: S
     val perfective = prefixes.getOrElse("").startsWith(VerbPair.perfectiveMarker)
     // create the Verb of the source language
     val word = PLVerb.word(plInfStem, plImpStem, plPattern, perfective)
-    // add exceptions
+    // add exceptions, ignore prefixes
 	plExceptions match {
-      case Some(str) => VerbPair.parse(str,"").foreach(word.except)
+      case Some(str) => SpeechPartPair.parseExceptions(str).foreach( ve => word.except(ve._1,ve._2) )
       case None => 
 	}
     // return the Verb
@@ -49,7 +48,7 @@ case class VerbPair(val plInfStem: String,val plImpStem: String,val plPattern: S
     // create the Verb of the target language
     val word = NSVerb.word(nsInfStem, nsImpStem, nsPattern, perfective)
 	nsExceptions match {
-      case Some(str) => VerbPair.parse(str,"").foreach(word.except)
+      case Some(str) => SpeechPartPair.parseExceptions(str).foreach( ve => word.except(ve._1,ve._2) )
       case None => 
 	}
 	word    
@@ -94,18 +93,12 @@ case class VerbPair(val plInfStem: String,val plImpStem: String,val plPattern: S
    * @param perfective indicates that the new verbs will be in the perfective aspect
    */
   private def prefixPair(plPrefix:String,nsPrefix:String,perfective:Boolean):(Verb,Verb) = {
-    if(plPrefix.isEmpty()) 
+    if(plPrefix.isEmpty() || plPrefix == VerbPair.perfectiveMarker) 
       throw new IllegalArgumentException("VerbPair.prefixPair for ("+plInfStem+"->"+nsInfStem+"): " +
           "the method was called even though plPrefix is empty")
-    else if(plPrefix == VerbPair.perfectiveMarker)
-      throw new IllegalArgumentException("VerbPair.prefixPair for ("+plInfStem+"->"+nsInfStem+"): " +
-          "the method was called even though plPrefix contains only the perfective marker")
-    if(nsPrefix.isEmpty()) 
+    if(nsPrefix.isEmpty() || nsPrefix == VerbPair.perfectiveMarker) 
       throw new IllegalArgumentException("VerbPair.prefixPair for ("+plInfStem+"->"+nsInfStem+"): " +
           "the method was called even though nsPrefix is empty")
-    else if(nsPrefix == VerbPair.perfectiveMarker)
-      throw new IllegalArgumentException("VerbPair.prefixPair for ("+plInfStem+"->"+nsInfStem+"): " +
-          "the method was called even though nsPrefix contains only the perfective marker")
     
     val plInf = plPrefix + plInfStem
     val plImp = plPrefix + plImpStem
@@ -117,7 +110,7 @@ case class VerbPair(val plInfStem: String,val plImpStem: String,val plPattern: S
     
     // the new prefixes string will either be empty or contain only the perfective marker,
     // so the new pair will not try to add any new prefixes to the stem - which already has a prefix fixed to it
-    val prefixes = VerbPair.pp("","",perfective)//(if(perfective) VerbPair.perfectiveMarker else "") + VerbPair.prefixSplitMarker
+    val prefixes = VerbPair.pp("","",perfective)
     // create the new VerbPair
     val pair = VerbPair(plInf,plImp,plPattern,plEx,nsInf,nsImp,nsPattern,nsEx,Some(prefixes))
     // generate a pair of verbs with prefixes
@@ -127,20 +120,7 @@ case class VerbPair(val plInfStem: String,val plImpStem: String,val plPattern: S
 }
 
 object VerbPair {
-  /**
-   * split the exceptions string into a sequence of VerbExceptions. Add a prefix to each if necessary
-   * @param exceptions should be in the format "case1:word1,case2:word2,..."
-   * @param prefix a prefix which should be fixed to each generated VerbException
-   */
-  private def parse(exceptions: String,prefix:String) = {
-    exceptions.split(",").map(str => {
-      val t = str.split(":");
-      val key = t(0)
-      val word = t(1)
-      VerbException(key,prefix+word);
-    });
-  }
-  
+ 
   /**
    * insert the prefix before each exception in the string
    * used when we have exceptions for the main verb and we know that the prefixed verb will have the same exceptions
@@ -151,8 +131,8 @@ object VerbPair {
    */
   private def prefixExceptions(exceptions:Option[String],prefix:String):Option[String] = exceptions match {
     case Some(str) =>
-      val parsed = VerbPair.parse(str,prefix)
-      val serialized = parsed.map(ve => "" + ve.conjCase + prefixSplitMarker + ve.word)
+      val parsed = SpeechPartPair.parseExceptions(str,prefix)
+      val serialized = parsed.map(ve => "" + ve._1 + prefixSplitMarker + ve._2)
       val reduced = serialized.reduce( (t1,t2) => t1 + "," + t2)
       Some(reduced)
     case None => None
