@@ -4,7 +4,6 @@ import logic.Verb
 import logic.PLVerb
 import logic.NSVerb
 import logic.NSTranslator
-import scala.collection.mutable;
 
 /**
  * Holds all data needed for generating translations of all cases of a set of verbs.

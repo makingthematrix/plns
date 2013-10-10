@@ -19,7 +19,9 @@ class Noun(val stem: String,val declension: DeclensionPattern,val ignored: Ignor
 	  NSTranslator.add(new Word(from,lang,rootId1,d),new Word(to,noun.lang,rootId2,d))
 	})
   }
-  
+
+  def decline(d: Decl.Value):String = getDeclinedWord(d,declension.decline(stem,d))
+
   /** maps for case -> word regular forms of all, singular and plural cases */
   private lazy val bothDeclensions = declension.decline(stem,Noun.declension)
   private lazy val singularDeclension = declension.decline(stem,Noun.singularDeclension)
@@ -35,19 +37,9 @@ class Noun(val stem: String,val declension: DeclensionPattern,val ignored: Ignor
     case PLURAL => singularDeclension
   }
   
-  def except(declCase: Decl.Value, word: String): Noun = {
-	exceptions.put(declCase, word);
-	return this;
-  }
-	
-  def except(decl: Seq[Decl.Value], word: String): Noun = { 
-	decl.foreach{ d => exceptions.put(d, word); }
-	return this;
-  }
-  
-  private val exceptions = new mutable.HashMap[Decl.Value,String]();
+  def except(declCase: Decl.Value, word: String) = exceptions.put(declCase, word);
 
-  private def decline(d: Decl.Value):String = getDeclinedWord(d,declension.decline(stem,d))
+  private val exceptions = new mutable.HashMap[Decl.Value,String]();
 
   private def getDeclinedWord(d: Decl.Value,word: String) = exceptions.get(d) match {
     case Some(ex) => ex

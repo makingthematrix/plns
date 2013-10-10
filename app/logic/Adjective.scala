@@ -1,88 +1,89 @@
 package logic
 
-import Decl._;
-import scala.collection.mutable;
+import Decl._
+import scala.collection.mutable
 
-case class AdjectiveException(val gender:String, val degree: String, val declCase: Decl.Value, val word: String);
+//case class AdjectiveException(val gender:String, val degree: String, val declCase: Decl.Value, val word: String);
 
-case class Adjective (val ind:String,val cmp:String,val sup:String,val adverb:Adverb,
-				      val indDeclension:Map[String,DeclensionPattern],
-				      val cmpDeclension:Map[String,DeclensionPattern],
-				      val cmpIgnored: Boolean,override val lang:String) 
-                extends SpeechPart[Adjective]{
-  
-  override def mainRoot:String = { 
-    val exOpt:Option[String] = exceptions.get(CaseDescription.key("m", "i", NOMS)); 
-    exOpt match {
-      case Some(str) => str
-      case None => indDeclension("m").decline(ind, NOMS)
-    }
-  }
+import AdjectiveCase._
+import AdjectiveGender._
+import AdjectiveDegree._
+
+class Adjective(val ind:String,val cmp:String,val sup:String,val adverb:Adverb,
+				val indDeclension:Map[AdjectiveGender.Value,DeclensionPattern],val cmpDeclension:Map[AdjectiveGender.Value,DeclensionPattern],
+				val cmpIgnored: Boolean,override val lang:String) 
+  extends SpeechPart[Adjective]{
   
   override val speechPart = "adjective"
-    
-  override def toRoot():Root = new Root(mainRoot,speechPart,lang)
+  override def mainRoot = decline(AdjectiveCase(MASCULINE, INDICATIVE, NOMS))
+  override def toRoot() = new Root(mainRoot,speechPart,lang)
   
-  val exceptions = new mutable.HashMap[String,String]()
-  
-  def except(patternCase: Array[(String,String,Decl.Value)], word: String): Adjective = {
-    patternCase.foreach{ t => except(t._1,t._2,t._3,word) }
-    return this;
+  override def translateTo(adj: Adjective, rootId1: Long, rootId2: Long) {
+    translateDegreeTo(adj,INDICATIVE,rootId1,rootId2)
+    if(!cmpIgnored){
+      translateDegreeTo(adj,COMPARATIVE,rootId1,rootId2)
+      translateDegreeTo(adj,SUPERLATIVE,rootId1,rootId2)
+    }    
+    if(adverb != null) adverb.translateTo(adj.adverb)
   }
   
-  def except(ex: AdjectiveException):Adjective = except(ex.gender, ex.degree, ex.declCase, ex.word);
-  
-  def except(gender: String, degree: String, declCase: Decl.Value, word: String): Adjective = {
-    val key = CaseDescription.key(gender,degree,declCase)
-    exceptions.put(key,word)
-    return this;
-  }
-  
-  def this(ind:String,cmp:String,sup:String,adv:Adverb,declMap:Map[String,DeclensionPattern],lang:String) 
-    = this(ind,cmp,sup,adv,declMap,declMap,true,lang);
-  def this(ind:String,cmp:String,sup:String,adv:Adverb,indDeclension:Map[String,DeclensionPattern],cmpDeclension:Map[String,DeclensionPattern],lang:String) 
-    = this(ind,cmp,sup,adv,indDeclension,cmpDeclension,true,lang);
-  def this(ind:String,adv:Adverb,declMap:Map[String,DeclensionPattern],lang:String)
-    = this(ind,null,null,adv,declMap,null,false,lang);
-  
-  private def getDeclPattern(degree: String) = degree match {
-    case "i" => (ind,indDeclension)
-    case "c" if !cmpIgnored => (cmp,cmpDeclension)
-    case "s" if !cmpIgnored => (sup,cmpDeclension)
-    case _ => throw new IllegalArgumentException("I can't give you that declination, with degree="+degree+" and cmpIgnored="+cmpIgnored)
+  def decline(ac: AdjectiveCase):String = {
+    val (stem, declension) = stemAndDecl(ac.degree)
+    getDeclinedWord(ac,declension(ac.gender).decline(stem,ac.declCase))
   }
 
-  private def translateDegreeTo(adj: Adjective, degree: String,rootId1: Long,rootId2: Long): Unit = {
-    val (fromRoot,fromDeclPattern) = getDeclPattern(degree)
-    val (toRoot,toDeclPattern) = adj.getDeclPattern(degree)
+  private def stemAndDecl(ad: AdjectiveDegree.Value) = ad match {
+    case INDICATIVE => (ind, indDeclension)
+    case COMPARATIVE if !cmpIgnored => (cmp, cmpDeclension)
+    case SUPERLATIVE if !cmpIgnored => (sup, cmpDeclension)
+    case _ => throw new IllegalArgumentException("I can't give you that declination, with ac="+ad+" and cmpIgnored="+cmpIgnored)
+  }
+    
   
-    CaseDescription.gendersSeq.foreach( gender => {
-      val fromDecl = fromDeclPattern(gender).decline(fromRoot)
-      val toDecl = toDeclPattern(gender).decline(toRoot)
-        
-      Noun.declension.foreach(decl => {
-        val key = CaseDescription.key(gender, degree, decl)
-        val from = exceptions.getOrElse(key,fromDecl.getOrElse(decl, null));
-        if(from != null){
-          val to = adj.exceptions.getOrElse(key,toDecl.getOrElse(decl, null)) 
-          if(to != null) NSTranslator.add(new Word(from,lang,rootId1,decl),new Word(to,adj.lang,rootId2,decl))
-        }
-      })
+  private def getDeclinedWord(ac: AdjectiveCase,word: String) = exceptions.get(ac) match {
+    case Some(ex) => ex
+	case None => word
+  }
+    
+  private val exceptions = new mutable.HashMap[AdjectiveCase,String]()
+  
+  def except(key: AdjectiveCase, word: String) = exceptions.put(key,word)
+  
+  private def translateDegreeTo(adj: Adjective, ad: AdjectiveDegree.Value,rootId1: Long,rootId2: Long){
+    val (thisStem, thisDeclension) = stemAndDecl(ad)
+    val (thatStem, thatDeclension) = adj.stemAndDecl(ad)
+  
+    AdjectiveGender.singular.foreach( ag => {
+      val thisDecl = thisDeclension(ag)
+      val thatDecl = thatDeclension(ag)
+      Noun.singularDeclension.foreach(d => {
+        val ac = AdjectiveCase(ag,ad,d)
+        val from = getDeclinedWord(ac,thisDecl.decline(thisStem,d))
+        val to = adj.getDeclinedWord(ac, thatDecl.decline(thatStem,d))
+	    NSTranslator.add(new Word(from,lang,rootId1,d),new Word(to,adj.lang,rootId2,d))
+	  })
+    })
+    
+    AdjectiveGender.plural.foreach( ag => {
+      val thisDecl = thisDeclension(ag)
+      val thatDecl = thatDeclension(ag)
+      Noun.pluralDeclension.foreach(d => {
+        val ac = AdjectiveCase(ag,ad,d)
+        val from = getDeclinedWord(ac,thisDecl.decline(thisStem,d))
+        val to = adj.getDeclinedWord(ac, thatDecl.decline(thatStem,d))
+	    NSTranslator.add(new Word(from,lang,rootId1,d),new Word(to,adj.lang,rootId2,d))
+	  })
     })
   }
   
-  override def translateTo(adj: Adjective, rootId1: Long, rootId2: Long) {
-    if(cmpIgnored || adj.cmpIgnored) translateDegreeTo(adj,"i",rootId1,rootId2)
-    else CaseDescription.degrees.keys.foreach( degree => translateDegreeTo(adj,degree,rootId1,rootId2) )    
-    if(adverb != null) adverb.translateTo(adj.adverb)
-  }
 }
 
 object Adjective {
   def declMap(m:DeclensionPattern,f:DeclensionPattern,
-			n:DeclensionPattern,p:DeclensionPattern):Map[String,DeclensionPattern] = declMap(m,f,n,p,p)
+			n:DeclensionPattern,p:DeclensionPattern):Map[AdjectiveGender.Value,DeclensionPattern] = declMap(m,f,n,p,p)
   
   def declMap(m:DeclensionPattern,f:DeclensionPattern,
 			n:DeclensionPattern,p:DeclensionPattern,
-			P:DeclensionPattern):Map[String,DeclensionPattern] = Map("m"->m,"f"->f,"n"->n,"p"->p,"P"->P)	
+			P:DeclensionPattern):Map[AdjectiveGender.Value,DeclensionPattern] = 
+	Map(MASCULINE->m,FEMININE->f,NEUTER->n,PLURAL_MASCULINE->p,PLURAL_NONMASCULINE->P)	
 }

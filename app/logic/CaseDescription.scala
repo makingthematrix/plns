@@ -246,9 +246,6 @@ object CaseDescription{
   def ids() = cases.keySet;
   
   def key(lang: String, gender: String, degree: String, decl: String): String = lang + gender + degree + decl.toUpperCase()
-  def key(lang: String, gender: String, degree: String, decl: Decl.Value): String = lang + gender + degree + decl
-  def key(gender: String, degree: String, decl: Decl.Value): String = gender + degree + decl
-  def key(lang: String, gender: String, degree: String): String = lang + gender + degree
   def key(lang: String, decl: String): String = lang + decl.toUpperCase()
   def key(lang: String, decl: Decl.Value): String = lang + decl
   

@@ -3,11 +3,12 @@ package models
 import logic.Noun
 import logic.PLNoun
 import logic.NSNoun
+import logic.IgnoredNumber
 
 case class NounPair(plStem: String,plPattern: String,plExceptions: Option[String], 
                     nsStem: String,nsPattern: String,nsExceptions: Option[String], ignored: String) 
     extends SpeechPartPair[Noun] {
-  
+
   override def pl: Noun = {
 	val word = PLNoun.word(plStem, plPattern, ignored)
 	plExceptions match {

@@ -5,7 +5,7 @@ import models.AdjectiveTemplate
 
 
 object PLMode extends Enumeration {
-  type PLAdjectiveMode = Value;
+  type PLMode = Value;
   val HARD, SOFT = Value;
   
   implicit def toString(v: PLMode.Value) = v.toString()

@@ -209,7 +209,7 @@ refreshNsExceptions = ->
   $('#nsExceptionsDiv').html(strDiv)
 
 isCmpIgnored = ->
-  $('#cmpIgnored').is(':checked')
+  $('#cmpIgnored').val() == 'true'
 
 refreshCmpIgnored = ->
   if(isCmpIgnored())
@@ -223,7 +223,9 @@ refreshCmpIgnored = ->
     $('#nsCmp').show()
     $('#nsAdvCmp').show()
     
-$('#cmpIgnored').change ->
+$('#ignoreCheckbox').change ->
+  ignored = if $('#ignoreCheckbox').is(':checked') then "true" else "false"
+  $('#cmpIgnored').val( ignored )
   refreshCmpIgnored()
   refreshPlResult()
   refreshNsResult()

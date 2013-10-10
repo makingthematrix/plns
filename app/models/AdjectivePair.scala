@@ -3,108 +3,39 @@ package models
 import logic.Adjective
 import logic.PLAdjective
 import logic.NSAdjective
-import logic.AdjectiveException
-import logic.Decl
-import logic.PLMode._
-import play.api.libs.json.Writes
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
-import logic.SpeechPart
-import play.api.Logger
+import logic.AdjectiveCase
 
-case class AdjectivePair(plInd:String,plAdvInd:Option[String],plCmp:Option[String],plAdvCmp:Option[String],
+case class AdjectivePair(plInd:String,plAdvInd:String,plCmp:String,plAdvCmp:String,
                          plMode:String,plAdvMode:String,plExceptions:Option[String],
-                         nsInd:String,nsAdvInd:Option[String],nsCmp:Option[String],nsAdvCmp:Option[String],
-                         nsExceptions:Option[String],cmpIgnored:Option[String]) 
+                         nsInd:String,nsAdvInd:String,nsCmp:String,nsAdvCmp:String,
+                         nsExceptions:Option[String],cmpIgnored:String) 
   extends SpeechPartPair[Adjective]{
+  def this(plInd:String,plCmp:String,plMode:String,plExceptions:Option[String],nsInd:String,nsCmp:String,nsExceptions:Option[String]) =
+    this(plInd,plInd,plCmp,plCmp,plMode,plMode,plExceptions,nsInd,nsInd,nsCmp,nsCmp,nsExceptions,"false")
+  def this(plInd:String,plMode:String,plExceptions:Option[String],nsInd:String,nsExceptions:Option[String]) =
+    this(plInd,plInd,plInd,plInd,plMode,plMode,plExceptions,nsInd,nsInd,nsInd,nsInd,nsExceptions,"true")
   
   def pl: Adjective = {	
-	val cmp = plCmp match {
-	  case None => plInd
-	  case Some(str) => str
-	}
-    val adjInd = plAdvInd match {
-      case None => plInd
-      case Some(str) => str
-    }
-    val adjCmp = plAdvCmp match {
-      case None => adjInd
-      case Some(str) => str
-    }
-    
-    val ignored = cmpIgnored.getOrElse("").equals("on")
-    val word = PLAdjective.word(plInd, cmp, adjInd, adjCmp, plMode, plAdvMode, ignored)
-    
+    val word = PLAdjective.word(plInd, plCmp, plAdvInd, plAdvCmp, plMode, plAdvMode, cmpIgnored.equals("true"))
     plExceptions match {
-      case Some(str) => AdjectivePair.parse(str).foreach(word.except);
+      case Some(str) => SpeechPartPair.parseExceptions(str).foreach(ae => word.except(AdjectiveCase.parse(ae._1), ae._2))
       case None => 
     } 
-    return word;
+    word
   }
 
   def ns: Adjective = {
-	val cmp = nsCmp match {
-	  case None => nsInd
-	  case Some(str) => str
-	}
-    val advInd = nsAdvInd match {
-      case None => nsInd
-      case Some(str) => str
-    }
-    val advCmp = nsAdvCmp match {
-      case None => advInd
-      case Some(str) => str
-    }
-    
-    val ignored = cmpIgnored.getOrElse("").equals("on")
-    val word = NSAdjective.word(nsInd,cmp,advInd,advCmp,ignored);
-    
-    plExceptions match {
-      case Some(str) => AdjectivePair.parse(str).foreach(word.except);
+    val word = NSAdjective.word(nsInd,nsCmp,nsAdvInd,nsAdvCmp,cmpIgnored.equals("true"))
+    nsExceptions match {
+      case Some(str) => SpeechPartPair.parseExceptions(str).foreach( ae => word.except(ae._1, ae._2) )
       case None => 
     }
-    return word;
+    word
   }
   
-  implicit val writes = new Writes[AdjectiveException] {
-    def writes(ae: AdjectiveException): JsValue = 
-      Json.obj( "gender" -> ae.gender, "degree" -> ae.degree, "declCase" -> ae.declCase.toString(), "word" -> ae.word );
-  }
+  //implicit val writes = new Writes[AdjectiveException] {
+  //  def writes(ae: AdjectiveException): JsValue = 
+  //    Json.obj( "gender" -> ae.gender, "degree" -> ae.degree, "declCase" -> ae.declCase.toString(), "word" -> ae.word );
+  //}
   
-}
-
-object AdjectivePair{
-  // exceptions should be in the format "gender1:degree1:case1:word1,gender2:degree2:case2:word2,..."
-  def parse(exceptions: String):Array[AdjectiveException] = {
-    val log = play.Logger.of("application")
-    log.info("parsing exceptions!: " + exceptions)
-    exceptions.split(",").map(str => {
-      log.debug("trying to parse exception: " + str)
-      println(str)
-      val t = str.split(":");
-      val key = t(0)
-      val gender = key.substring(0, 1)
-      val degree = key.substring(1, 2)
-      val declCase: Decl.Value = key.substring(2)
-      val word = t(1)
-      new AdjectiveException(gender,degree,declCase,word);
-    });
-  }
-  
-  def main(args: Array[String]): Unit = {
-    val exs = parse("piNOMP:lekcy,pcNOMP:lżejsi,")
-    exs.foreach(println)
-    
-    val pair = new AdjectivePair("lekk",None,Option("lżej"),Option("lż"),"SOFT","HARD",Option("piNOMP:lekcy,pcNOMP:lżejsi"),
-                                 "legk",None,None,None,None,None)
-    val pl = pair.pl
-    println(pl)
-    pl.exceptions.foreach(println)
-    
-    val ns = pair.ns
-    println(ns)
-    ns.exceptions.foreach(println)
-    
-    pl.translateTo(ns)
-  }
 }

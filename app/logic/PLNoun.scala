@@ -127,5 +127,6 @@ object PLNoun extends NounGenerator("pl"){
 	  } else throw new IllegalArgumentException("The noun's suffix does not fit the Polish noun participle: " + word)
 	  
 	  participle.except(GENP, genpException)
+	  participle
 	}
 }

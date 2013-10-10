@@ -74,8 +74,9 @@
 				<br><input type="button" id="clearPlExceptions" value="Wyczyść"/>
 				<br><font size=-1>Aby dodać wyjątek, kliknij <b>[!]</b> obok danego wyrazu. Aby przywrócić regularną odmianę, kliknij <b>[*]</b>.</font>
 				<p><h2>Ignoruj stopień wyższy</h2>@input(adjectiveForm("cmpIgnored")){ (id,name, value, args) =>
-    			<input type="checkbox" name="@name" id="@id" @toHtmlArgs(args)></input>
+    			<input type="hidden" name="@name" id="@id" @toHtmlArgs(args) value="false"></input>
     			}
+    			<input type="checkbox" name="ignoreCheckbox" id="ignoreCheckbox"/>
    			</div>
 		</div><div id="right"><div class="longbox"><center>
 		<table>	<tr><td colspan=2><p><center><h2>Odmiana</h2></center></p></td></tr>

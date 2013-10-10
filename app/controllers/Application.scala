@@ -130,18 +130,18 @@ object Application extends Controller {
   
   val adjectiveForm = Form(
     mapping("plInd" -> nonEmptyText,
-    		"plAdvInd" -> optional(text),
-    		"plCmp" -> optional(text),
-    		"plAdvCmp" -> optional(text),
+    		"plAdvInd" -> nonEmptyText,
+    		"plCmp" -> nonEmptyText,
+    		"plAdvCmp" -> nonEmptyText,
     		"plMode" -> nonEmptyText,
     		"plAdvMode" -> nonEmptyText,
     		"plExceptions" -> optional(text),
             "nsInd" -> nonEmptyText,
-            "nsAdvInd" -> optional(text),
-            "nsCmp" -> optional(text),
-            "nsAdvCmp" -> optional(text),
+            "nsAdvInd" -> nonEmptyText,
+            "nsCmp" -> nonEmptyText,
+            "nsAdvCmp" -> nonEmptyText,
             "nsExceptions" -> optional(text),
-            "cmpIgnored" -> optional(text)
+            "cmpIgnored" -> nonEmptyText
     ) 
     (AdjectivePair.apply)
     (AdjectivePair.unapply) 

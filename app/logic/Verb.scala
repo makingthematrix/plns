@@ -44,20 +44,7 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
    * @param conjCase the conjugation case
    * @param word the exception form for this case
    */
-  def except(conjCase: Conj.Value, word: String): Verb = {
-    exceptions.put(conjCase, word)
-    this
-  }
-  
-  /**
-   * in rare cases where the same exception form exists for many cases we can add them all
-   * @param conjCases a sequence of conjugation cases
-   * @param word the exception form, identical for all these cases
-   */
-  def except(conjCases: Seq[Conj.Value], word:String): Verb = {
-    conjCases.foreach{ exceptions.put(_,word) }
-    this
-  }
+  def except(conjCase: Conj.Value, word: String) = exceptions.put(conjCase, word)
   
   /** the map of exceptions, case -> word */
   private val exceptions = mutable.Map[Conj.Value,String]()
