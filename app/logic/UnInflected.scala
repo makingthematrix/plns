@@ -8,6 +8,8 @@ class UnInflected(val word: String,override val lang: String) extends SpeechPart
     
   override def translateTo(un: UnInflected,rootId1: Long,rootId2: Long) =
     NSTranslator.add(new Word(word,lang,rootId1,""),new Word(un.word,un.lang,rootId2,""))
+    
+  override def validateExceptionKey(key: String): String = key // uninflected don't have exceptions
 }
 
 object UnInflected {

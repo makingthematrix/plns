@@ -15,6 +15,6 @@ object DeclensionTemplate {
     		  	"NOMS" -> dt.get("NOMS"),"GENS" -> dt.get("GENS"),"DATS" -> dt.get("DATS"),"ACCS" -> dt.get("ACCS"),
     		  	"VOCS" -> dt.get("VOCS"),"LOCS" -> dt.get("LOCS"),"INSS" -> dt.get("INSS"),
     		  	"NOMP" -> dt.get("NOMP"),"GENP" -> dt.get("GENP"),"DATP" -> dt.get("DATP"),"ACCP" -> dt.get("ACCP"),
-    		  	"VOCP" -> dt.get("VOCP"),"LOCP" -> dt.get("LOCP"),"INSP" -> dt.get("INSP"));
+    		  	"VOCP" -> dt.get("VOCP"),"LOCP" -> dt.get("LOCP"),"INSP" -> dt.get("INSP"))
   }
 }

@@ -51,12 +51,13 @@ object AdjectiveCase {
     AdjectiveGender.toString(ac.gender) + AdjectiveDegree.toString(ac.degree) + Decl.toString(ac.declCase)
     
   implicit def parse(key: String):AdjectiveCase = {
-    val gender = key.substring(0, 1)
-    val degree = key.substring(1, 2)
+    val gender: AdjectiveGender.Value = key.substring(0, 1)
+    val degree: AdjectiveDegree.Value = key.substring(1, 2)
     val declCase: Decl.Value = key.substring(2)
     AdjectiveCase(gender,degree,declCase)
   }
   
-  def key(lang: String, gender: String, degree: String, decl: Decl.Value): String = lang + gender + degree + decl
-  def key(gender: String, degree: String, decl: Decl.Value): String = gender + degree + decl
+  def key(lang: String, gender: AdjectiveGender.Value, degree: AdjectiveDegree.Value, decl: Decl.Value): String 
+  	= lang + gender + degree + decl
+  def key(gender: AdjectiveGender.Value, degree: AdjectiveDegree.Value, decl: Decl.Value): String = gender + degree + decl
 }

@@ -52,9 +52,15 @@ fill = (lang, f, r, root, cases, suffices, exceptions) ->
 
 refreshPlAdvResult = ->
   ind = $('#plAdvInd').val()
-  ind = $('#plInd').val() if ind == ''
+  if ind == ''
+    ind = $('#plInd').val() 
+    $('#plAdvInd').val(ind)
+    
   cmp = $('#plAdvCmp').val()
-  cmp = ind if cmp == ''
+  if cmp == ''
+    cmp = ind
+    $('#plAdvCmp').val(cmp)
+     
   mode = $('#plAdvMode').val()
   suffices = if mode == "HARD" then plAdvHardSuffices else plAdvSoftSuffices
   advFill("pl",ind,cmp,suffices)
@@ -62,7 +68,11 @@ refreshPlAdvResult = ->
 refreshPlResult = ->
   ind = $('#plInd').val()
   cmp = $('#plCmp').val()
-  cmp = ind if cmp == ''
+  
+  if cmp == ''
+    cmp = ind 
+    $('#plCmp').val(cmp)
+  
   mode = $('#plMode').val()
   suffices = if(mode == 'HARD') then plHardSuffices else plSoftSuffices
   fill('pl','m','i',ind,casesSing,suffices,plExceptions)
@@ -78,15 +88,23 @@ refreshPlResult = ->
 
 refreshNsAdvResult = ->
   ind = $('#nsAdvInd').val()
-  ind = $('#nsInd').val() if ind == ''
+  if ind == ''
+    ind = $('#nsInd').val() 
+    $('#nsAdvInd').val(ind)
+  
   cmp = $('#nsAdvCmp').val()
-  cmp = ind if cmp == ''
+  if cmp == ''
+    cmp = ind 
+    $('#nsAdvCmp').val(cmp)
+  
   advFill("ns",ind,cmp,nsAdvSuffices)
     
 refreshNsResult = ->
   ind = $('#nsInd').val()
   cmp = $('#nsCmp').val()
-  cmp = ind if cmp == ''
+  if cmp == ''
+  	cmp = ind 
+  	$('#nsCmp').val(cmp)
   fill('ns','m','i',ind,casesSing,nsSuffices,nsExceptions)
   fill('ns','f','i',ind,casesSing,nsSuffices,nsExceptions)
   fill('ns','n','i',ind,casesSing,nsSuffices,nsExceptions)
@@ -352,6 +370,31 @@ initInputs = ->
 
 $('#statusbar').click ->
   hidePopup()
+
+$('#submitButton').click ->
+  ind = $('#plAdvInd').val()
+  if ind == ''
+    ind = $('#plInd').val()
+    $('#plAdvInd').val(ind)
+  cmp = $('#plAdvCmp').val()
+  if cmp == ''
+    $('#plAdvCmp').val(ind)
+  cmp = $('#plCmp').val()
+  if cmp == ''
+    $('#plCmp').val(ind)
+
+  ind = $('#nsAdvInd').val()
+  if ind == ''
+    ind = $('#nsInd').val()
+    $('#nsAdvInd').val(ind)
+  cmp = $('#nsAdvCmp').val()
+  if cmp == ''
+    $('#nsAdvCmp').val(ind)
+  cmp = $('#nsCmp').val()
+  if cmp == ''
+    $('#nsCmp').val(ind)
+  
+  $('#adjectiveForm').submit()
 
 $ ->
   initInputs()

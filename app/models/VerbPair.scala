@@ -25,16 +25,13 @@ case class VerbPair(val plInfStem: String,val plImpStem: String,val plPattern: S
   /**
    * Build a Verb of the source language based on the available data
    */
-  override def pl:Verb = {
+  override def pl = {
     // if the prefixes string starts with the perfective marker, it means that the verb is in the perfective aspect
     val perfective = prefixes.getOrElse("").startsWith(VerbPair.perfectiveMarker)
     // create the Verb of the source language
     val word = PLVerb.word(plInfStem, plImpStem, plPattern, perfective)
     // add exceptions, ignore prefixes
-	plExceptions match {
-      case Some(str) => SpeechPartPair.parseExceptions(str).foreach( ve => word.except(ve._1,ve._2) )
-      case None => 
-	}
+	addExceptions(word,plExceptions)
     // return the Verb
 	word
   }
@@ -46,10 +43,7 @@ case class VerbPair(val plInfStem: String,val plImpStem: String,val plPattern: S
     val perfective = prefixes.getOrElse("").startsWith(VerbPair.perfectiveMarker)
     // create the Verb of the target language
     val word = NSVerb.word(nsInfStem, nsImpStem, nsPattern, perfective)
-	nsExceptions match {
-      case Some(str) => SpeechPartPair.parseExceptions(str).foreach( ve => word.except(ve._1,ve._2) )
-      case None => 
-	}
+	addExceptions(word,nsExceptions)
 	word    
   }
   

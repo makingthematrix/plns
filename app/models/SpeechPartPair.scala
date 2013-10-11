@@ -4,13 +4,18 @@ import logic.SpeechPart
 import logic.NSTranslator
 
 abstract class SpeechPartPair[T <: SpeechPart[T]] {
-  def pl: T;
-  def ns: T;
+  def pl: T
+  def ns: T
 	
-  def add():Seq[(String,String)] = {
+  def add() = {
     NSTranslator.add(pl,ns);
     Seq((pl.mainRoot,ns.mainRoot))    
   }
+  
+  def addExceptions(word: SpeechPart[T], exceptions: Option[String]) = exceptions match {
+    case Some(str) => SpeechPartPair.parseExceptions(str).foreach( ex => word.except(ex._1, ex._2) )
+    case None => 
+  } 
 }
 
 object SpeechPartPair {

@@ -1,16 +1,13 @@
 package logic
 
 import Decl._
-import scala.collection.mutable
-
-//case class AdjectiveException(val gender:String, val degree: String, val declCase: Decl.Value, val word: String);
-
 import AdjectiveCase._
 import AdjectiveGender._
 import AdjectiveDegree._
 
 class Adjective(val ind:String,val cmp:String,val sup:String,val adverb:Adverb,
-				val indDeclension:Map[AdjectiveGender.Value,DeclensionPattern],val cmpDeclension:Map[AdjectiveGender.Value,DeclensionPattern],
+				val indDeclension:Map[AdjectiveGender.Value,DeclensionPattern],
+				val cmpDeclension:Map[AdjectiveGender.Value,DeclensionPattern],
 				val cmpIgnored: Boolean,override val lang:String) 
   extends SpeechPart[Adjective]{
   
@@ -39,16 +36,11 @@ class Adjective(val ind:String,val cmp:String,val sup:String,val adverb:Adverb,
     case _ => throw new IllegalArgumentException("I can't give you that declination, with ac="+ad+" and cmpIgnored="+cmpIgnored)
   }
     
-  
-  private def getDeclinedWord(ac: AdjectiveCase,word: String) = exceptions.get(ac) match {
+  protected def getDeclinedWord(ac: AdjectiveCase,word: String) = exceptions.get(ac) match {
     case Some(ex) => ex
 	case None => word
   }
     
-  private val exceptions = new mutable.HashMap[AdjectiveCase,String]()
-  
-  def except(key: AdjectiveCase, word: String) = exceptions.put(key,word)
-  
   private def translateDegreeTo(adj: Adjective, ad: AdjectiveDegree.Value,rootId1: Long,rootId2: Long){
     val (thisStem, thisDeclension) = stemAndDecl(ad)
     val (thatStem, thatDeclension) = adj.stemAndDecl(ad)
@@ -76,6 +68,7 @@ class Adjective(val ind:String,val cmp:String,val sup:String,val adverb:Adverb,
     })
   }
   
+  override def validateExceptionKey(key: String): String = AdjectiveCase.parse(key).toString
 }
 
 object Adjective {

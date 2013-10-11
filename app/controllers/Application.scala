@@ -4,29 +4,10 @@ import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
-import models.TranslationPair
-import logic.NSTranslator
-import models.UninflectedPair
-import models.AdverbPair
-import logic.PLAdverb
-import logic.PLAdjective
-import logic.NSAdverb
 import play.api.libs.json._
-import models.AdjectivePair
+import logic._
+import models._
 import logic.PLMode._
-import logic.NSAdjective
-import logic.CaseDescription
-import logic.SpeechPart
-import models.SpeechPartPair
-import models.NounPair
-import logic.PLNoun
-import logic.NSNoun
-import models.DeclensionTemplate
-import models.VerbPair
-import logic.NSVerb
-import logic.PLVerb
-import logic.Noun
-import logic.Verb
 
 object Application extends Controller {
 
@@ -39,7 +20,7 @@ object Application extends Controller {
     	  if(NSTranslator.isEmpty) NSTranslator.init()
     	  NSTranslator.translate(source)
     	}
-    	Ok(views.html.index(new TranslationPair(source,target),untranslated,translateForm));
+    	Ok(views.html.index(TranslationPair(source,target),untranslated,translateForm));
     }
   }
   
@@ -176,11 +157,11 @@ object Application extends Controller {
   
   val adverbForm = Form( 
     mapping("plInd" -> nonEmptyText,
-    		"plCmp" -> optional(text),
+    		"plCmp" -> nonEmptyText,
     		"plMode" -> nonEmptyText,
             "nsInd" -> nonEmptyText,
-            "nsCmp" -> optional(text),
-            "cmpIgnored" -> optional(text)
+            "nsCmp" -> nonEmptyText,
+            "cmpIgnored" -> nonEmptyText
     )(AdverbPair.apply)(AdverbPair.unapply) 
   );
   
@@ -199,10 +180,10 @@ object Application extends Controller {
   };
   
   def adverbTemplates = Action {
-    val plHard = PLAdverb.template(HARD);
-    val plSoft = PLAdverb.template(SOFT);
-    val ns = NSAdverb.template;
-    val templatesJson:Seq[JsValue] = Seq(plHard, plSoft, ns).map(template => Json.toJson(template));
+    val plHard = PLAdverb.template(HARD)
+    val plSoft = PLAdverb.template(SOFT)
+    val ns = NSAdverb.template
+    val templatesJson:Seq[JsValue] = Seq(plHard, plSoft, ns).map(template => Json.toJson(template))
     Ok(Json.toJson(templatesJson)).as("application/json")
   }
   
@@ -210,7 +191,7 @@ object Application extends Controller {
     mapping("plWord" -> nonEmptyText, 
             "nsWord" -> nonEmptyText
     )(UninflectedPair.apply)(UninflectedPair.unapply) 
-  );
+  )
   
   def uninflected(pl:String) = Action {
     Ok(views.html.uninflected(pl,uninflectedForm))
@@ -223,7 +204,7 @@ object Application extends Controller {
     	pair => add(pair)
       )
     }
-  };
+  }
   
   private def add[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = {
     val results = pair.add()

@@ -15,4 +15,6 @@ case class Adverb(val ind: String,val cmp: String,val sup: String,val cmpIgnored
       NSTranslator.add(new Word(sup,lang,rootId1,"sup"),new Word(adv.sup,adv.lang,rootId2,"sup"))
     }
   }  
+  
+  override def validateExceptionKey(key: String): String = key // adverbs don't have exceptions
 }

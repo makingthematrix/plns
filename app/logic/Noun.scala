@@ -2,14 +2,26 @@ package logic
 
 import Decl._;
 import IgnoredNumber._
-import scala.collection.mutable;
 
+/**
+ * The Noun class; encapsulates logic for generating noun cases 
+ * @constructor creates a new noun
+ * @param stem the stem of all cases
+ * @param declension encapsulates logic for generating cases
+ * @param ignored marks if the noun can be used in both singular and plural forms, only singular (eg. capitalism), or only plural (eg. pants)
+ * @param lang the language of the verb
+ */
 class Noun(val stem: String,val declension: DeclensionPattern,val ignored: IgnoredNumber.Value,
            override val lang: String) extends SpeechPart[Noun] {
   override val speechPart = "noun"
   override def mainRoot = decline(NOMS);
   override def toRoot() = new Root(mainRoot,speechPart,lang)
 
+  /** generates cases with the given declension and add them all to the dictionary
+   *  @param noun a noun of another language which this one should be translated to
+   *  @param rootId1 the id of the Root object of this noun in the DB [@todo: this should be NounPair id]
+   *  @param rootId1 the id of the Root object of that noun in the DB [@todo: this should be NounPair id]
+   */
   override def translateTo(noun: Noun, rootId1: Long, rootId2: Long){ 
 	lazy val thisDeclension = declensionByIgnored()
 	lazy val thatDeclension = noun.declensionByIgnored()
@@ -27,26 +39,29 @@ class Noun(val stem: String,val declension: DeclensionPattern,val ignored: Ignor
   private lazy val singularDeclension = declension.decline(stem,Noun.singularDeclension)
   private lazy val pluralDeclension = declension.decline(stem,Noun.pluralDeclension)
 
-  /** choose the proper conjugation map
-   *  @param t conjugation type
-   *  @return a case -> word map of regular forms for this verb 
+  /** choose the proper declension based on the ignored marker
+   *  @return a case -> word map of regular forms for this noun 
    */
   private def declensionByIgnored():Map[Decl.Value,String] = ignored match {
     case NONE => bothDeclensions
     case SINGULAR => pluralDeclension
     case PLURAL => singularDeclension
   }
-  
-  def except(declCase: Decl.Value, word: String) = exceptions.put(declCase, word);
 
-  private val exceptions = new mutable.HashMap[Decl.Value,String]();
-
-  private def getDeclinedWord(d: Decl.Value,word: String) = exceptions.get(d) match {
+  /** for the given case and the declined regular form of the verb, return either the exception of this case, or that form
+   *  @param d declension case
+   *  @param word a regular form for this case
+   *  @return either exception for this case or (if there is no exception) the regular form
+   */
+  protected def getDeclinedWord(d: Decl.Value,word: String) = exceptions.get(d) match {
     case Some(ex) => ex
 	case None => word
   }
+  
+  override def validateExceptionKey(key: String): String = Decl.parse(key).toString
 }
 
+/** info about which cases belong to singluar and which to plural declensions */
 object Noun{
   lazy val declension = Seq( NOMS, GENS, DATS, ACCS, INSS, LOCS, VOCS, 
 	                      	   NOMP, GENP, DATP, ACCP, INSP, LOCP, VOCP );  

@@ -228,6 +228,9 @@ initInputs = ->
 $('#statusbar').click ->
   hidePopup()
 
+$('#submitButton').click ->
+  $('#nounForm').submit()
+
 $ ->
   initInputs()
   refresh()

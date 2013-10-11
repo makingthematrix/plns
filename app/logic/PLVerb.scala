@@ -33,9 +33,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "ano",
 	      ACTIVE -> "ając", PASSIVE -> "an", PERFECT -> "awszy", // czyt|ając|y, czyt|an|y, czyt|awszy
 	      IMP2S -> "aj", IMP1P -> "ajmy", IMP2P -> "ajcie" // czyt|aj, czyt|ajmy, czyt|ajcie
-	  );
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// czyt, czyt
   	
@@ -52,9 +52,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "ano",
 	      ACTIVE -> "ąc", PASSIVE -> "an", PERFECT -> "awszy",
 	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie"
-	  );	 
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// słysz, słysz
 	
@@ -72,9 +72,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "ano",
 	      ACTIVE -> "ąc", PASSIVE -> "an", PERFECT -> "awszy", // ciągn|ąc, malow|an
 	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie" // ciągn, ciągn|my, ciągn|cie
-	  );
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// malow, maluj
 	
@@ -91,9 +91,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "niono", // ciąg|niono
 	      ACTIVE -> "nąc", PASSIVE -> "nięt", PERFECT -> "nąwszy", // ciąg|nąc, ciąg|nięt(y/a/o)
 	      IMP2S -> "nij", IMP1P -> "nijmy", IMP2P -> "nijcie" // ciąg|nij, ciąg|nijmy, ciąg|nijcie
-	  );
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// ciąg, ciąg
 
@@ -110,9 +110,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "nięto", // pły|nięto
 	      ACTIVE -> "nąc", PASSIVE -> "nięt", PERFECT -> "nąwszy", // pły|nąc, pły|nięt(y/a/o)
 	      IMP2S -> "ń", IMP1P -> "ńmy", IMP2P -> "ńcie" // pły|ń, pły|ńmy, pły|ńcie
-	  );
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// pły, pły
 
@@ -148,9 +148,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "iono", // rob|iono
 	      ACTIVE -> "iąc", PASSIVE -> "ion", PERFECT -> "iwszy", // rob|iąc, rob|ion
 	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie" // rób, rób|my, rób|cie
-	  );
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// rob, rob
 	
@@ -167,9 +167,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "ono", // wierz|iono
 	      ACTIVE -> "ąc", PASSIVE -> "on", PERFECT -> "ywszy", // wierz|ąc, wierz|on
 	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie" // wierz, wierz|my, wierz|cie
-	  );
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// wierz, wierz
 	
@@ -186,9 +186,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "iano",
 	      ACTIVE -> "ąc", PASSIVE -> "ian", PERFECT -> "iawszy", 
 	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie"
-	  );	 
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// widz, widz
 	
@@ -205,9 +205,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "ano",
 	      ACTIVE -> "ąc", PASSIVE -> "an", PERFECT -> "awszy",
 	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie"
-	  );	 
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// leż, leż
 	
@@ -224,9 +224,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "to", // pi|to
 	      ACTIVE -> "jąc", PASSIVE -> "t", PERFECT -> "ywszy", // pi|jąc, pi|t
 	      IMP2S -> "j", IMP1P -> "jmy", IMP2P -> "jcie" // pi|j, pi|jmy, pi|jcie
-	  );
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// pi, pi
 		 
@@ -243,9 +243,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "no", // la|no
 	      ACTIVE -> "jąc", PASSIVE -> "n", PERFECT -> "awszy", // le|jąc, la|n
 	      IMP2S -> "j", IMP1P -> "jmy", IMP2P -> "jcie" // le|j, le|jmy, le|jcie
-	  );
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// la, le
 	
@@ -262,9 +262,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "ęto", // wzi|ęto
 	      ACTIVE -> "mąc", PASSIVE -> "ęt", PERFECT -> "ąwszy",// weź|mąc, wzi|ęt
 	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie" // weź|, weź|my, weź|cie
-	  );
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// wzi, weź
 	
@@ -281,9 +281,9 @@ object PLVerb extends VerbGenerator("pl") {
 	      PASTIMP -> "ono", // wiezi|ono
 	      ACTIVE -> "ąc", PASSIVE -> "on", PERFECT -> "ąwszy", // wioz|ąc, wioz|on
 	      IMP2S -> "", IMP1P -> "my", IMP2P -> "cie" // wieź|, wieź|my, wieź|cie
-	  );
+	  )
 	  
-	  patternMap.put(this.id, this);
+	  patternMap.put(this.id, this)
 	}
 	// wioz, wieź
 	
@@ -340,6 +340,5 @@ object PLVerb extends VerbGenerator("pl") {
 	  case PRES3P => "będą"
 	  case _ => ""
 	}
-	
-	val ppRootEndings = Set()
+
 }

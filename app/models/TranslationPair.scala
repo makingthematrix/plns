@@ -1,8 +1,8 @@
 package models
 
-case class TranslationPair(source: String, target: String);
+case class TranslationPair(val source: String,val target: String)
 
 object TranslationPair {
-  def empty = new TranslationPair("","");
+  val empty = new TranslationPair("","")
 }
 

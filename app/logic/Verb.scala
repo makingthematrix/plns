@@ -3,7 +3,6 @@ package logic
 import Conj._
 import PLMode._
 import ConjugationType._
-import scala.collection.mutable
 
 /**
  * The Verb class; encapsulates logic for generating of verb cases, participles and verb-derived nouns 
@@ -21,7 +20,7 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
   override def mainRoot = conjugate(INF)
   override def toRoot() = new Root(mainRoot,speechPart,lang)
   
-  /** generates cases for TYPE_INF, TYPE_IMP and TYPE_COND, the passive participle and the noun and add them all to the dictionar
+  /** generates cases for TYPE_INF, TYPE_IMP and TYPE_COND, the passive participle and the noun and add them all to the dictionary
    *  @param verb a verb of another language which this one should be translated to
    *  @param rootId1 the id of the Root object of this verb in the DB [@todo: this should be VerbPair id]
    *  @param rootId1 the id of the Root object of that verb in the DB [@todo: this should be VerbPair id]
@@ -38,16 +37,6 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
 	else adjParticiple(verb,rootId1,rootId2,ACTIVE)
 	
   }
-  
-  /**
-   * adds a verb exception
-   * @param conjCase the conjugation case
-   * @param word the exception form for this case
-   */
-  def except(conjCase: Conj.Value, word: String) = exceptions.put(conjCase, word)
-  
-  /** the map of exceptions, case -> word */
-  private val exceptions = mutable.Map[Conj.Value,String]()
   
   /** maps for case -> word regular forms of TYPE_INF, TYPE_IMP and TYPE_COND cases */
   private lazy val infConjugation = conjugation.conjugate(infStem, Verb.infConjCases)
@@ -69,7 +58,7 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
    *  @param word a regular form for this case
    *  @return either exception for this case or (if there is no exception) the regular form
    */
-  private def getConjugatedWord(c: Conj.Value,word: String) = exceptions.get(c) match {
+  protected def getConjugatedWord(c: Conj.Value,word: String) = exceptions.get(c) match {
     case Some(ex) => ex
 	case None => word
   }
@@ -139,6 +128,7 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
 	NSTranslator.add(new Word(from,lang,rootId1,PERFECT),new Word(to,verb.lang,rootId2,PERFECT))
   }
   
+  override def validateExceptionKey(key: String): String = Conj.parse(key).toString
 }
 
 /** info about which cases belong to which conjugations, etc. */

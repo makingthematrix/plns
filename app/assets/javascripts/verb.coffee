@@ -10,13 +10,13 @@ nsPatterns = {}
 getId = (lang, c) ->
   lang + c
 
-fillCase = (id, root, suffix, exceptions) ->
+fillCase = (id, stem, suffix, exceptions) ->
   word = ''
   if exceptions
     if exceptions[id]
       word = exceptions[id]
   if word == ''
-    word = "#{root}#{suffix}"
+    word = "#{stem}#{suffix}"
   $('#'+id).html(word)
   if id=="plINF" then $('.plPref').html(word)
   else if id=="nsINF" then $('.nsPref').html(word)
@@ -29,49 +29,55 @@ getCase = (lang, c) ->
   val = $('#'+id).html()
   return val
 
-fill = (lang, infRoot, impRoot, suffices, exceptions) ->
+fill = (lang, infStem, impStem, suffices, exceptions) ->
   for c in infCases
     id = getId(lang,c)
     suffix = suffices[c]
-    fillCase(id,infRoot,suffix,exceptions)
+    fillCase(id,infStem,suffix,exceptions)
   for c in impCases
     id = getId(lang,c)
     suffix = suffices[c]
-    fillCase(id,impRoot,suffix,exceptions)
+    fillCase(id,impStem,suffix,exceptions)
                   
 refreshPlResult = ->
-  infRoot = $('#plInfRoot').val()
-  impRoot = $('#plImpRoot').val()
+  infStem = $('#plInfStem').val()
+  impStem = $('#plImpStem').val()
+  if impStem == ''
+  	impStem = infStem 
+  	$('#plImpStem').val(impStem)
   patternName = $('#plPattern').val()
   suffices = plPatterns[patternName]
-  fill('pl',infRoot,impRoot,suffices,plExceptions)
+  fill('pl',infStem,impStem,suffices,plExceptions)
   
 refreshNsResult = ->
-  infRoot = $('#nsInfRoot').val()
-  impRoot = $('#nsImpRoot').val()
+  infStem = $('#nsInfStem').val()
+  impStem = $('#nsImpStem').val()
+  if impStem == ''
+    impStem = infStem 
+    $('#nsImpStem').val(impStem)
   patternName = $('#nsPattern').val()
   suffices = nsPatterns[patternName]
-  fill('ns',infRoot,impRoot,suffices,nsExceptions)
+  fill('ns',infStem,impStem,suffices,nsExceptions)
 
-$('#plInfRoot').keyup (e) -> 
+$('#plInfStem').keyup (e) -> 
   if(e.which == 13) 
     false
   else 
     refreshPlResult()
 
-$('#plImpRoot').keyup (e) -> 
+$('#plImpStem').keyup (e) -> 
   if(e.which == 13) 
     false
   else 
     refreshPlResult()
     
-$('#nsInfRoot').keyup (e) -> 
+$('#nsInfStem').keyup (e) -> 
   if(e.which == 13) 
     false
   else 
     refreshNsResult()
 
-$('#nsImpRoot').keyup (e) -> 
+$('#nsImpStem').keyup (e) -> 
   if(e.which == 13) 
     false
   else 
@@ -237,7 +243,7 @@ initInputs = ->
 $('#statusbar').click ->
   hidePopup()
 
-$('#submitButton').click ->
+setPrefixesInput = ->
   prefixesStr = ''
     
   for pre in prefixes
@@ -248,10 +254,24 @@ $('#submitButton').click ->
       prefixesStr += t + ','
   
   $('#prefixes').val(prefixesStr)
+  
+$('#submitButton').click ->
+  setPrefixesInput()
+  
+  impStem = $('#plImpStem').val()
+  if impStem == ''
+    infStem = $('#plInfStem').val()
+  	$('#plImpStem').val(infStem)
+  	
+  impStem = $('#nsImpStem').val()
+  if impStem == ''
+    infStem = $('#nsInfStem').val()
+  	$('#nsImpStem').val(infStem)
+  	
   $('#verbForm').submit()
 
 $ ->
   initInputs()
   refresh()
   hidePopup()
-  $('#nsRoot').focus()
+  $('#nsStem').focus()
