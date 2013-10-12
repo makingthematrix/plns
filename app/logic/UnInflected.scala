@@ -4,11 +4,8 @@ class UnInflected(val word: String,override val lang: String) extends SpeechPart
   override def mainRoot = word
   override val speechPart = "uninflected"
     
-  override def toRoot():Root = new Root(mainRoot,speechPart,lang)
-    
-  override def translateTo(un: UnInflected,rootId1: Long,rootId2: Long) =
-    NSTranslator.add(new Word(word,lang,rootId1,""),new Word(un.word,un.lang,rootId2,""))
-    
+  override def toRoot():Root = new Root(mainRoot,speechPart,lang)  
+  override def generate(un: UnInflected) = Seq(new DictEntry(word,lang,un.word,un.lang))
   override def validateExceptionKey(key: String): String = key // uninflected don't have exceptions
 }
 

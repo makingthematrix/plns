@@ -3,7 +3,7 @@ package logic
 import scala.collection.mutable
 
 abstract class SpeechPart[T <: SpeechPart[T]] {
-  def translateTo(speechPart: T,rootId1: Long,rootId2: Long)
+  def generate(t: T):Seq[DictEntry]
   def mainRoot: String
   def toRoot:Root
   override def toString = toRoot.toString
@@ -14,8 +14,9 @@ abstract class SpeechPart[T <: SpeechPart[T]] {
   def addRoots(t: T):(Long,Long) = NSTranslator.addRoots(this.toRoot, t.toRoot)
   
   def translateTo(t: T){ 
-    val (rootId1,rootId2) = addRoots(t)
-    translateTo(t,rootId1,rootId2)
+    val (plRootId,nsRootId) = addRoots(t)
+    val translations = generate(t)
+    translations.foreach{ entry => NSTranslator.add(entry.wordPair(plRootId, nsRootId)) }
   }  
   
   /**

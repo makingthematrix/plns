@@ -4,7 +4,7 @@ import Decl._;
 import IgnoredNumber._
 
 /**
- * The Noun class; encapsulates logic for generating noun cases 
+ * encapsulates logic for generating noun cases 
  * @constructor creates a new noun
  * @param stem the stem of all cases
  * @param declension encapsulates logic for generating cases
@@ -19,16 +19,14 @@ class Noun(val stem: String,val declension: DeclensionPattern,val ignored: Ignor
 
   /** generates cases with the given declension and add them all to the dictionary
    *  @param noun a noun of another language which this one should be translated to
-   *  @param rootId1 the id of the Root object of this noun in the DB [@todo: this should be NounPair id]
-   *  @param rootId1 the id of the Root object of that noun in the DB [@todo: this should be NounPair id]
    */
-  override def translateTo(noun: Noun, rootId1: Long, rootId2: Long){ 
+  override def generate(noun: Noun) = { 
 	lazy val thisDeclension = declensionByIgnored()
 	lazy val thatDeclension = noun.declensionByIgnored()
-	Noun.casesTypeMap(ignored).foreach(d => {
+	Noun.ignoreTypeMap(ignored).map(d => {
 	  val from = getDeclinedWord(d,thisDeclension(d))  
 	  val to = noun.getDeclinedWord(d,thatDeclension(d))
-	  NSTranslator.add(new Word(from,lang,rootId1,d),new Word(to,noun.lang,rootId2,d))
+	  DictEntry(from,lang,to,noun.lang,d)
 	})
   }
 
@@ -68,7 +66,7 @@ object Noun{
   lazy val singularDeclension = Seq( NOMS, GENS, DATS, ACCS, INSS, LOCS, VOCS );
   lazy val pluralDeclension = Seq( NOMP, GENP, DATP, ACCP, INSP, LOCP, VOCP );
   
-  def casesTypeMap = Map(
+  lazy val ignoreTypeMap = Map(
     NONE -> declension,
     SINGULAR -> pluralDeclension,
     PLURAL -> singularDeclension

@@ -3,7 +3,6 @@ package models
 import logic.Adverb
 import logic.PLAdverb
 import logic.NSAdverb
-import logic.PLMode
 
 /**
  * Holds all data needed for generating translations of all degrees of an adverb.

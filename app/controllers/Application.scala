@@ -7,7 +7,7 @@ import play.api.data.Forms._
 import play.api.libs.json._
 import logic._
 import models._
-import logic.PLMode._
+import logic.HardSoftMode._
 
 object Application extends Controller {
 

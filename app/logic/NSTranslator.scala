@@ -1,7 +1,7 @@
 package logic
 
 import Decl._
-import PLMode._
+import HardSoftMode._
 import scala.collection.mutable;
 import models.AdjectivePair
 
@@ -60,13 +60,13 @@ object NSTranslator {
 	});
   }
   	
-  def addAdjective(plInd: String, plCmp: String,nsInd: String, nsCmp: String,mode: PLMode.Value, isRoot: Boolean): Unit =  {
+  def addAdjective(plInd: String, plCmp: String,nsInd: String, nsCmp: String,mode: HardSoftMode.Value, isRoot: Boolean): Unit =  {
 	val pl = PLAdjective.word(plInd, plCmp, plInd, plCmp, mode, mode, false);
 	val ns = NSAdjective.word(nsInd, nsCmp);
 	pl.translateTo(ns);
   }
 
-  def addAdjective(plRoot: String, nsRoot: String,mode: PLMode.Value, isRoot: Boolean): Unit =  {
+  def addAdjective(plRoot: String, nsRoot: String,mode: HardSoftMode.Value, isRoot: Boolean): Unit =  {
 	val pl = PLAdjective.word(plRoot, mode);
 	val ns = NSAdjective.word(nsRoot);
 	pl.translateTo(ns);
@@ -79,8 +79,9 @@ object NSTranslator {
 	
   def addRoots(from: Root, to: Root):(Long,Long) = dictionary.addRoots(from,to)
   
-  def add(from: Word, to: Word):Unit = dictionary.add(from,to);
-  
+  def add(from: Word, to: Word):Unit = dictionary.add(from,to)
+  def add(tuple: (Word,Word)):Unit = add(tuple._1,tuple._2)
+ 
   def list:Seq[Root] = dictionary.roots
   
   def rootPairs:Seq[(Root,Root)] = dictionary.rootPairs
@@ -112,5 +113,5 @@ object NSTranslator {
   
   def translate(source: String): (String,Array[String]) = dictionary.translate(source);
   
-  private def add(pl: String, ns: String, mode: PLMode.Value, isRoot: Boolean = true) = addAdjective(pl,ns,mode,isRoot);
+  private def add(pl: String, ns: String, mode: HardSoftMode.Value, isRoot: Boolean = true) = addAdjective(pl,ns,mode,isRoot);
 }
