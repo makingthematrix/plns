@@ -7,11 +7,12 @@ import models.AdjectivePair
 import logic.AdjectiveCase._
 import logic.AdjectiveGender._
 import logic.AdjectiveDegree._
-import logic.PLMode._
+import logic.HardSoftMode._
 import logic.Decl._
+import DictionaryFactory._
 
 class AdjectiveSuite {
-   val dict = NSTranslator.changeDictionary("debug")
+   val dict = DictionaryFactory.dict(DEBUG)
   
   private def setUp() = dict.clear
   private def tearDown() = dict.clear

@@ -4,9 +4,10 @@ import org.scalatest.junit.JUnitSuite
 import org.junit.Assert._
 import org.junit.{Test, Before}
 import models.NounPair
+import DictionaryFactory._
 
 class NounSuite {
-  val dict = NSTranslator.changeDictionary("debug")
+  val dict = DictionaryFactory.dict(DEBUG)
   
   private def setUp() = dict.clear
   private def tearDown() = dict.clear

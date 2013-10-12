@@ -11,16 +11,23 @@ import logic.HardSoftMode._
 
 object Application extends Controller {
 
-  def index = Action { Ok(views.html.index(TranslationPair.empty,Array[String](),translateForm)) }
+  def index = Action { Ok(views.html.index(TranslationPair.empty,Seq[String](),translateForm)) }
   
-  def translate = Action { 
+  private def translate(source: String): SimpleResult = {
+    val (target,untranslated) = if(source == "") ("",Seq[String]()) else {
+      if(NSTranslator.isEmpty) NSTranslator.init()
+      DictionaryFactory.dict.translate(source)
+    }
+    Ok(views.html.index(TranslationPair(source,target),untranslated,translateForm));
+  }
+  
+  def translate: Action[AnyContent] = Action { 
     implicit request => {
-    	val (source,_) = translateForm.bindFromRequest.get;
-    	val (target,untranslated) = if(source == "") ("",Array[String]()) else {
-    	  if(NSTranslator.isEmpty) NSTranslator.init()
-    	  NSTranslator.translate(source)
-    	}
-    	Ok(views.html.index(TranslationPair(source,target),untranslated,translateForm));
+      Logger("MyApp").info("translate")
+      translateForm.bindFromRequest.fold(
+        formWithErrors => printFormErrors(formWithErrors),
+        source => translate(source._1)
+      )
     }
   }
   

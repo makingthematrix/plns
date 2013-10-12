@@ -4,6 +4,7 @@ import logic.Verb
 import logic.PLVerb
 import logic.NSVerb
 import logic.NSTranslator
+import logic.DictionaryFactory
 
 /**
  * Holds all data needed for generating translations of all cases of a set of verbs.
@@ -70,12 +71,16 @@ case class VerbPair(val plInfStem: String,val plImpStem: String,val plPattern: S
     							    else (plPrefix.substring(1),true)
     // if this is the main verb (ie. no prefixes) just generate the verbs,
     // otherwise create a VerbPair for the verbs with the prefixes and only then generate the verbs
-    val (plWord,nsWord) = if(realPlPrefix.isEmpty()) (this.pl,this.ns) 
+    val (plVerb,nsVerb) = if(realPlPrefix.isEmpty()) (this.pl,this.ns) 
     					  else prefixPair(realPlPrefix,nsPrefix,perfective)
+    
+    val (plRootId,nsRootId) = DictionaryFactory.dict.addRoots(plVerb.toRoot, nsVerb.toRoot)
+    
     // add the verbs to the dictionary
-    NSTranslator.add(plWord,nsWord);
+    val translations = plVerb.generate(nsVerb)
+    translations.foreach{ entry => DictionaryFactory.dict.add(entry.wordPair(plRootId, nsRootId)) }
     // return the main roots
-    (plWord.mainRoot,nsWord.mainRoot)
+    (plVerb.mainRoot,nsVerb.mainRoot)
   }
   
   /**

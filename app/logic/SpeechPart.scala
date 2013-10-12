@@ -11,14 +11,6 @@ abstract class SpeechPart[T <: SpeechPart[T]] {
   val speechPart: String
   val lang: String
   
-  def addRoots(t: T):(Long,Long) = NSTranslator.addRoots(this.toRoot, t.toRoot)
-  
-  def translateTo(t: T){ 
-    val (plRootId,nsRootId) = addRoots(t)
-    val translations = generate(t)
-    translations.foreach{ entry => NSTranslator.add(entry.wordPair(plRootId, nsRootId)) }
-  }  
-  
   /**
    * adds an exception exception
    * @param key the declension/conjugation/other of the exceptional case; it should be a valid case for the given speech part 

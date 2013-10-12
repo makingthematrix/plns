@@ -15,77 +15,64 @@ case class Translation(val id:Long, val wordid1:Long, val wordid2:Long){
 }
 
 abstract class AbstractDictionary {
-  def clear:Unit;
-  
-  def size:Int;
-  
-  def get(word: String):Option[String];
-	
-  def add(from: Word, to: Word): Unit;
-	
-  def update(from: String, to: String): Unit;
-	
-  def tuples:Seq[(String,String)];
-  
-  def words:Seq[String];
-  
-  def hasWord(word: String,lang: String):Boolean;
-  
-  def isEmpty:Boolean;
-  
+  def clear:Unit
+  def size:Int
+  def get(word: String):Option[String]
+  def add(from: Word, to: Word): Unit
+  def update(from: String, to: String): Unit
+  def tuples:Seq[(String,String)]
+  def words:Seq[String]
+  def hasWord(word: String,lang: String):Boolean
+  def isEmpty:Boolean
   def addRoot(root: Root):Option[Long]
-  
-  def addRoots(from: Root,to: Root): (Long,Long);
-  
+  def addRoots(from: Root,to: Root): (Long,Long)
   def roots:Seq[Root]
-  
   def rootPairs:Seq[(Root,Root)]
 //-----------------------------------------------------
-  def add(tuple: (Word,Word)): Unit = add(tuple._1,tuple._2);
-	
-  def update(tuple: (String,String)): Unit = update(tuple._1,tuple._2);
+  def add(tuple: (Word,Word)): Unit = add(tuple._1,tuple._2)
+  def update(tuple: (String,String)): Unit = update(tuple._1,tuple._2)
   
-  def translate(sentence: String): (String, Array[String]) = {
-	val words = split(sentence);
+  def translate(sentence: String):(String,Seq[String]) = {
+	val words = split(sentence)
 	val translatedPairs = words.map(word => word match {
-	  case wordPattern() => translateWord(word);
-	  case _ => (word,true);
-	});
+	  case wordPattern() => translateWord(word)
+	  case _ => (word,true)
+	})
 	
-	val translatedWords = translatedPairs.map(pair => pair._1);
-	val untranslated = translatedPairs.flatMap(pair => if(pair._2) None else Some(pair._1));
-	return (translatedWords.mkString,untranslated);
+	val translatedWords = translatedPairs.map(pair => pair._1)
+	val untranslated = translatedPairs.flatMap(pair => if(pair._2) None else Some(pair._1)).toSeq
+	(translatedWords.mkString,untranslated)
   }
   
-  private def split(sentence: String): Array[String] = {
-    val words = new mutable.ArrayBuffer[String]();
-	var flag = 0; // 0 - start, 1 - a letter, 2 - other
-	val sb = new StringBuilder();
+  private def split(sentence: String) = {
+    val words = new mutable.ArrayBuffer[String]()
+	var flag = 0 // 0 - start, 1 - a letter, 2 - other
+	val sb = StringBuilder.newBuilder
 	
 	val flush = (newFlag: Int) => { 
 	  if(!sb.isEmpty){ 
-	    words += sb.toString; 
-	    sb.clear(); 
-	  }; 
-	  flag = newFlag; 
+	    words += sb.toString 
+	    sb.clear()
+	  }
+	  flag = newFlag 
 	}
 	    
 	sentence.toCharArray.foreach(c => { 
 	  c.toString match { 
-	    case letterPattern() => if(flag != 1) flush(1);
-	    case _ => if(flag == 1) flush(2);
+	    case letterPattern() => if(flag != 1) flush(1)
+	    case _ => if(flag == 1) flush(2)
 	  }
-	  sb.append(c);
-	});
+	  sb.append(c)
+	})
 	    
-	flush(0);
+	flush(0)
 	    
-	words.toArray;
+	words.toSeq
   }
     
   private def translateWord(word: String): (String,Boolean) = {
-	if(word.isEmpty()) return ("",true);
-	if(wordPattern.findFirstIn(word).isEmpty) return (word,true);
+	if(word.isEmpty()) return ("",true)
+	if(wordPattern.findFirstIn(word).isEmpty) return (word,true)
 	
 	get(word.toLowerCase()) match {
 	  case Some(t) => {

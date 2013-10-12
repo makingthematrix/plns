@@ -2,14 +2,17 @@ package models
 
 import logic.SpeechPart
 import logic.NSTranslator
+import logic.DictionaryFactory
 
 abstract class SpeechPartPair[T <: SpeechPart[T]] {
   def pl: T
   def ns: T
 	
   def add() = {
-    NSTranslator.add(pl,ns);
-    Seq((pl.mainRoot,ns.mainRoot))    
+    val (plRootId,nsRootId) = DictionaryFactory.dict.addRoots(pl.toRoot, ns.toRoot)
+    val translations = pl.generate(ns)
+    translations.foreach{ entry => DictionaryFactory.dict.add(entry.wordPair(plRootId, nsRootId)) }
+    Seq((pl.mainRoot,ns.mainRoot))
   }
   
   def addExceptions(word: SpeechPart[T], exceptions: Option[String]) = exceptions match {
