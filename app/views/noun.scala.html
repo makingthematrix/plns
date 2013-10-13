@@ -1,4 +1,4 @@
-@(pl: String, nounForm: Form[NounPair])
+@(pairId: Long, pl: String, nounForm: Form[NounPair])
 
 @import helper._
 @import logic.CaseDescription.cases
@@ -40,6 +40,7 @@
   <div id="content">
   	<div id="wrap">
 	@form(routes.Application.addNoun,'id -> "nounForm") {
+		<input type="hidden" name="id" id="id" value="@pairId"/>
 		<div id="left">
 			<div class="longbox">
 				<h2><center>Rzeczownik PL</center></h2>

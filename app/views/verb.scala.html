@@ -1,4 +1,4 @@
-@(pl: String, verbForm: Form[VerbPair])
+@(pairId: Long, pl: String, verbForm: Form[VerbPair])
 
 @import helper._
 @import logic.CaseDescription._
@@ -63,13 +63,14 @@
   <div id="content">
   	<div id="wrap">
 	@form(routes.Application.addVerb,'id -> "verbForm") {
+    	<input type="hidden" name="id" id="id" value="@pairId"/>
 		<div id="left">
 			<div class="longbox">
 				<h2><center>Czasownik PL</center></h2>
-				<br><h3>Temat 1</h3> @input(verbForm("plInfRoot")){ (id, name, value, args) =>
+				<br><h3>Temat 1</h3> @input(verbForm("plInfStem")){ (id, name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value="@pl"></input>
     			}
-    			<br><h3>Temat 2</h3> @input(verbForm("plImpRoot")){ (id, name, value, args) =>
+    			<br><h3>Temat 2</h3> @input(verbForm("plImpStem")){ (id, name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value="@pl"></input>
     			}
     			<br><h3>Wzorzec odmiany</h3> @select(verbForm("plPattern"), options = options(plVerbPatterns))
@@ -109,10 +110,10 @@
 		<div id="left">
 			<div class="longbox">
 				<h2><center>Czasownik NS</center></h2>
-				<br><h3>Temat 1</h3> @input(verbForm("nsInfRoot")){ (id, name, value, args) =>
+				<br><h3>Temat 1</h3> @input(verbForm("nsInfStem")){ (id, name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value=""></input>
     			}
-    			<br><h3>Temat 2</h3> @input(verbForm("nsImpRoot")){ (id, name, value, args) =>
+    			<br><h3>Temat 2</h3> @input(verbForm("nsImpStem")){ (id, name, value, args) =>
     				<input type="text" name="@name" id="@id" @toHtmlArgs(args) value=""></input>
     			}
     			<br><h3>Wzorzec odmiany</h3> @select(verbForm("nsPattern"), options = options(nsVerbPatterns))

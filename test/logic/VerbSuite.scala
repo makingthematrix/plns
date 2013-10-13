@@ -25,7 +25,7 @@ class VerbSuite {
   def shouldGenerateTranslation(){
     setUp()
     try {
-      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,None)
+      val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,None)
       assertEquals(None,dict.get("mówić"))
       vp.add()
       assertEquals(Option("govoriti"),dict.get("mówić"))
@@ -36,7 +36,7 @@ class VerbSuite {
   def shouldGenerateTranslationWithPrefix(){
     setUp()
     try {
-      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,Some("_,prze_pre"))
+      val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,Some("_,prze_pre"))
       assertEquals(None,dict.get("mówić"))
       vp.add()
       assertEquals(Option("pregovoriti"),dict.get("przemówić")) 
@@ -48,7 +48,7 @@ class VerbSuite {
     setUp()
     val prefixes = Some("_,"+VerbPair.perfectiveMarker+"prze_pre")
     try{
-      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,prefixes)
+      val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,prefixes)
       assertEquals(None,dict.get("mówić"))
       vp.add()
       assertEquals(Option("govoriti"),dict.get("mówić"))
@@ -65,7 +65,7 @@ class VerbSuite {
     setUp()
     val prefixes = Some("_,"+VerbPair.perfectiveMarker+"po_po")
     try {
-      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,prefixes)
+      val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,prefixes)
       assertEquals(None,dict.get("mówić"))
       vp.add()
       assertEquals(Option("govoriti"),dict.get("mówić"))
@@ -82,7 +82,7 @@ class VerbSuite {
   def shouldGenerateConditionals(){
     setUp()
     try {
-      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,None)
+      val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,None)
       assertEquals(None,dict.get("mówić"))
       vp.add()
       assertEquals(Option("govoril byh"),dict.get("mówiłbym"))
@@ -98,7 +98,7 @@ class VerbSuite {
   def shouldGenerateLongPastTense(){
     setUp()
     try {
-      val vp = VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,None)
+      val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,None)
       assertEquals(None,dict.get("mówić"))
       vp.add()
       assertEquals(Option("jesm govoril"),dict.get("mówiłem"))

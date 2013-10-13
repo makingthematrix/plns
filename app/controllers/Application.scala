@@ -4,6 +4,7 @@ import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
+import play.api.data.format.Formats._
 import play.api.libs.json._
 import logic._
 import models._
@@ -39,7 +40,8 @@ object Application extends Controller {
   }
 
   val verbForm = Form(
-    mapping("plInfStem" -> nonEmptyText,
+    mapping("id" -> of[Long],
+            "plInfStem" -> nonEmptyText,
             "plImpStem" -> nonEmptyText,
     		"plPattern" -> nonEmptyText,
     		"plExceptions" -> optional(text),
@@ -64,8 +66,7 @@ object Application extends Controller {
   }
   
   def verb(pl:String) = Action {
-    val root = pl;
-    Ok(views.html.verb(root,verbForm))
+    Ok(views.html.verb(SpeechPartPair.noId, pl, verbForm))
   }
   
   def addVerb = Action {
@@ -79,7 +80,8 @@ object Application extends Controller {
   }
   
   val nounForm = Form(
-    mapping("plStem" -> nonEmptyText,
+    mapping("id" -> of[Long],
+            "plStem" -> nonEmptyText,
     		"plPattern" -> nonEmptyText,
     		"plExceptions" -> optional(text),
     		"nsStem" -> nonEmptyText,
@@ -95,8 +97,7 @@ object Application extends Controller {
   val nsNounPatterns = NSNoun.idsExamples
   
   def noun(pl:String) = Action {
-    val root = pl;
-    Ok(views.html.noun(root,nounForm))
+    Ok(views.html.noun(SpeechPartPair.noId, pl, nounForm))
   }
   
   def nounTemplates = Action {
@@ -117,7 +118,8 @@ object Application extends Controller {
   };
   
   val adjectiveForm = Form(
-    mapping("plInd" -> nonEmptyText,
+    mapping("id" -> of[Long],
+            "plInd" -> nonEmptyText,
     		"plAdvInd" -> nonEmptyText,
     		"plCmp" -> nonEmptyText,
     		"plAdvCmp" -> nonEmptyText,
@@ -140,8 +142,7 @@ object Application extends Controller {
   val declPl = Noun.pluralDeclension.map(d => d.toString());
   
   def adjective(pl:String) = Action {
-    val root = if(pl.length()>1) pl.substring(0, pl.length()-1) else pl;
-    Ok(views.html.adjective(root,adjectiveForm))
+    Ok(views.html.adjective(SpeechPartPair.noId, pl, adjectiveForm))
   }
   
   def addAdjective = Action {
@@ -163,7 +164,8 @@ object Application extends Controller {
   }
   
   val adverbForm = Form( 
-    mapping("plInd" -> nonEmptyText,
+    mapping("id" -> of[Long],
+            "plInd" -> nonEmptyText,
     		"plCmp" -> nonEmptyText,
     		"plMode" -> nonEmptyText,
             "nsInd" -> nonEmptyText,
@@ -173,8 +175,7 @@ object Application extends Controller {
   );
   
   def adverb(pl:String) = Action {
-    val root = if(pl.length()>1) pl.substring(0, pl.length()-1) else pl;
-    Ok(views.html.adverb(root,adverbForm))
+    Ok(views.html.adverb(SpeechPartPair.noId, pl, adverbForm))
   }
   
   def addAdverb = Action {
@@ -195,13 +196,14 @@ object Application extends Controller {
   }
   
   val uninflectedForm = Form( 
-    mapping("plWord" -> nonEmptyText, 
+    mapping("id" -> of[Long],
+            "plWord" -> nonEmptyText, 
             "nsWord" -> nonEmptyText
     )(UninflectedPair.apply)(UninflectedPair.unapply) 
   )
   
   def uninflected(pl:String) = Action {
-    Ok(views.html.uninflected(pl,uninflectedForm))
+    Ok(views.html.uninflected(SpeechPartPair.noId, pl, uninflectedForm))
   }
   
   def addUninflected = Action {
@@ -221,9 +223,9 @@ object Application extends Controller {
   }
   
   private def printFormErrors[T](formWithErrors: Form[T]) = {
-    val sb = new StringBuilder("Errors: <br>\n")
+    val sb = new StringBuilder("Errors: \n")
     formWithErrors.errors.foreach( error => {
-      sb.append(error).append("<br>\n")
+      sb.append(error).append("\n")
       println(error)
     })
     BadRequest(sb.toString);

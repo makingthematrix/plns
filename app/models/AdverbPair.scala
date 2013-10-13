@@ -13,8 +13,10 @@ import logic.NSAdverb
  * @param nsInd the stem for the INDICATIVE degree of the adverb in the target language
  * @param nsCmp the stem for the COMPARATIVE and SUPERLATIVE degrees of the adverb in the target language
  */
-case class AdverbPair(plInd: String,plCmp: String,plMode: String,
+case class AdverbPair(override val id: Long, plInd: String,plCmp: String,plMode: String,
 			     nsInd: String,nsCmp: String, cmpIgnored: String) extends SpeechPartPair[Adverb]{
+  def this(plInd: String, plCmp: String, plMode: String, nsInd: String, nsCmp: String, cmpIgnored: String) =
+    this(SpeechPartPair.noId, plInd, plCmp, plMode, nsInd, nsCmp, cmpIgnored)
   override def pl = PLAdverb.word(plInd,plCmp,plMode,cmpIgnored.equals("true"))
   override def ns = NSAdverb.word(nsInd,nsCmp,cmpIgnored.equals("true"))
 }

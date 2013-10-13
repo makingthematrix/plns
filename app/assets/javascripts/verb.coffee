@@ -261,17 +261,17 @@ $('#submitButton').click ->
   impStem = $('#plImpStem').val()
   if impStem == ''
     infStem = $('#plInfStem').val()
-  	$('#plImpStem').val(infStem)
+    $('#plImpStem').val(infStem)
   	
   impStem = $('#nsImpStem').val()
   if impStem == ''
     infStem = $('#nsInfStem').val()
-  	$('#nsImpStem').val(infStem)
-  	
+    $('#nsImpStem').val(infStem)  	
+
   $('#verbForm').submit()
 
 $ ->
   initInputs()
   refresh()
   hidePopup()
-  $('#nsStem').focus()
+  $('#nsInfStem').focus()

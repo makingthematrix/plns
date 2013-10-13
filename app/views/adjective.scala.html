@@ -1,4 +1,4 @@
-@(pl: String, adjectiveForm: Form[AdjectivePair])
+@(pairId: Long, pl: String, adjectiveForm: Form[AdjectivePair])
 
 @import helper._
 @import logic.CaseDescription.cases
@@ -47,6 +47,7 @@
   <div id="content">
   	<div id="wrap">
 	@form(routes.Application.addAdjective,'id -> "adjectiveForm") {
+		<input type="hidden" name="id" id="id" value="@pairId"/>
 		<div id="left">
 			<div class="longbox">
 				<h2><center>Przymiotnik PL</center></h2>

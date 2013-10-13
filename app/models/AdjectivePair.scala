@@ -22,15 +22,21 @@ import logic.AdjectiveCase
  * @param nsExceptions a string composed of exceptions from the regular declension in the target language, if there are any, or None
  * @see logic.AdjectiveCase
  */
-case class AdjectivePair(plInd:String,plAdvInd:String,plCmp:String,plAdvCmp:String,
-                         plMode:String,plAdvMode:String,plExceptions:Option[String],
-                         nsInd:String,nsAdvInd:String,nsCmp:String,nsAdvCmp:String,
-                         nsExceptions:Option[String],cmpIgnored:String) 
-  extends SpeechPartPair[Adjective]{
-  def this(plInd:String,plCmp:String,plMode:String,plExceptions:Option[String],nsInd:String,nsCmp:String,nsExceptions:Option[String]) =
-    this(plInd,plInd,plCmp,plCmp,plMode,plMode,plExceptions,nsInd,nsInd,nsCmp,nsCmp,nsExceptions,"false")
-  def this(plInd:String,plMode:String,plExceptions:Option[String],nsInd:String,nsExceptions:Option[String]) =
-    this(plInd,plInd,plInd,plInd,plMode,plMode,plExceptions,nsInd,nsInd,nsInd,nsInd,nsExceptions,"true")
+case class AdjectivePair(override val id: Long, plInd: String, plAdvInd: String, plCmp: String, plAdvCmp: String,
+                         plMode: String, plAdvMode: String, plExceptions: Option[String],
+                         nsInd: String, nsAdvInd: String, nsCmp: String,nsAdvCmp: String,
+                         nsExceptions: Option[String], cmpIgnored: String) extends SpeechPartPair[Adjective]{
+  def this(plInd: String, plAdvInd: String, plCmp: String, plAdvCmp: String, plMode: String, plAdvMode: String, plExceptions: Option[String],
+           nsInd: String, nsAdvInd: String, nsCmp: String, nsAdvCmp: String, nsExceptions:Option[String], cmpIgnored: String) =
+    this(SpeechPartPair.noId, plInd, plAdvInd, plCmp, plAdvCmp, plMode, plAdvMode, plExceptions, 
+                              nsInd, nsAdvInd, nsCmp, nsAdvCmp, nsExceptions, cmpIgnored)
+  def this(plInd:String, plCmp:String, plMode:String, plExceptions:Option[String],
+           nsInd:String, nsCmp:String, nsExceptions:Option[String]) =
+    this(SpeechPartPair.noId, plInd, plInd, plCmp, plCmp, plMode, plMode, plExceptions, 
+                              nsInd, nsInd, nsCmp, nsCmp, nsExceptions, "false")
+  def this(plInd:String, plMode:String, plExceptions:Option[String], nsInd:String, nsExceptions:Option[String]) =
+    this(SpeechPartPair.noId, plInd, plInd, plInd, plInd, plMode, plMode, plExceptions,
+                              nsInd, nsInd, nsInd, nsInd, nsExceptions, "true")
   
   /**
    * Build an Adjective of the source language based on the available data
@@ -42,10 +48,10 @@ case class AdjectivePair(plInd:String,plAdvInd:String,plCmp:String,plAdvCmp:Stri
   }
 
   /**
-   * Build a Verb of the target language based on the available data
+   * Build a n Adjective of the target language based on the available data
    */
   override def ns = {
-    val word = NSAdjective.word(nsInd,nsCmp,nsAdvInd,nsAdvCmp,cmpIgnored.equals("true"))
+    val word = NSAdjective.word(nsInd, nsCmp, nsAdvInd, nsAdvCmp, cmpIgnored.equals("true"))
     addExceptions(word,nsExceptions)
     word
   }

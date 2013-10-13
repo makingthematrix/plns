@@ -16,7 +16,7 @@ class NounSuite {
   def shouldGenerateTranslation(){
     setUp()
     try {
-      val np = NounPair("wilk","SOFT_MASCULINE_PERSON",None,"vlk","SOFT_MASCULINE_PERSON",None,IgnoredNumber.NONE)
+      val np = new NounPair("wilk","SOFT_MASCULINE_PERSON",None,"vlk","SOFT_MASCULINE_PERSON",None,IgnoredNumber.NONE)
       assertEquals(None,dict.get("wilk"))
       np.add()
       assertEquals(Option("vlk"),dict.get("wilk"))
@@ -27,7 +27,7 @@ class NounSuite {
   def shouldGenerateException(){
     setUp()
     try {
-      val np = NounPair("wilk","SOFT_MASCULINE_PERSON",Some("NOMP:wilki,VOCP:wilki"),"vlk","SOFT_MASCULINE_PERSON",None,IgnoredNumber.NONE)
+      val np = new NounPair("wilk","SOFT_MASCULINE_PERSON",Some("NOMP:wilki,VOCP:wilki"),"vlk","SOFT_MASCULINE_PERSON",None,IgnoredNumber.NONE)
       assertEquals(None,dict.get("wilk"))
       np.add()
       assertEquals(Option("vlk"),dict.get("wilk"))
@@ -40,7 +40,7 @@ class NounSuite {
   def shouldIgnoreSingular(){
     setUp()
     try {
-      val np = NounPair("spodni","SOFT_MASCULINE_OBJECT_E",
+      val np = new NounPair("spodni","SOFT_MASCULINE_OBJECT_E",
     		  			Some("NOMS:spodeń,GENP:spodni"),
     		  			"nogavic","HARD_MASCULINE_OBJECT",
     		  			Some("NOMS:nogavic,NOMP:nogavice,ACCP:nogavice"),
@@ -56,7 +56,7 @@ class NounSuite {
   def shouldIgnorePlural(){
     setUp()
     try {
-      val np = NounPair("człowiek","SOFT_MASCULINE_OBJECT_I",Some("GENP:człowieków"),
+      val np = new NounPair("człowiek","SOFT_MASCULINE_OBJECT_I",Some("GENP:człowieków"),
     		  			"muž","HARD_MASCULINE_PERSON",None,
     		  			IgnoredNumber.PLURAL)
       assertEquals(None,dict.get("człowiek"))

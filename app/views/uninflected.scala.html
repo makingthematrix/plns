@@ -1,4 +1,4 @@
-@(pl: String, uninflectedForm: Form[UninflectedPair]) 
+@(pairId: Long, pl: String, uninflectedForm: Form[UninflectedPair]) 
 
 @import helper._
 
@@ -10,6 +10,7 @@
   <div id="content">
   	<div id="wrap">
 	@form(routes.Application.addUninflected,'id -> "uninflectedForm") {
+		<input type="hidden" name="id" id="id" value="@pairId"/>
 		<div id="left"><div class="box">
 		@input(uninflectedForm("plWord")){ (id,name, value, args) =>
     		<input type="text" name="@name" id="@id" @toHtmlArgs(args) value="@pl"></input>
