@@ -25,7 +25,7 @@ import logic.AdjectiveCase
 case class AdjectivePair(override val id: Long, plInd: String, plAdvInd: String, plCmp: String, plAdvCmp: String,
                          plMode: String, plAdvMode: String, plExceptions: Option[String],
                          nsInd: String, nsAdvInd: String, nsCmp: String,nsAdvCmp: String,
-                         nsExceptions: Option[String], cmpIgnored: String) extends SpeechPartPair[Adjective]{
+                         nsExceptions: Option[String], cmpIgnored: String) extends SpeechPartPair[Adjective]("adjective"){
   def this(plInd: String, plAdvInd: String, plCmp: String, plAdvCmp: String, plMode: String, plAdvMode: String, plExceptions: Option[String],
            nsInd: String, nsAdvInd: String, nsCmp: String, nsAdvCmp: String, nsExceptions:Option[String], cmpIgnored: String) =
     this(SpeechPartPair.noId, plInd, plAdvInd, plCmp, plAdvCmp, plMode, plAdvMode, plExceptions, 
@@ -56,4 +56,11 @@ case class AdjectivePair(override val id: Long, plInd: String, plAdvInd: String,
     word
   }
   
+  override def copyWithId(id: Long) = AdjectivePair(id, plInd, plAdvInd, plCmp, plAdvCmp, plMode, plAdvMode, plExceptions,
+                         							nsInd, nsAdvInd, nsCmp, nsAdvCmp, nsExceptions, cmpIgnored)
+  
+  override protected def contentize = Seq(
+    plInd, plAdvInd, plCmp, plAdvCmp, plMode, plAdvMode, plExceptions.getOrElse(""),
+    nsInd, nsAdvInd, nsCmp, nsAdvCmp, nsExceptions.getOrElse(""), cmpIgnored
+  ).mkString(",")
 }

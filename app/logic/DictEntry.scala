@@ -1,13 +1,25 @@
 package logic
 
-case class DictEntry(val plWord: String,val plLang: String,val nsWord: String,val nsLang: String,val caseId: String) {
-  def this(plWord: String,plLang: String,nsWord: String,nsLang: String) = this(plWord,plLang,nsWord,nsLang,DictEntry.undef)
+import SpeechPart._
+import models.SpeechPartPair
 
-  def makePlWord(rootId: Long) = new Word(plWord,plLang,rootId,caseId)
-  def makeNsWord(rootId: Long) = new Word(nsWord,nsLang,rootId,caseId)
-  def wordPair(plRootId: Long,nsRootId: Long):(Word,Word) = (makePlWord(plRootId),makeNsWord(nsRootId))
+case class DictEntry(id: Long, plWord: String, plLang: String, 
+                     nsWord: String, nsLang: String, 
+                     caseId: String, speechPart: SpeechPart.Value, speechPartId: Long) extends Contentized {
+  def this(plWord: String, plLang: String, nsWord: String, nsLang: String) 
+    = this(DictEntry.noId, plWord, plLang, nsWord, nsLang, DictEntry.undef, UNINFLECTED, SpeechPartPair.noId)
+
+  def this(plWord: String, plLang: String, nsWord: String, nsLang: String, 
+           caseId: String, speechPart: SpeechPart.Value, speechPartId: Long) 
+    = this(DictEntry.noId, plWord, plLang, nsWord, nsLang, caseId, speechPart, speechPartId)
+    
+  override protected def contentize = Seq(
+    plWord, plLang, nsWord, nsLang, 
+    caseId, speechPart.toString(), speechPartId
+  ).mkString(",")
 }
 
 object DictEntry {
   val undef = "undef" // undefined case
+  val noId = -1L;
 }

@@ -7,7 +7,7 @@ import logic.IgnoredNumber
 
 case class NounPair(override val id: Long, plStem: String, plPattern: String, plExceptions: Option[String], 
                                            nsStem: String, nsPattern: String, nsExceptions: Option[String], ignored: String) 
-    extends SpeechPartPair[Noun] {
+    extends SpeechPartPair[Noun]("noun") {
 
   def this(plStem: String, plPattern: String, plExceptions: Option[String], 
            nsStem: String, nsPattern: String, nsExceptions: Option[String], ignored: String) =
@@ -24,6 +24,12 @@ case class NounPair(override val id: Long, plStem: String, plPattern: String, pl
 	addExceptions(word,nsExceptions)
 	word
   }
+  
+  override def copyWithId(id: Long) = NounPair(id, plStem, plPattern, plExceptions, nsStem, nsPattern, nsExceptions, ignored)
+  
+  override protected def contentize = Seq(
+      plStem, plPattern, plExceptions.getOrElse(""), nsStem, nsPattern, nsExceptions.getOrElse(""), ignored
+  ).mkString(",")
 }
 
 object NounPair { 

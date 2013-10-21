@@ -10,28 +10,28 @@ import ConjugationType._
  * @param infStem the stem for TYPE_INF and TYPE_COND cases
  * @param impStem the stem for TYPE_IMP cases
  * @param conjugation encapsulates logic for generating cases
- * @param lang the language of the verb
  * @param perfective a flag denoting the aspect of the verb: perfective or not
+ * @param lang the language of the verb
  * @see ConjugationType
  */
-class Verb (val infStem: String, val impStem: String, val conjugation: ConjugationPattern, 
-				 override val lang: String, val perfective: Boolean) extends SpeechPart[Verb] {
-  override val speechPart = "verb"
+class Verb(val infStem: String, val impStem: String, val conjugation: ConjugationPattern, val perfective: Boolean, val lang: String) 
+  extends SpeechPart[Verb](lang) {
+  override val speechPart = SpeechPart.VERB
   override def mainRoot = conjugate(INF)
-  override def toRoot() = new Root(mainRoot,speechPart,lang)
+  override def toRoot = new Root(mainRoot, speechPart, lang)
   
   /** generates cases for TYPE_INF, TYPE_IMP and TYPE_COND, the noun and the adjective participles
    *  @param verb a verb of another language which this one should be translated to
    */
-  override def generate(verb: Verb):Seq[DictEntry] = {  
-    val infSeq = generate(TYPE_INF,verb)	
-	val impSeq = generate(TYPE_IMP,verb)
-	val condSeq = generate(TYPE_COND,verb)
-	val nounSeq = noun(verb)	
-	val adjSeq1 = adjParticiple(verb,PASSIVE)
+  override def generate(verb: Verb, id: Long):Seq[DictEntry] = {  
+    val infSeq = generate(TYPE_INF, verb, id)	
+	val impSeq = generate(TYPE_IMP, verb, id)
+	val condSeq = generate(TYPE_COND, verb, id)
+	val nounSeq = noun(verb, id)	
+	val adjSeq1 = adjParticiple(verb, PASSIVE, id)
 	// if the aspect is perfective, generate the perfect participle, otherwise, the active participle
-	val adjSeq2 = if(perfective) Seq(perfectParticiple(verb))
-				  else adjParticiple(verb,ACTIVE)
+	val adjSeq2 = if(perfective) Seq(perfectParticiple(verb, id))
+				  else adjParticiple(verb, ACTIVE, id)
 	
 	Seq(infSeq, impSeq, condSeq, nounSeq, adjSeq1, adjSeq2).flatten
   }
@@ -77,7 +77,7 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
    *  @param t conjugation type
    *  @param verb a verb of another language which this one should be translated to
    */
-  private def generate(t: ConjugationType.Value,verb: Verb):Seq[DictEntry] = {
+  private def generate(t: ConjugationType.Value, verb: Verb, id: Long):Seq[DictEntry] = {
     // get conjugation maps for both of them
     lazy val thisConjugation = this.conjugationByType(t)
     lazy val thatConjugation = verb.conjugationByType(t)
@@ -85,7 +85,7 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
     Verb.casesTypeMap(t).map(c => {
 	  val from = getConjugatedWord(c,thisConjugation(c))
 	  val to = verb.getConjugatedWord(c,thatConjugation(c))
-	  DictEntry(from,lang,to,verb.lang,c)
+	  new DictEntry(from, lang, to, verb.lang, c, speechPart, id)
 	}).toSeq
   }
   
@@ -94,19 +94,19 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
    *  @param c conjugation case of the participle; ACTIVE or PASSIVE
    *  @see Adjective
    */
-  private def adjParticiple(verb: Verb,c: Conj.Value):Seq[DictEntry] = { 
+  private def adjParticiple(verb: Verb,c: Conj.Value, id: Long):Seq[DictEntry] = { 
     val from = conjugation.adjParticiple(conjugate(c))
     val to = verb.conjugation.adjParticiple(verb.conjugate(c))
-    from.generate(to)
+    from.generate(to, id)
   }
   
   /** create verb-derived nouns of both verbs and execute Noun.translateTo on them
    *  @param verb a verb of another language which this one should be translated to
    */  
-  private def noun(verb: Verb):Seq[DictEntry] = {
+  private def noun(verb: Verb, id: Long) = {
 	val from = conjugation.nounParticiple(conjugate(NOUN))
 	val to = verb.conjugation.nounParticiple(verb.conjugate(NOUN))
-	from.generate(to)
+	from.generate(to, id)
   }
 
   /** create the perfect participles of both verbs and add them to the dictionary
@@ -115,10 +115,10 @@ class Verb (val infStem: String, val impStem: String, val conjugation: Conjugati
    *  @param rootId1 the id of the Root object of this verb in the DB [@todo: this should be VerbPair id]
    *  @param rootId1 the id of the Root object of that verb in the DB [@todo: this should be VerbPair id] 
    */  
-  private def perfectParticiple(verb: Verb):DictEntry = {
+  private def perfectParticiple(verb: Verb, id: Long) = {
     val from = conjugate(PERFECT)
     val to = verb.conjugate(PERFECT)
-    DictEntry(from,lang,to,verb.lang,PERFECT)
+    new DictEntry(from, lang, to, verb.lang, PERFECT, speechPart, id)
   }
   
   override def validateExceptionKey(key: String): String = Conj.parse(key).toString

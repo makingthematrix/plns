@@ -4,6 +4,7 @@ import Decl._
 import AdjectiveCase._
 import AdjectiveGender._
 import AdjectiveDegree._
+import SpeechPart._
 
 /**
  * encapsulates logic for generating adjective cases 
@@ -16,30 +17,30 @@ import AdjectiveDegree._
  * @param ignored marks if the noun can be used in both singular and plural forms, only singular (eg. capitalism), or only plural (eg. pants)
  * @param lang the language of the verb
  */
-class Adjective(val ind:String,val cmp:String,val sup:String,val adverb:Option[Adverb],
+class Adjective(val ind:String, val cmp:String, val sup:String, val adverb:Option[Adverb],
 				val indDeclension:Map[AdjectiveGender.Value,DeclensionPattern],
 				val cmpDeclension:Map[AdjectiveGender.Value,DeclensionPattern],
-				val cmpIgnored: Boolean,override val lang:String) 
-  extends SpeechPart[Adjective]{
-  override val speechPart = "adjective"
+				val cmpIgnored: Boolean, val lang:String) 
+  extends SpeechPart[Adjective](lang){
+  override val speechPart = ADJECTIVE
   override def mainRoot = decline(AdjectiveCase(MASCULINE, INDICATIVE, NOMS))
   override def toRoot() = new Root(mainRoot,speechPart,lang)
   
-  override def generate(adj: Adjective):Seq[DictEntry] = {
+  override def generate(adj: Adjective, id: Long):Seq[DictEntry] = {
 	if((adverb == None && adj.adverb != None) || (adverb != None && adj.adverb == None))  
 	  throw new IllegalArgumentException("Adjective.generate " + mainRoot + " -> " + adj.mainRoot + 
 	                                     ": Associated adverbs of both adjectives must either exist or be None.") 
 	
-    val indSeq = generate(adj,INDICATIVE)
+    val indSeq = generate(adj, INDICATIVE, id)
     
     val (cmpSeq,supSeq) = if(!cmpIgnored){
-      val cmpSeq = generate(adj,COMPARATIVE)
-      val supSeq = generate(adj,SUPERLATIVE)
+      val cmpSeq = generate(adj, COMPARATIVE. id)
+      val supSeq = generate(adj, SUPERLATIVE, id)
       (cmpSeq,supSeq)
     } else (Seq(),Seq())   
     
     val advSeq = adverb match {
-      case Some(adv) => adv.generate(adj.adverb.get)
+      case Some(adv) => adv.generate(adj.adverb.get, id)
       case _ => Seq()
     } 
 	
@@ -65,29 +66,32 @@ class Adjective(val ind:String,val cmp:String,val sup:String,val adverb:Option[A
     
   private def generate(adj: Adjective,ac: AdjectiveCase,
 		  			   thisStem: String, thatStem: String,
-		  			   thisDecl: DeclensionPattern,thatDecl: DeclensionPattern):DictEntry = {
+		  			   thisDecl: DeclensionPattern,
+		  			   thatDecl: DeclensionPattern,
+		  			   id: Long):DictEntry = {
     val from = getDeclinedWord(ac,thisDecl.decline(thisStem,ac.declCase))
     val to = adj.getDeclinedWord(ac, thatDecl.decline(thatStem,ac.declCase)) 
-    DictEntry(from,lang,to,adj.lang,ac.toString)
+    new DictEntry(from, lang, to, adj.lang, ac.toString, speechPart, id)
   }
   
   private def generate(adj: Adjective, ad: AdjectiveDegree.Value, ag: AdjectiveGender.Value, 
                        thisStem: String, thatStem: String,
-                       thisDecl: DeclensionPattern,thatDecl: DeclensionPattern):Seq[DictEntry] = 
+                       thisDecl: DeclensionPattern,thatDecl: DeclensionPattern,
+                       id: Long):Seq[DictEntry] = 
     Adjective.declensionByGender(ag).map( d => { 
-    	val ac = AdjectiveCase(ag,ad,d)
-        generate(adj,ac,thisStem,thatStem,thisDecl,thatDecl) 
+    	val ac = AdjectiveCase(ag, ad, d)
+        generate(adj, ac, thisStem, thatStem, thisDecl, thatDecl, id) 
     })
     
   
-  private def generate(adj: Adjective, ad: AdjectiveDegree.Value):Seq[DictEntry] = {
+  private def generate(adj: Adjective, ad: AdjectiveDegree.Value, id: Long):Seq[DictEntry] = {
     val (thisStem, thisDeclension) = stemAndDecl(ad)
     val (thatStem, thatDeclension) = adj.stemAndDecl(ad)
   
     AdjectiveGender.values.flatMap( ag => {
       val thisDecl = thisDeclension(ag)
       val thatDecl = thatDeclension(ag)
-      generate(adj, ad, ag, thisStem, thatStem, thisDecl, thatDecl) 
+      generate(adj, ad, ag, thisStem, thatStem, thisDecl, thatDecl, id) 
     }).toSeq
   }
   

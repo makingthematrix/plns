@@ -1,9 +1,6 @@
 package logic
-
-import Decl._
-import HardSoftMode._
 import scala.collection.mutable;
-import models.AdjectivePair
+import SpeechPart._
 
 object NSTranslator {
    
@@ -33,16 +30,12 @@ object NSTranslator {
 	("byli","byli"), ("były","byle")
   ) 
 	  
-  def add(from: String, to:String):Unit = DictionaryFactory.dict.add(new Word(from,"pl",-1,""),new Word(to,"ns",-1,""))
-
-  def list = DictionaryFactory.dict.roots
-  def rootPairs = DictionaryFactory.dict.rootPairs  
-  def isEmpty = DictionaryFactory.dict.isEmpty;
+  def add(from: String, to:String) 
+    = DictionaryFactory.dict.add(new DictEntry(from, "pl", to, "ns", UnInflected.caseId, UNINFLECTED, -1L))
   
   def init() = {
 	pronouns.foreach{ t => add(t._1,t._2) }
 	toBe.foreach{ t => add(t._1,t._2) }    
   }
   
-  def translate(source: String) = DictionaryFactory.dict.translate(source)
 }

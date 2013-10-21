@@ -2,14 +2,13 @@ package logic
 
 import scala.collection.mutable
 
-abstract class SpeechPart[T <: SpeechPart[T]] {
-  def generate(t: T):Seq[DictEntry]
+abstract class SpeechPart[T <: SpeechPart[T]](val lang: String) {
+  def generate(t: T, speechPartId: Long):Seq[DictEntry]
   def mainRoot: String
   def toRoot:Root
   override def toString = toRoot.toString
 
   val speechPart: String
-  val lang: String
   
   /**
    * adds an exception exception
@@ -23,4 +22,20 @@ abstract class SpeechPart[T <: SpeechPart[T]] {
 
   /** the map of exceptions, case -> word */
   protected val exceptions = new mutable.HashMap[String,String]()
+}
+
+object SpeechPart extends Enumeration {
+  type SpeechPart = Value
+  val UNINFLECTED, ADVERB, ADJECTIVE, NOUN, VERB = Value
+  
+  implicit def toString(sp: SpeechPart.Value) = sp.toString.toLowerCase
+  
+  implicit def parse(str: String) = str.toLowerCase match {
+    case "uninflected" => UNINFLECTED
+    case "adverb" => ADVERB
+    case "adjective" => ADJECTIVE
+    case "noun" => NOUN
+    case "verb" => VERB
+    case _ => throw new IllegalArgumentException("Unable to parse SpeechPart.Value: " + str)
+  }
 }

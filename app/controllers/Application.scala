@@ -14,10 +14,11 @@ object Application extends Controller {
 
   def index = Action { Ok(views.html.index(TranslationPair.empty,Seq[String](),translateForm)) }
   
-  private def translate(source: String): SimpleResult = {
+  private def translate(source: String) = {
+    val dict = DictionaryFactory.dict
     val (target,untranslated) = if(source == "") ("",Seq[String]()) else {
-      if(NSTranslator.isEmpty) NSTranslator.init()
-      DictionaryFactory.dict.translate(source)
+      if(dict.isEmpty) NSTranslator.init()
+      dict.translate(source)
     }
     Ok(views.html.index(TranslationPair(source,target),untranslated,translateForm));
   }
@@ -35,8 +36,9 @@ object Application extends Controller {
   val translateForm = Form( tuple("source" -> text, "target" -> text) );
   
   def list = Action { 
-    if(NSTranslator.isEmpty) NSTranslator.init()
-    Ok(views.html.list(NSTranslator.rootPairs))
+    val dict = DictionaryFactory.dict
+    if(dict.isEmpty) NSTranslator.init()
+    Ok(views.html.list(dict.seq))
   }
 
   val verbForm = Form(

@@ -23,7 +23,7 @@ import logic.DictEntry
 case class VerbPair(override val id: Long,
                     plInfStem: String, plImpStem: String, plPattern: String, plExceptions: Option[String],
                     nsInfStem: String, nsImpStem: String, nsPattern: String, nsExceptions: Option[String],
-                    prefixes: Option[String]) extends SpeechPartPair[Verb] {
+                    prefixes: Option[String]) extends SpeechPartPair[Verb]("verb") {
   def this(plInfStem: String, plImpStem: String, plPattern: String, plExceptions: Option[String],
            nsInfStem: String, nsImpStem: String, nsPattern: String, nsExceptions: Option[String], prefixes: Option[String]) =
     this(SpeechPartPair.noId, plInfStem, plImpStem, plPattern, plExceptions,
@@ -35,7 +35,7 @@ case class VerbPair(override val id: Long,
     // if the prefixes string starts with the perfective marker, it means that the verb is in the perfective aspect
     val perfective = prefixes.getOrElse("").startsWith(VerbPair.perfectiveMarker)
     // create the Verb of the source language
-    val word = PLVerb.word(plInfStem, plImpStem, plPattern, perfective)
+    val word = PLVerb.word(plInfStem, plImpStem, plPattern, perfective, id)
     // add exceptions, ignore prefixes
 	addExceptions(word,plExceptions)
     // return the Verb
@@ -48,7 +48,7 @@ case class VerbPair(override val id: Long,
   override def ns:Verb = {
     val perfective = prefixes.getOrElse("").startsWith(VerbPair.perfectiveMarker)
     // create the Verb of the target language
-    val word = NSVerb.word(nsInfStem, nsImpStem, nsPattern, perfective)
+    val word = NSVerb.word(nsInfStem, nsImpStem, nsPattern, perfective, id)
 	addExceptions(word,nsExceptions)
 	word    
   }
@@ -59,12 +59,12 @@ case class VerbPair(override val id: Long,
    * @return a sequence of pairs of main roots; one for each pair of prefixes
    */
   override def add() = { 
-    val (plRootId,nsRootId) = DictionaryFactory.dict.addRoots(pl.toRoot, ns.toRoot)
+    val id = DictionaryFactory.dict.add(this)
     val translations = prefixes match {
-      case Some(pre) => VerbPair.prefixesAsSeq(pre).flatMap( tuple => generate(tuple._1,tuple._2) ).toSeq
-      case None => generate("","")
+      case Some(pre) => VerbPair.prefixesAsSeq(pre).flatMap( tuple => generate(tuple._1,tuple._2, id) ).toSeq
+      case None => generate("","", id)
     }
-    translations.foreach{ entry => DictionaryFactory.dict.add(entry.wordPair(plRootId, nsRootId)) }
+    translations.foreach{ entry => DictionaryFactory.dict.add(entry) }
     Seq(((pl.mainRoot,ns.mainRoot)))
   }
   
@@ -74,7 +74,7 @@ case class VerbPair(override val id: Long,
    * @param nsPrefix a prefix for the target verb - may be empty
    * @return a sequence of all cases of the prefixed verbs
    */
-  private def generate(plPrefix: String,nsPrefix: String) = {
+  private def generate(plPrefix: String,nsPrefix: String, id: Long) = {
     // if plPrefix contains the perfective marker, we have to extract it
     val (realPlPrefix,perfective) = if(!plPrefix.startsWith(VerbPair.perfectiveMarker)) (plPrefix,false)
     							    else (plPrefix.substring(1),true)
@@ -84,7 +84,7 @@ case class VerbPair(override val id: Long,
     					  else prefixPair(realPlPrefix,nsPrefix,perfective)
     
     // generate all cases of the prefixed verbs
-    plVerb.generate(nsVerb)
+    plVerb.generate(nsVerb, id)
   }
   
   /**
@@ -118,6 +118,15 @@ case class VerbPair(override val id: Long,
     // generate a pair of verbs with prefixes
     (pair.pl,pair.ns)
   }  
+  
+  override def copyWithId(id: Long) = VerbPair(id, plInfStem, plImpStem, plPattern, plExceptions,
+                    			 nsInfStem, nsImpStem, nsPattern, nsExceptions, prefixes)
+  
+  override protected def contentize = Seq(
+    plInfStem, plImpStem, plPattern, plExceptions.getOrElse(""),
+    nsInfStem, nsImpStem, nsPattern, nsExceptions.getOrElse(""),
+    prefixes.getOrElse("")
+  ).mkString(",")
 }
 
 object VerbPair {

@@ -1,36 +1,50 @@
 package logic
 
-import scala.collection.mutable;
+import scala.collection.mutable
+import models.UninflectedPair
+import models.AdverbPair
+import models.AdjectivePair
+import models.NounPair
+import models.VerbPair
+import models.SpeechPartPair
 
-case class Root(val id:Long,val root:String,val speechpart:String,val lang:String){
-  def this(root:String,speechpart:String,lang:String) = this(-1,root,speechpart,lang)
-}
+import scala.reflect.runtime.{universe => ru}
 
-case class Word(val id:Long,val word:String,val lang:String,val rootid:Long,val caseid:String){
-  def this(word:String,lang:String,rootid:Long,caseid:String) = this(-1,word,lang,rootid,caseid)
-}
-
-case class Translation(val id:Long, val wordid1:Long, val wordid2:Long){
-  def this(wordid1:Long,wordid2:Long) = this(-1,wordid1,wordid2)
+case class Root(id: Long, root: String, speechPart: SpeechPart.Value, lang: String){
+  def this(root: String, speechPart: SpeechPart.Value, lang: String) = this(-1L, root, speechPart, lang)
 }
 
 abstract class AbstractDictionary {
   def clear:Unit
   def size:Int
-  def get(word: String):Option[String]
-  def add(from: Word, to: Word): Unit
-  def update(from: String, to: String): Unit
-  def tuples:Seq[(String,String)]
-  def words:Seq[String]
-  def hasWord(word: String,lang: String):Boolean
+  def getTranslation(word: String):Option[String]
+  def add(entry: DictEntry): Boolean
+  def update(entry: DictEntry): Boolean
+  def remove(entry: DictEntry): Boolean
+  def getEntry(word: String): DictEntry
+  def seq: Seq[DictEntry]
+
   def isEmpty:Boolean
-  def addRoot(root: Root):Option[Long]
-  def addRoots(from: Root,to: Root): (Long,Long)
-  def roots:Seq[Root]
-  def rootPairs:Seq[(Root,Root)]
+  
+  /** @todo can these be refactorized into one generic method?
+   *  they all do similar stuff, although the way it's done in DB
+   *  is totally different from the debug mode
+   */
+  def add(pair: UninflectedPair): Long
+  def add(pair: AdverbPair): Long
+  def add(pair: AdjectivePair): Long
+  def add(pair: NounPair): Long
+  def add(pair: VerbPair): Long
+  
+  def add[T](pair: SpeechPartPair[T]): Long = pair match {
+    case un: UninflectedPair => add(un)
+    case adv: AdverbPair => add(adv)
+    case adj: AdjectivePair => add(adj)
+    case noun: NounPair => add(noun)
+    case verb: VerbPair => add(verb)
+    case _ => throw new IllegalArgumentException("Unrecogrnized speech part: " + pair.toString())
+  }
 //-----------------------------------------------------
-  def add(tuple: (Word,Word)): Unit = add(tuple._1,tuple._2)
-  def update(tuple: (String,String)): Unit = update(tuple._1,tuple._2)
   
   def translate(sentence: String):(String,Seq[String]) = {
 	val words = split(sentence)
@@ -74,7 +88,7 @@ abstract class AbstractDictionary {
 	if(word.isEmpty()) return ("",true)
 	if(wordPattern.findFirstIn(word).isEmpty) return (word,true)
 	
-	get(word.toLowerCase()) match {
+	getTranslation(word.toLowerCase()) match {
 	  case Some(t) => {
 	    val translated = word match {
 	      case allLowercasePattern() => t

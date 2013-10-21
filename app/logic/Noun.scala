@@ -2,6 +2,7 @@ package logic
 
 import Decl._;
 import IgnoredNumber._
+import SpeechPart._
 
 /**
  * encapsulates logic for generating noun cases 
@@ -11,22 +12,22 @@ import IgnoredNumber._
  * @param ignored marks if the noun can be used in both singular and plural forms, only singular (eg. capitalism), or only plural (eg. pants)
  * @param lang the language of the verb
  */
-class Noun(val stem: String,val declension: DeclensionPattern,val ignored: IgnoredNumber.Value,
-           override val lang: String) extends SpeechPart[Noun] {
-  override val speechPart = "noun"
-  override def mainRoot = decline(NOMS);
-  override def toRoot() = new Root(mainRoot,speechPart,lang)
+class Noun(val stem: String, val declension: DeclensionPattern, val ignored: IgnoredNumber.Value, val lang: String) 
+  extends SpeechPart[Noun](lang) {
+  override val speechPart = NOUN
+  override def mainRoot = decline(NOMS)
+  override def toRoot = new Root(mainRoot, speechPart, lang)
 
   /** generates cases with the given declension and add them all to the dictionary
    *  @param noun a noun of another language which this one should be translated to
    */
-  override def generate(noun: Noun) = { 
+  override def generate(noun: Noun, id: Long) = { 
 	lazy val thisDeclension = declensionByIgnored()
 	lazy val thatDeclension = noun.declensionByIgnored()
 	Noun.ignoreTypeMap(ignored).map(d => {
 	  val from = getDeclinedWord(d,thisDeclension(d))  
 	  val to = noun.getDeclinedWord(d,thatDeclension(d))
-	  DictEntry(from,lang,to,noun.lang,d)
+	  new DictEntry(from, lang, to, noun.lang, d, speechPart, id)
 	})
   }
 
@@ -62,9 +63,9 @@ class Noun(val stem: String,val declension: DeclensionPattern,val ignored: Ignor
 /** info about which cases belong to singluar and which to plural declensions */
 object Noun{
   lazy val declension = Seq( NOMS, GENS, DATS, ACCS, INSS, LOCS, VOCS, 
-	                      	   NOMP, GENP, DATP, ACCP, INSP, LOCP, VOCP );  
-  lazy val singularDeclension = Seq( NOMS, GENS, DATS, ACCS, INSS, LOCS, VOCS );
-  lazy val pluralDeclension = Seq( NOMP, GENP, DATP, ACCP, INSP, LOCP, VOCP );
+	                      	   NOMP, GENP, DATP, ACCP, INSP, LOCP, VOCP )  
+  lazy val singularDeclension = Seq( NOMS, GENS, DATS, ACCS, INSS, LOCS, VOCS )
+  lazy val pluralDeclension = Seq( NOMP, GENP, DATP, ACCP, INSP, LOCP, VOCP )
   
   lazy val ignoreTypeMap = Map(
     NONE -> declension,

@@ -5,8 +5,8 @@ import scala.collection._
 abstract class VerbGenerator(val lang: String) {
   protected val patternMap = mutable.HashMap[String,ConjugationPattern]();
   
-  def word(infRoot: String, impRoot:String, patternId: String,perfective: Boolean):Verb
-    = new Verb(infRoot,impRoot,patternMap(patternId),lang,perfective);
+  def word(infRoot: String, impRoot:String, patternId: String, perfective: Boolean, speechPartId: Long) =
+    new Verb(infRoot, impRoot, patternMap(patternId), perfective, lang)
 
   def examples = patternMap.values.map(d => d.example)
   def ids = patternMap.keys
