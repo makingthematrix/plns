@@ -9,121 +9,89 @@ import models.VerbPair
 import models.SpeechPartPair
 
 class Dictionary extends AbstractDictionary {
-  private val uninflecteds = new mutable.HashMap[Int, UninflectedPair]
-  private val adverbs = new mutable.HashMap[Int, AdverbPair]
-  private val adjectives = new mutable.HashMap[Int, AdjectivePair]
-  private val nouns = new mutable.HashMap[Int, NounPair]
-  private val verbs = new mutable.HashMap[Int, VerbPair]
-  private val map = new mutable.HashMap[String,String]
+  private val pairs = new mutable.HashMap[Int, SpeechPartPair[_]]
   private val entries = new mutable.HashMap[Int, DictEntry]
   
-  override def getTranslation(word: String) = map.get(word)
+  override def clear(){
+    pairs.clear
+    entries.clear
+  }
   
-  /** @todo ok, now, there has to be some way to generalize the following methods
-   *  somehow along the lines of this commented out method (it was commented out because it doesn't work)
-   */
-  /**
-  private def add[T <: SpeechPartPair[T]](map: mutable.HashMap[Int, SpeechPartPair[T]], pair: SpeechPartPair[T]): Long = 
-    if(!map.contains(pair.hashCode)){
-      val copy = pair.copyWithId(map.size)
+  override def size = entries.size
+  
+  override def isEmpty = entries.isEmpty
+  
+  override def getTranslation(word: String) = {
+    val entryOption = entries.find{ entry => entry._2.plWord == word }
+    entryOption match {
+      case Some(tuple) => Some(tuple._2.nsWord)
+      case None => None
+    }
+  }
+    
+  override def addPair[T](pair: SpeechPartPair[T]): Long = 
+    if(!pairs.contains(pair.hashCode)){
+      val copy = pair.copyWithId(pairs.size)
       assert(pair.compareContents(copy) == 0)
-      map.put(copy.hashCode, copy)
+      pairs.put(copy.hashCode, copy)
       copy.id
     } else {
-      val original = map(pair.hashCode)
-      original.id
-    }
-  */
-  override def add(un: UninflectedPair): Long = if(!uninflecteds.contains(un.hashCode)){
-      val copy = un.copyWithId(uninflecteds.size)
-      assert(un.compareContents(copy) == 0)
-      uninflecteds.put(copy.hashCode, copy)
-      copy.id
-    } else {
-      val original = uninflecteds(un.hashCode)
+      val original = pairs(pair.hashCode)
       original.id
     }
   
-  override def add(adv: AdverbPair) = if(!adverbs.contains(adv.hashCode)){
-      val copy = adv.copyWithId(adverbs.size)
-      assert(adv.compareContents(copy) == 0)
-      adverbs.put(copy.hashCode, copy)
-      copy.id
-    } else {
-      val original = adverbs(adv.hashCode)
-      original.id
-    }
+  override def updatePair[T](pair: SpeechPartPair[T]){
+    val removedPair = removePair(pair.id)
+    println("Dictionary.update, replacing pair " + removedPair + " with " + pair)
+	pairs.put(pair.hashCode, pair)
+  }
   
-  override def add(adj: AdjectivePair) = if(!adjectives.contains(adj.hashCode)){
-      val copy = adj.copyWithId(adjectives.size)
-      assert(adj.compareContents(copy) == 0)
-      adjectives.put(copy.hashCode, copy)
-      copy.id
-    } else {
-      val original = adjectives(adj.hashCode)
-      original.id
+  override def removePair[T](id: Long): SpeechPartPair[T] = {
+    val pairOption = pairs.find{ tuple => tuple._2.id == id }
+    pairOption match {
+      case Some(tuple) => pairs.remove(tuple._2.hashCode); tuple._2.asInstanceOf[SpeechPartPair[T]]
+      case None => throw new IllegalArgumentException("No entry with the given id: " + id)
     }
+  }
   
-  override def add(noun: NounPair) = if(!nouns.contains(noun.hashCode)){
-      val copy = noun.copyWithId(nouns.size)
-      assert(noun.compareContents(copy) == 0)
-      nouns.put(copy.hashCode, copy)
-      copy.id
-    } else {
-      val original = nouns(noun.hashCode)
-      original.id
-    }
+  override def listPairs = pairs.values.toSeq
   
-  override def add(verb: VerbPair) = if(!verbs.contains(verb.hashCode)){
-      val copy = verb.copyWithId(verbs.size)
-      assert(verb.compareContents(copy) == 0)
-      verbs.put(copy.hashCode, copy)
-      copy.id
-    } else {
-      val original = verbs(verb.hashCode)
-      original.id
-    }
-  
-  override def add(entry: DictEntry): Boolean = {
+  override def add(entry: DictEntry): Long = 
+    if(!entries.contains(entry.hashCode)) {
 	println("Dictionary.add, " + entry.plWord + " -> " + entry.nsWord)
-	val w = entry.plWord.toLowerCase()
-	if(!map.contains(w)){
-	  println("no such word yet in the map - adding")
-	  map += (w -> entry.nsWord.toLowerCase())
-	  entries += entry
-	  true
-	} else false
+	  val copy = entry.copyWithId(entries.size)
+      assert(entry.compareContents(copy) == 0)
+      entries.put(copy.hashCode, copy)
+      copy.id
+    } else {
+      val original = entries(entry.hashCode)
+      original.id
+    }
+	
+  override def update(entry: DictEntry) {
+    val removedEntry = remove(entry.id)
+    println("Dictionary.update, replacing entry " + removedEntry + " with " + entry)
+	entries.put(entry.hashCode, entry)
+  }
+  
+  override def remove(id: Long): DictEntry = {
+    val entryOption = entries.find{ tuple => tuple._2.id == id }
+    entryOption match {
+      case Some(tuple) => entries.remove(tuple._2.hashCode); tuple._2
+      case None => throw new IllegalArgumentException("No entry with the given id: " + id)
+    }
+  }
+  
+  /** get by id */
+  override def get(id: Long): Option[DictEntry] = {
+    val entryOption = entries.find{ tuple => tuple._2.id == id }
+    entryOption match {
+      case Some(tuple) => Some(tuple._2)
+      case None => None
+    }
   }
 	
-  override def update(entry: DictEntry): Boolean = {
-	remove(entry)
-	add(entry)
-  }
-  
-  override def remove(entry: DictEntry): Boolean = {
-    val w = entry.plWord.toLowerCase();
-	if(map.contains(w)){
-	  val filteredEntrySet = entries.filter(_.plWord == w)
-	  if(filteredEntrySet.isEmpty) 
-	    throw new IllegalArgumentException("Dictionary.update: Found the word " + w + " in the map, but no associated DictEntry")
-	  filteredEntrySet.foreach(entries.remove(_))
-	  map -= w
-	  true
-	} else false
-  }
-	
-  override def words:Seq[String] = map.keys.toSeq ++ map.values
-  
-  override def hasWord(word: String,lang: String):Boolean = lang match {
-    case "pl" => map.keySet.contains(word)
-    case "ns" => map.values.toSet.contains(word)
-    case _ => false
-  }
-  
-  override def tuples = map.keys.toSeq.map(w =>(w,map.getOrElse(w,w)))
-  
-  override def isEmpty = map.isEmpty;
+  /** get by contents */
+  override def get(entry: DictEntry): Option[DictEntry] = entries.get(entry.hashCode)
 
-  override def size:Int = map.size
-  override def clear:Unit = map.clear
 }

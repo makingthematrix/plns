@@ -17,7 +17,7 @@ abstract class SpeechPartPair[T <: SpeechPart[T]](val id: Long, val speechPart: 
   def ns: T
 	
   def add() = {
-    val id = DictionaryFactory.dict.add(this)
+    val id = DictionaryFactory.dict.addPair(this)
     val translations = pl.generate(ns, id)
     translations.foreach{ entry => DictionaryFactory.dict.add(entry) }
     Seq((pl.mainRoot,ns.mainRoot))

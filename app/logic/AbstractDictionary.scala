@@ -17,33 +17,23 @@ case class Root(id: Long, root: String, speechPart: SpeechPart.Value, lang: Stri
 abstract class AbstractDictionary {
   def clear:Unit
   def size:Int
-  def getTranslation(word: String):Option[String]
-  def add(entry: DictEntry): Boolean
-  def update(entry: DictEntry): Boolean
-  def remove(entry: DictEntry): Boolean
-  def getEntry(word: String): DictEntry
-  def seq: Seq[DictEntry]
-
   def isEmpty:Boolean
+  def getTranslation(word: String):Option[String]
   
-  /** @todo can these be refactorized into one generic method?
-   *  they all do similar stuff, although the way it's done in DB
-   *  is totally different from the debug mode
-   */
-  def add(pair: UninflectedPair): Long
-  def add(pair: AdverbPair): Long
-  def add(pair: AdjectivePair): Long
-  def add(pair: NounPair): Long
-  def add(pair: VerbPair): Long
+  def addPair[T](pair: SpeechPartPair[T]): Long
+  def updatePair[T](pair: SpeechPartPair[T]): Unit
+  def removePair[T](id: Long): SpeechPartPair[T]
+  def listPairs: Seq[SpeechPartPair[_]]
   
-  def add[T](pair: SpeechPartPair[T]): Long = pair match {
-    case un: UninflectedPair => add(un)
-    case adv: AdverbPair => add(adv)
-    case adj: AdjectivePair => add(adj)
-    case noun: NounPair => add(noun)
-    case verb: VerbPair => add(verb)
-    case _ => throw new IllegalArgumentException("Unrecogrnized speech part: " + pair.toString())
-  }
+  def add(entry: DictEntry): Long
+  def update(entry: DictEntry): Unit
+  def remove(id: Long): DictEntry
+  /** get by id */
+  def get(id: Long): Option[DictEntry]
+  /** get by contents */
+  def get(entry: DictEntry): Option[DictEntry]
+  
+  
 //-----------------------------------------------------
   
   def translate(sentence: String):(String,Seq[String]) = {

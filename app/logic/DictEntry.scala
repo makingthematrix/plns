@@ -13,9 +13,12 @@ case class DictEntry(id: Long, plWord: String, plLang: String,
            caseId: String, speechPart: SpeechPart.Value, speechPartId: Long) 
     = this(DictEntry.noId, plWord, plLang, nsWord, nsLang, caseId, speechPart, speechPartId)
     
-  override protected def contentize = Seq(
+  override def copyWithId(id: Long) = DictEntry(id, plWord, plLang, nsWord, nsLang, 
+                     							caseId, speechPart, speechPartId)
+  
+  override protected def contentize = Seq[String](
     plWord, plLang, nsWord, nsLang, 
-    caseId, speechPart.toString(), speechPartId
+    caseId, speechPart.toString, speechPartId.toString
   ).mkString(",")
 }
 

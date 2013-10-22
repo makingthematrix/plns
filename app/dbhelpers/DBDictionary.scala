@@ -7,51 +7,112 @@ import play.api.Play.current
 import play.api.Logger
 import logic.AbstractDictionary
 import logic.Root
-import logic.Word
-import logic.Translation
-
-case class RootTrans(id: Long,rootid1: Long, rootid2: Long)
+import models.SpeechPartPair
+import models.UninflectedPair
+import models.AdverbPair
+import models.AdjectivePair
+import models.NounPair
+import models.VerbPair
+import logic.DictEntry
 
 object DBParsers {
-  val rootParser = {
+  val dictEntryParser = {
     get[Long]("id") ~ 
-    get[String]("root") ~
+    get[String]("fromword") ~
+    get[String]("fromlang") ~
+    get[String]("toword") ~
+    get[String]("tolang") ~
+    get[String]("caseid") ~
     get[String]("speechpart") ~
-    get[String]("lang") map {
-      case id~root~speechpart~lang => Root(id, root, speechpart, lang)
+    get[Long]("speechpartid") map {
+      case id~fromword~fromlang~toword~tolang~caseid~speechpart~speechpartid => 
+        DictEntry(id, fromword, fromlang, toword, tolang, caseid, speechpart, speechpartid)
     }
   }
   
-  val wordParser = {
+  val uninflectedPairParser = {
     get[Long]("id") ~ 
-    get[String]("word") ~
-    get[String]("lang") ~
-    get[Long]("rootid") ~
-    get[String]("caseid") map {
-      case id~word~lang~rootid~caseid => Word(id, word, lang, rootid, caseid)
+    get[String]("fromword") ~
+    get[String]("toword") map {
+      case id~fromword~toword => 
+        UninflectedPair(id, fromword, toword) 
     }
   }
   
-  val translationParser = {
+  val adverbPairParser = {
     get[Long]("id") ~
-    get[Long]("wordid1") ~
-    get[Long]("wordid2") map {
-      case id~wordid1~wordid2 => Translation(id, wordid1, wordid2)
-    }
-  }  
-  
-  val wordTupleParser = {
-    get[String]("word1") ~
-    get[String]("word2") map {
-      case word1~word2 => (word1,word2)
+    get[String]("fromind") ~
+    get[String]("fromcmp") ~
+    get[String]("frommode") ~
+    get[String]("toind") ~
+    get[String]("tocmp") ~
+    get[String]("cmpignored") map {
+      case id~fromind~fromcmp~frommode~toind~tocmp~cmpignored => 
+        AdverbPair(id, fromind, fromcmp, frommode, toind, tocmp, cmpignored) 
     }
   }
   
-  val rootTransParser = {
+  val adjectivePairParser = {
     get[Long]("id") ~
-    get[Long]("rootid1") ~
-    get[Long]("rootid2") map {
-      case id~rootid1~rootid2 => RootTrans(id, rootid1, rootid2)
+    get[String]("fromind") ~
+    get[String]("fromadvind") ~
+    get[String]("fromcmp") ~
+    get[String]("fromadvcmp") ~
+    get[String]("frommode") ~
+    get[String]("fromadvmode") ~
+    get[String]("fromexceptions") ~
+    get[String]("toind") ~
+    get[String]("toadvind") ~
+    get[String]("tocmp") ~
+    get[String]("toadvcmp") ~
+    get[String]("toexceptions") ~
+    get[String]("cmpignored") map {
+      case id~fromind~fromadvind~fromcmp~fromadvcmp~frommode~fromadvmode~fromexceptions~
+           toind~toadvind~tocmp~toadvcmp~toexceptions~cmpignored => {
+        val fromExceptions = if(fromexceptions.isEmpty()) None else Some(fromexceptions)
+        val toExceptions = if(toexceptions.isEmpty()) None else Some(toexceptions)
+        AdjectivePair(id, fromind, fromadvind, fromcmp, fromadvcmp, frommode, fromadvmode, fromExceptions,
+                          toind, toadvind, tocmp, toadvcmp, toExceptions, cmpignored) 
+      }
+    }
+  }
+  
+  val nounPairParser = {
+    get[Long]("id") ~
+    get[String]("fromstem") ~
+    get[String]("frompattern") ~
+    get[String]("fromexceptions") ~
+    get[String]("tostem") ~
+    get[String]("topattern") ~
+    get[String]("toexceptions") ~
+    get[String]("ignored") map {
+      case id~fromstem~frompattern~fromexceptions~
+           tostem~topattern~toexceptions~ignored => {
+        val fromExceptions = if(fromexceptions.isEmpty()) None else Some(fromexceptions)
+        val toExceptions = if(toexceptions.isEmpty()) None else Some(toexceptions)
+        NounPair(id, fromstem, frompattern, fromExceptions, tostem, topattern, toExceptions, ignored) 
+      }
+    }
+  }
+  
+  val verbPairParser = {
+    get[Long]("id") ~
+    get[String]("frominfstem") ~
+    get[String]("fromimpstem") ~
+    get[String]("frompattern") ~
+    get[String]("fromexceptions") ~
+    get[String]("toinfstem") ~
+    get[String]("toimpstem") ~
+    get[String]("topattern") ~
+    get[String]("toexceptions") ~
+    get[String]("prefixes") map {
+      case id~frominfstem~fromimpstem~frompattern~fromexceptions~
+           toinfstem~toimpstem~topattern~toexceptions~prefixes => {
+        val fromExceptions = if(fromexceptions.isEmpty()) None else Some(fromexceptions)
+        val toExceptions = if(toexceptions.isEmpty()) None else Some(toexceptions)
+        val pref = if(prefixes.isEmpty()) None else Some(prefixes)
+        VerbPair(id, frominfstem, fromimpstem, frompattern, fromExceptions, toinfstem, toimpstem, topattern, toExceptions, pref) 
+      }
     }
   }
 }
@@ -59,34 +120,68 @@ object DBParsers {
 class DBDictionary extends AbstractDictionary {
   override def size:Int = DB.withConnection {
     implicit c => {
-      val cRow = SQL("select count(*) as c from translations").apply().head
+      val cRow = SQL("select count(*) as c from dictentries").apply().head
       cRow[Int]("c")
     }  
   }
   
   override def clear:Unit = DB.withConnection {
     implicit c => {
-      SQL("delete * from roottrans").execute()
-      SQL("delete * from translations").execute()
-      SQL("delete * from words").execute()
-      SQL("delete * from roots").execute()
+      SQL("delete * from dictentries").execute()
+      SQL("delete * from uninflectedpairs").execute()
+      SQL("delete * from adverbpairs").execute()
+      SQL("delete * from adjectivepairs").execute()
+      SQL("delete * from nounpairs").execute()
+      SQL("delete * from verbpairs").execute()
     }
   }
   
-  override def get(word:String):Option[String] = DB.withConnection { 
+  override def isEmpty:Boolean = this.size == 0
+    
+  override def getTranslation(word: String):Option[String] = DB.withConnection { 
     implicit c => {
-      println("DBDictionary.get, word: " + word)
-      val wordRowOption = SQL("""
-          select words.word as word from words, translations 
-          where words.id=translations.wordid2 
-          and translations.wordid1 = (select id from words where word={word} and lang='pl');
+      println("DBDictionary.getTranslation, word: " + word)
+      val dictEntryRowOption = SQL("""
+          select dictentries.toword as word from dictentries 
+          where fromword={word} lang='pl');
       """).on('word -> word).apply().headOption
-      wordRowOption match {
+      dictEntryRowOption match {
         case Some(wordRow) => Some(wordRow[String]("word"))
         case None => None
       }
     }
   }
+
+  override def add[T](pair: SpeechPartPair[T]): Long = pair match {
+    case un: UninflectedPair => add(un)
+    case adv: AdverbPair => add(adv)
+    case adj: AdjectivePair => add(adj)
+    case noun: NounPair => add(noun)
+    case verb: VerbPair => add(verb)
+    case _ => throw new IllegalArgumentException("Unrecognized speech part: " + pair.toString())
+  }
+  
+  private def add(pair: UninflectedPair) = {}
+  private def add(pair: AdverbPair) = {}
+  private def add(pair: AdjectivePair) = {}
+  private def add(pair: NounPair) = {}
+  private def add(pair: VerbPair) = {}
+  
+  def updatePair[T](pair: SpeechPartPair[T]): Unit
+  def removePair[T](id: Long): SpeechPartPair[T]
+  def listPairs: Seq[SpeechPartPair[_]]
+  
+  def add(entry: DictEntry): Long
+  def update(entry: DictEntry): Unit
+  def remove(id: Long): DictEntry
+  /** get by id */
+  def get(id: Long): Option[DictEntry]
+  /** get by contents */
+  def get(entry: DictEntry): Option[DictEntry]
+    
+
+  
+
   
   override def add(word1:Word, word2:Word):Unit = DB.withConnection {
     implicit c => {
@@ -140,12 +235,7 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  override def isEmpty:Boolean = DB.withConnection {
-    implicit c => {
-      val cRow = SQL("select count(*) as c from translations").apply().head
-      cRow[Long]("c") == 0
-    }
-  }
+
   
   override def addRoot(root: Root):Option[Long] = DB.withConnection {
     implicit c => rootId(root) match {

@@ -59,7 +59,7 @@ case class VerbPair(override val id: Long,
    * @return a sequence of pairs of main roots; one for each pair of prefixes
    */
   override def add() = { 
-    val id = DictionaryFactory.dict.add(this)
+    val id = DictionaryFactory.dict.addPair(this)
     val translations = prefixes match {
       case Some(pre) => VerbPair.prefixesAsSeq(pre).flatMap( tuple => generate(tuple._1,tuple._2, id) ).toSeq
       case None => generate("","", id)

@@ -35,10 +35,19 @@ object Application extends Controller {
   
   val translateForm = Form( tuple("source" -> text, "target" -> text) );
   
+  /** @todo there has to be some better way to handle it than using asInstanceOf
+   *  Probably dict.listRoots should not return a Seq[SpeechPartPair[_]] but something
+   *  more like Seq[SpeechPartPair[T <: SpeechPart[T]]] - but it doesn't work
+   */
   def list = Action { 
     val dict = DictionaryFactory.dict
     if(dict.isEmpty) NSTranslator.init()
-    Ok(views.html.list(dict.seq))
+    val rootPairs = dict.listPairs.map( pair => {
+      val pl = pair.pl.asInstanceOf[SpeechPart[_]]
+      val ns = pair.ns.asInstanceOf[SpeechPart[_]]
+      (pl.toRoot, ns.toRoot)
+    })
+    Ok(views.html.list(rootPairs))
   }
 
   val verbForm = Form(
