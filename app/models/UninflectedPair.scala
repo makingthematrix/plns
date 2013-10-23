@@ -1,6 +1,6 @@
 package models
 
-import logic.UnInflected
+import logic.Uninflected
 
 /**
  * Holds all data needed for generating a translation between two words.
@@ -9,11 +9,15 @@ import logic.UnInflected
  * @param nsWord a word in the target language
  */
 case class UninflectedPair(override val id: Long, plWord: String, nsWord: String) 
-  extends SpeechPartPair[UnInflected]("uninflected"){
+  extends SpeechPartPair[Uninflected]("uninflected"){
   def this(plWord: String, nsWord: String) = this(SpeechPartPair.noId, plWord, nsWord)
-  override def pl = new UnInflected(plWord, "pl")
-  override def ns = new UnInflected(nsWord, "ns")
+  override def pl = new Uninflected(plWord, "pl")
+  override def ns = new Uninflected(nsWord, "ns")
 
   override def copyWithId(id: Long) = UninflectedPair(id, plWord, nsWord)
   override protected def contentize = Seq(plWord, nsWord).mkString(",")
+  override def minimumComparison(pair: SpeechPartPair[Uninflected]) = {
+    val p = pair.asInstanceOf[UninflectedPair]
+    this.plWord == p.plWord
+  }
 }

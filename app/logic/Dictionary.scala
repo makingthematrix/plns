@@ -41,17 +41,58 @@ class Dictionary extends AbstractDictionary {
     }
   
   override def updatePair[T](pair: SpeechPartPair[T]){
-    val removedPair = removePair(pair.id)
+    val removedPair = removePair(pair)
     println("Dictionary.update, replacing pair " + removedPair + " with " + pair)
 	pairs.put(pair.hashCode, pair)
   }
   
-  override def removePair[T](id: Long): SpeechPartPair[T] = {
-    val pairOption = pairs.find{ tuple => tuple._2.id == id }
+  override def removePair[T](pair : SpeechPartPair[T]): Option[SpeechPartPair[T]] = {
+    val pairOption = getById(pair)
     pairOption match {
-      case Some(tuple) => pairs.remove(tuple._2.hashCode); tuple._2.asInstanceOf[SpeechPartPair[T]]
-      case None => throw new IllegalArgumentException("No entry with the given id: " + id)
+      case Some(p) => pairs.remove(p.hashCode); Some(p)
+      case None => None
     }
+  }
+  
+  override def getById[T](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]] = 
+    pairs.values.find { p => p.id == pair.id }.asInstanceOf[Option[SpeechPartPair[T]]]
+  
+  /** @todo again, it should be something like filterBySpeechPart[T <: SpeechPartPair[T]] but it doesn't work */
+  private def filterBySpeechPart[T](speechPart: String) = 
+    pairs.values.filter{ _.speechPart == "uninflected" }.asInstanceOf[Iterable[T]]
+    
+  private def getByContents(pair: UninflectedPair): Option[UninflectedPair] = {
+    val filtered = filterBySpeechPart[UninflectedPair]("uninflected")
+    filtered.find{ _.plWord == pair.plWord }
+  }
+  
+  private def getByContents(pair: AdverbPair): Option[AdverbPair] = {
+    val filtered = filterBySpeechPart[AdverbPair]("adverb")
+    filtered.find{ p => p.plInd == pair.plInd && p.plCmp == pair.plCmp }
+  }
+  
+  private def getByContents(pair: AdjectivePair): Option[AdjectivePair] = {
+    val filtered = filterBySpeechPart[AdjectivePair]("adjective")
+    filtered.find{ p => p.plInd == pair.plInd && p.plCmp == pair.plCmp }
+  }
+  
+  private def getByContents(pair: NounPair): Option[NounPair] = {
+    val filtered = filterBySpeechPart[NounPair]("noun")
+    filtered.find{ p => p.plStem == pair.plStem && p.plPattern == pair.plPattern }
+  }
+  
+  private def getByContents(pair: VerbPair): Option[VerbPair] = {
+    val filtered = filterBySpeechPart[VerbPair]("verb")
+    filtered.find{ p => p.plInfStem == pair.plInfStem && p.plImpStem == pair.plImpStem }
+  }
+  
+  override def getByContents[T](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]] = pair match {
+    case un: UninflectedPair => getByContents(un)
+    case adv: AdverbPair => getByContents(adv)
+    case adj: AdjectivePair => getByContents(adj)
+    case noun: NounPair => getByContents(noun)
+    case verb: VerbPair => getByContents(verb)
+    case _ => throw new IllegalArgumentException("Unrecognized speech part: " + pair.toString())
   }
   
   override def listPairs = pairs.values.toSeq

@@ -22,7 +22,12 @@ abstract class AbstractDictionary {
   
   def addPair[T](pair: SpeechPartPair[T]): Long
   def updatePair[T](pair: SpeechPartPair[T]): Unit
-  def removePair[T](id: Long): SpeechPartPair[T]
+  def removePair[T](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
+  def getById[T](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
+  /** Tries to retrieve the pair by its contents, different for every type.
+   *  In order to use it, create a stub version of the pair of the given type
+   *  and provide at least info for the 'from' part. */
+  def getByContents[T](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
   def listPairs: Seq[SpeechPartPair[_]]
   
   def add(entry: DictEntry): Long

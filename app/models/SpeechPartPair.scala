@@ -12,7 +12,7 @@ abstract class SpeechPartPair[T <: SpeechPart[T]](val id: Long, val speechPart: 
   def this(speechPart: String) = this(-1L, speechPart)
   def copy = copyWithId(id)
   def copyWithId(id: Long): SpeechPartPair[T]
-  
+
   def pl: T
   def ns: T
 	
