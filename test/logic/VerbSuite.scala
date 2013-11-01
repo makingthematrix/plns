@@ -14,7 +14,7 @@ class VerbSuite {
   
   @Test
   def shouldContainImperfectiveAspect(){
-    val word = PLVerb.word("mów", "mów", "VIa",false)
+    val word = PLVerb.word("mów", "mów", "VIa", false, -1L)
     word.conjugation.suffices.get(Conj.ACTIVE) match {
       case Some(str) => assertEquals("iąc",str)
       case None => fail()
@@ -26,9 +26,9 @@ class VerbSuite {
     setUp()
     try {
       val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,None)
-      assertEquals(None,dict.get("mówić"))
+      assertEquals(None,dict.getTranslation("mówić"))
       vp.add()
-      assertEquals(Option("govoriti"),dict.get("mówić"))
+      assertEquals(Option("govoriti"),dict.getTranslation("mówić"))
     } finally tearDown()
   }
   
@@ -37,9 +37,9 @@ class VerbSuite {
     setUp()
     try {
       val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,Some("_,prze_pre"))
-      assertEquals(None,dict.get("mówić"))
+      assertEquals(None,dict.getTranslation("mówić"))
       vp.add()
-      assertEquals(Option("pregovoriti"),dict.get("przemówić")) 
+      assertEquals(Option("pregovoriti"),dict.getTranslation("przemówić")) 
     } finally tearDown()
   } 
   
@@ -49,14 +49,14 @@ class VerbSuite {
     val prefixes = Some("_,"+VerbPair.perfectiveMarker+"prze_pre")
     try{
       val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,prefixes)
-      assertEquals(None,dict.get("mówić"))
+      assertEquals(None,dict.getTranslation("mówić"))
       vp.add()
-      assertEquals(Option("govoriti"),dict.get("mówić"))
-      assertEquals(Option("pregovoriti"),dict.get("przemówić")) 
-      assertEquals(Option("govorjučy"),dict.get("mówiący"))
-      assertEquals(None,dict.get("przemówiący"))
-      assertEquals(Option("pregovorivšy"),dict.get("przemówiwszy"))
-      assertEquals(None,dict.get("mówiwszy"))
+      assertEquals(Option("govoriti"),dict.getTranslation("mówić"))
+      assertEquals(Option("pregovoriti"),dict.getTranslation("przemówić")) 
+      assertEquals(Option("govorjučy"),dict.getTranslation("mówiący"))
+      assertEquals(None,dict.getTranslation("przemówiący"))
+      assertEquals(Option("pregovorivšy"),dict.getTranslation("przemówiwszy"))
+      assertEquals(None,dict.getTranslation("mówiwszy"))
     } finally tearDown()
   }
   
@@ -66,15 +66,15 @@ class VerbSuite {
     val prefixes = Some("_,"+VerbPair.perfectiveMarker+"po_po")
     try {
       val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,prefixes)
-      assertEquals(None,dict.get("mówić"))
+      assertEquals(None,dict.getTranslation("mówić"))
       vp.add()
-      assertEquals(Option("govoriti"),dict.get("mówić"))
-      assertEquals(Option("govorjuč"),dict.get("mówiąc"))
-      assertEquals(Option("govorjučy"),dict.get("mówiący"))
-      assertEquals(Option("govorieny"),dict.get("mówiony"))
-      assertEquals(Option("govorienje"),dict.get("mówienie"))
-      assertEquals(Option("pogovorienjej"),dict.get("pomówień"))
-      assertEquals(Option("pogovorivšy"),dict.get("pomówiwszy"))
+      assertEquals(Option("govoriti"),dict.getTranslation("mówić"))
+      assertEquals(Option("govorjuč"),dict.getTranslation("mówiąc"))
+      assertEquals(Option("govorjučy"),dict.getTranslation("mówiący"))
+      assertEquals(Option("govorieny"),dict.getTranslation("mówiony"))
+      assertEquals(Option("govorienje"),dict.getTranslation("mówienie"))
+      assertEquals(Option("pogovorienjej"),dict.getTranslation("pomówień"))
+      assertEquals(Option("pogovorivšy"),dict.getTranslation("pomówiwszy"))
     } finally tearDown()
   }
   
@@ -83,14 +83,14 @@ class VerbSuite {
     setUp()
     try {
       val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,None)
-      assertEquals(None,dict.get("mówić"))
+      assertEquals(None,dict.getTranslation("mówić"))
       vp.add()
-      assertEquals(Option("govoril byh"),dict.get("mówiłbym"))
-      assertEquals(Option("govorila bys"),dict.get("mówiłabyś"))
-      assertEquals(Option("govoril by"),dict.get("mówiłby"))
-      assertEquals(Option("govorili byhom"),dict.get("mówiłybyśmy"))
-      assertEquals(Option("govorili byste"),dict.get("mówilibyście"))
-      assertEquals(Option("govorili by"),dict.get("mówiłyby"))
+      assertEquals(Option("govoril byh"),dict.getTranslation("mówiłbym"))
+      assertEquals(Option("govorila bys"),dict.getTranslation("mówiłabyś"))
+      assertEquals(Option("govoril by"),dict.getTranslation("mówiłby"))
+      assertEquals(Option("govorili byhom"),dict.getTranslation("mówiłybyśmy"))
+      assertEquals(Option("govorili byste"),dict.getTranslation("mówilibyście"))
+      assertEquals(Option("govorili by"),dict.getTranslation("mówiłyby"))
     } finally tearDown()
   }
   
@@ -99,14 +99,14 @@ class VerbSuite {
     setUp()
     try {
       val vp = new VerbPair("mów","mów","VIa",None,"govori","govor","SOFT",None,None)
-      assertEquals(None,dict.get("mówić"))
+      assertEquals(None,dict.getTranslation("mówić"))
       vp.add()
-      assertEquals(Option("jesm govoril"),dict.get("mówiłem"))
-      assertEquals(Option("jesi govorila"),dict.get("mówiłaś"))
-      assertEquals(Option("je govoril"),dict.get("mówił"))
-      assertEquals(Option("jesme govorili"),dict.get("mówiłyśmy"))
-      assertEquals(Option("jeste govorili"),dict.get("mówiliście"))
-      assertEquals(Option("sut govorili"),dict.get("mówiły"))
+      assertEquals(Option("jesm govoril"),dict.getTranslation("mówiłem"))
+      assertEquals(Option("jesi govorila"),dict.getTranslation("mówiłaś"))
+      assertEquals(Option("je govoril"),dict.getTranslation("mówił"))
+      assertEquals(Option("jesme govorili"),dict.getTranslation("mówiłyśmy"))
+      assertEquals(Option("jeste govorili"),dict.getTranslation("mówiliście"))
+      assertEquals(Option("sut govorili"),dict.getTranslation("mówiły"))
     } finally tearDown()
   }      
 }

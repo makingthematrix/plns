@@ -14,11 +14,12 @@ import ConjugationType._
  * @param lang the language of the verb
  * @see ConjugationType
  */
-class Verb(val infStem: String, val impStem: String, val conjugation: ConjugationPattern, val perfective: Boolean, val lang: String) 
+class Verb(val infStem: String, val impStem: String, val conjugation: ConjugationPattern, 
+           val perfective: Boolean, override val lang: String) 
   extends SpeechPart[Verb](lang) {
   override val speechPart = SpeechPart.VERB
   override def mainRoot = conjugate(INF)
-  override def toRoot = new Root(mainRoot, speechPart, lang)
+  override def toRoot(speechPartId: Long) = new Root(mainRoot, speechPart, lang, speechPartId)
   
   /** generates cases for TYPE_INF, TYPE_IMP and TYPE_COND, the noun and the adjective participles
    *  @param verb a verb of another language which this one should be translated to

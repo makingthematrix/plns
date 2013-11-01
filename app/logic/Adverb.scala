@@ -3,11 +3,11 @@ package logic
 import SpeechPart._
 import AdjectiveDegree._
 
-class Adverb(val ind: String, val cmp: String, val sup: String, val cmpIgnored: Boolean, val lang: String) 
+class Adverb(val ind: String, val cmp: String, val sup: String, val cmpIgnored: Boolean, override val lang: String) 
 			extends SpeechPart[Adverb](lang) {
   override def mainRoot = ind
   override val speechPart = ADVERB
-  override def toRoot = new Root(mainRoot,speechPart,lang)
+  override def toRoot(speechPartId: Long) = new Root(mainRoot, speechPart, lang, speechPartId)
   
   override def generate(adv: Adverb, id: Long) = { 
     val indDE = new DictEntry(ind, lang, adv.ind, adv.lang, INDICATIVE, speechPart, id)

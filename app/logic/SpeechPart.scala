@@ -5,10 +5,9 @@ import scala.collection.mutable
 abstract class SpeechPart[T <: SpeechPart[T]](val lang: String) {
   def generate(t: T, speechPartId: Long):Seq[DictEntry]
   def mainRoot: String
-  def toRoot:Root
-  override def toString = toRoot.toString
+  def toRoot(speechPartId: Long):Root
 
-  val speechPart: String
+  val speechPart: SpeechPart.Value
   
   /**
    * adds an exception exception

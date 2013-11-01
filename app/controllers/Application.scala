@@ -43,9 +43,9 @@ object Application extends Controller {
     val dict = DictionaryFactory.dict
     if(dict.isEmpty) NSTranslator.init()
     val rootPairs = dict.listPairs.map( pair => {
-      val pl = pair.pl.asInstanceOf[SpeechPart[_]]
-      val ns = pair.ns.asInstanceOf[SpeechPart[_]]
-      (pl.toRoot, ns.toRoot)
+      val pl:SpeechPart[_] = pair.pl
+      val ns:SpeechPart[_] = pair.ns
+      (pl.toRoot(pair.id), ns.toRoot(pair.id)) 
     })
     Ok(views.html.list(rootPairs))
   }

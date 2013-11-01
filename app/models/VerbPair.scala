@@ -64,7 +64,7 @@ case class VerbPair(override val id: Long,
       case Some(pre) => VerbPair.prefixesAsSeq(pre).flatMap( tuple => generate(tuple._1,tuple._2, id) ).toSeq
       case None => generate("","", id)
     }
-    translations.foreach{ entry => DictionaryFactory.dict.add(entry) }
+    DictionaryFactory.dict.addEntries(translations)
     Seq(((pl.mainRoot,ns.mainRoot)))
   }
   
@@ -122,11 +122,6 @@ case class VerbPair(override val id: Long,
   override def copyWithId(id: Long) = VerbPair(id, plInfStem, plImpStem, plPattern, plExceptions,
                     			 nsInfStem, nsImpStem, nsPattern, nsExceptions, prefixes)
   
-  override protected def contentize = Seq(
-    plInfStem, plImpStem, plPattern, plExceptions.getOrElse(""),
-    nsInfStem, nsImpStem, nsPattern, nsExceptions.getOrElse(""),
-    prefixes.getOrElse("")
-  ).mkString(",")
 }
 
 object VerbPair {

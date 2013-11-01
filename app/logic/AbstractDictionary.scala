@@ -8,37 +8,30 @@ import models.NounPair
 import models.VerbPair
 import models.SpeechPartPair
 
-import scala.reflect.runtime.{universe => ru}
-
-case class Root(id: Long, root: String, speechPart: SpeechPart.Value, lang: String){
-  def this(root: String, speechPart: SpeechPart.Value, lang: String) = this(-1L, root, speechPart, lang)
-}
-
 abstract class AbstractDictionary {
   def clear:Unit
-  def size:Int
+  def size:Long
   def isEmpty:Boolean
   def getTranslation(word: String):Option[String]
   
-  def addPair[T](pair: SpeechPartPair[T]): Long
-  def updatePair[T](pair: SpeechPartPair[T]): Unit
-  def removePair[T](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
-  def getById[T](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
+  def addPair[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Long
+  def updatePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Unit
+  def removePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
+  def getPairById[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
   /** Tries to retrieve the pair by its contents, different for every type.
    *  In order to use it, create a stub version of the pair of the given type
    *  and provide at least info for the 'from' part. */
-  def getByContents[T](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
-  def listPairs: Seq[SpeechPartPair[_]]
+  def getPairByContents[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
+  def listPairs: Seq[SpeechPartPair[_ <: SpeechPart[_]]]
   
-  def add(entry: DictEntry): Long
-  def update(entry: DictEntry): Unit
-  def remove(id: Long): DictEntry
-  /** get by id */
-  def get(id: Long): Option[DictEntry]
-  /** get by contents */
-  def get(entry: DictEntry): Option[DictEntry]
-  
-  
+  def addEntry(entry: DictEntry): Long
+  def addEntries(entries: Seq[DictEntry]): Unit
+  def updateEntry(entry: DictEntry): Unit
+  def removeEntry(id: Long): Option[DictEntry]
+  def getEntryById(id: Long): Option[DictEntry]
+  def getEntryByContents(entry: DictEntry): Option[DictEntry]
+  def getWord(word: String, lang: String): Option[DictEntry]
+ 
 //-----------------------------------------------------
   
   def translate(sentence: String):(String,Seq[String]) = {
@@ -82,7 +75,7 @@ abstract class AbstractDictionary {
   private def translateWord(word: String): (String,Boolean) = {
 	if(word.isEmpty()) return ("",true)
 	if(wordPattern.findFirstIn(word).isEmpty) return (word,true)
-	
+	println("word to translate: " + word)
 	getTranslation(word.toLowerCase()) match {
 	  case Some(t) => {
 	    val translated = word match {

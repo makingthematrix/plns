@@ -31,7 +31,7 @@ object NSTranslator {
   ) 
 	  
   def add(from: String, to:String) 
-    = DictionaryFactory.dict.add(new DictEntry(from, "pl", to, "ns", UnInflected.caseId, UNINFLECTED, -1L))
+    = DictionaryFactory.dict.addEntry(new DictEntry(from, "pl", to, "ns", Uninflected.caseId, UNINFLECTED, -1L))
   
   def init() = {
 	pronouns.foreach{ t => add(t._1,t._2) }

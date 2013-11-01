@@ -15,9 +15,4 @@ case class UninflectedPair(override val id: Long, plWord: String, nsWord: String
   override def ns = new Uninflected(nsWord, "ns")
 
   override def copyWithId(id: Long) = UninflectedPair(id, plWord, nsWord)
-  override protected def contentize = Seq(plWord, nsWord).mkString(",")
-  override def minimumComparison(pair: SpeechPartPair[Uninflected]) = {
-    val p = pair.asInstanceOf[UninflectedPair]
-    this.plWord == p.plWord
-  }
 }

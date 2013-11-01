@@ -14,6 +14,8 @@ import models.AdjectivePair
 import models.NounPair
 import models.VerbPair
 import logic.DictEntry
+import logic.SpeechPart
+import logic.Adverb
 
 object DBParsers {
   val dictEntryParser = {
@@ -118,10 +120,10 @@ object DBParsers {
 }
 
 class DBDictionary extends AbstractDictionary {
-  override def size:Int = DB.withConnection {
+  override def size = DB.withConnection {
     implicit c => {
       val cRow = SQL("select count(*) as c from dictentries").apply().head
-      cRow[Int]("c")
+      cRow[Long]("c")
     }  
   }
   
@@ -138,21 +140,24 @@ class DBDictionary extends AbstractDictionary {
   
   override def isEmpty:Boolean = this.size == 0
     
-  override def getTranslation(word: String):Option[String] = DB.withConnection { 
+  override def getTranslation(word: String) = DB.withConnection { 
     implicit c => {
       println("DBDictionary.getTranslation, word: " + word)
       val dictEntryRowOption = SQL("""
           select toword from dictentries 
-          where fromword={word} lang='pl');
+          where fromword={word} and fromlang='pl'
       """).on('word -> word).apply().headOption
       dictEntryRowOption match {
-        case Some(wordRow) => Some(wordRow[String]("word"))
+        case Some(wordRow) => Some(wordRow[String]("toword"))
         case None => None
       }
     }
   }
 
-  override def addPair[T](pair: SpeechPartPair[T]): Long = DB.withConnection {
+  /** @todo This 'synchronized' is sooo going to be replaced by an Akka actor 
+   *        And try to find a way not to use asInstanceOf
+   */
+  override def addPair[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = DB.withConnection {
     implicit c => pair match {
       case un: UninflectedPair => this.synchronized { add(un) }
       case adv: AdverbPair => this.synchronized { add(adv) }
@@ -163,18 +168,18 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  override def removePair[T](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]] = DB.withConnection {
+  override def removePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = DB.withConnection {
     implicit c => pair match {
-      case un: UninflectedPair => this.synchronized { remove(un) }
-      case adv: AdverbPair => this.synchronized { remove(adv) }
-      case adj: AdjectivePair => this.synchronized { remove(adj) }
-      case noun: NounPair => this.synchronized { remove(noun) }
-      case verb: VerbPair => this.synchronized { remove(verb) }
+      case un: UninflectedPair => this.synchronized { remove(un).asInstanceOf[Option[SpeechPartPair[T]]] }
+      case adv: AdverbPair => this.synchronized { remove(adv).asInstanceOf[Option[SpeechPartPair[T]]] }
+      case adj: AdjectivePair => this.synchronized { remove(adj).asInstanceOf[Option[SpeechPartPair[T]]] }
+      case noun: NounPair => this.synchronized { remove(noun).asInstanceOf[Option[SpeechPartPair[T]]] }
+      case verb: VerbPair => this.synchronized { remove(verb).asInstanceOf[Option[SpeechPartPair[T]]] }
       case _ => throw new IllegalArgumentException("Unrecognized speech part: " + pair.toString())
     }
   }
   
-  override def updatePair[T](pair: SpeechPartPair[T]): Unit = DB.withConnection {
+  override def updatePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = DB.withConnection {
     implicit c => pair match {
       case un: UninflectedPair => this.synchronized { update(un) }
       case adv: AdverbPair => this.synchronized { update(adv) }
@@ -185,31 +190,32 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  override def getById[T](pair: SpeechPartPair[T]): SpeechPartPair[T] = DB.withConnection {
+  override def getPairById[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = DB.withConnection {
     implicit c => pair match {
-      case un: UninflectedPair => getById(un) 
-      case adv: AdverbPair => getById(adv) 
-      case adj: AdjectivePair => getById(adj) 
-      case noun: NounPair => getById(noun) 
-      case verb: VerbPair => getById(verb) 
+      case un: UninflectedPair => getById(un).asInstanceOf[Option[SpeechPartPair[T]]] 
+      case adv: AdverbPair => getById(adv).asInstanceOf[Option[SpeechPartPair[T]]]
+      case adj: AdjectivePair => getById(adj).asInstanceOf[Option[SpeechPartPair[T]]] 
+      case noun: NounPair => getById(noun).asInstanceOf[Option[SpeechPartPair[T]]] 
+      case verb: VerbPair => getById(verb).asInstanceOf[Option[SpeechPartPair[T]]] 
       case _ => throw new IllegalArgumentException("Unrecognized speech part: " + pair.toString())
     }
   }
 
-  override def getByContents[T](pair: SpeechPartPair[T]): SpeechPartPair[T] = DB.withConnection {
+  override def getPairByContents[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = DB.withConnection {
     implicit c => pair match {
-      case un: UninflectedPair => getByContents(un) 
-      case adv: AdverbPair => getByContents(adv) 
-      case adj: AdjectivePair => getByContents(adj) 
-      case noun: NounPair => getByContents(noun) 
-      case verb: VerbPair => getByContents(verb) 
+      case un: UninflectedPair => getByContents(un).asInstanceOf[Option[SpeechPartPair[T]]]
+      case adv: AdverbPair => getByContents(adv).asInstanceOf[Option[SpeechPartPair[T]]]
+      case adj: AdjectivePair => getByContents(adj).asInstanceOf[Option[SpeechPartPair[T]]]
+      case noun: NounPair => getByContents(noun).asInstanceOf[Option[SpeechPartPair[T]]]
+      case verb: VerbPair => getByContents(verb).asInstanceOf[Option[SpeechPartPair[T]]]
       case _ => throw new IllegalArgumentException("Unrecognized speech part: " + pair.toString())
     }
   }
   
-  private def add(pair: UninflectedPair)(implicit c: java.sql.Connection): Long = {
+  private def add(pair: UninflectedPair)(implicit c: java.sql.Connection) = {
 	assert(pair.id == SpeechPartPair.noId)
 	// returns the new id, generated for this pair
+	val t = getByContents(pair)
     getByContents(pair) match { 
       case None => SQL("insert into uninflectedpairs (fromword, toword) values ({fromword}, {toword})").on(
                         'fromword -> pair.plWord,
@@ -219,7 +225,7 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  private def remove(pair: UninflectedPair)(implicit c: java.sql.Connection): Option[UninflectedPair] =  {
+  private def remove(pair: UninflectedPair)(implicit c: java.sql.Connection) = {
     assert(pair.id != SpeechPartPair.noId)
     getById(pair) match{
       case Some(p) => SQL("delete from uninflectedpairs where id={id}").on('id -> pair.id).executeUpdate(); Some(p);
@@ -234,21 +240,21 @@ class DBDictionary extends AbstractDictionary {
     .executeUpdate()  
   }
   
-  private def getById(pair: UninflectedPair)(implicit c: java.sql.Connection): Option[UninflectedPair] = {
+  private def getById(pair: UninflectedPair)(implicit c: java.sql.Connection) = {
     val t = SQL("select id, fromword, toword from uninflectedpairs where id={id}")
             .on('id -> pair.id)
             .as(DBParsers.uninflectedPairParser *)
     if(t.isEmpty) None else Some(t(0))
   }
   
-  private def getByContents(pair: UninflectedPair)(implicit c: java.sql.Connection): Option[UninflectedPair] = {
+  private def getByContents(pair: UninflectedPair)(implicit c: java.sql.Connection) = {
     val t = SQL("select id, fromword, toword from uninflectedpairs where fromword={fromword}")
             .on('fromword -> pair.plWord)
             .as(DBParsers.uninflectedPairParser *)
     if(t.isEmpty) None else Some(t(0))
   } 
   
-  private def add(pair: AdverbPair)(implicit c: java.sql.Connection): Long = {
+  private def add(pair: AdverbPair)(implicit c: java.sql.Connection) = {
 	assert(pair.id == SpeechPartPair.noId)
 	// returns the new id, generated for this pair
     getByContents(pair) match { 
@@ -265,7 +271,7 @@ class DBDictionary extends AbstractDictionary {
     }
   }
 
-  private def remove(pair: AdverbPair)(implicit c: java.sql.Connection): Option[AdverbPair] = {
+  private def remove(pair: AdverbPair)(implicit c: java.sql.Connection) = {
     assert(pair.id != SpeechPartPair.noId)
     getById(pair) match{
       case Some(p) => SQL("delete from adverbpairs where id={id}").on('id -> pair.id).executeUpdate(); Some(p);
@@ -276,7 +282,7 @@ class DBDictionary extends AbstractDictionary {
   private def update(pair: AdverbPair)(implicit c: java.sql.Connection) {
 	assert(pair.id != SpeechPartPair.noId)
     SQL("""update adverbpairs 
-           set fromind={fromind}, fromcmp={fomcmp}, frommode={frommode},
+           set fromind={fromind}, fromcmp={fromcmp}, frommode={frommode},
                toind={toind}, tocmp={tocmp}, cmpignored={cmpignored}
            where id={id}""")
     .on('id -> pair.id, 'fromind -> pair.plInd, 'fromcmp -> pair.plCmp, 'frommode -> pair.plMode,
@@ -284,7 +290,7 @@ class DBDictionary extends AbstractDictionary {
     .executeUpdate()
   }
   
-  private def getById(pair: AdverbPair)(implicit c: java.sql.Connection): Option[AdverbPair] = {
+  private def getById(pair: AdverbPair)(implicit c: java.sql.Connection) = {
     val t = SQL("""select id, fromind, fromcmp, frommode, toind, tocmp, cmpignored 
                    from adverbpairs where id={id}""")
             .on('id -> pair.id)
@@ -292,7 +298,7 @@ class DBDictionary extends AbstractDictionary {
     if(t.isEmpty) None else Some(t(0))
   }
   
-  private def getByContents(pair: AdverbPair)(implicit c: java.sql.Connection): Option[AdverbPair] = {
+  private def getByContents(pair: AdverbPair)(implicit c: java.sql.Connection) = {
     val t = SQL("""select id, fromind, fromcmp, frommode, toind, tocmp, cmpignored 
                    from adverbpairs where fromind={fromind} and fromcmp={fromcmp}""")
             .on('fromind -> pair.plInd, 'fromcmp -> pair.plCmp)
@@ -300,7 +306,7 @@ class DBDictionary extends AbstractDictionary {
     if(t.isEmpty) None else Some(t(0))
   } 
   
-  private def add(pair: AdjectivePair)(implicit c: java.sql.Connection): Long = {
+  private def add(pair: AdjectivePair)(implicit c: java.sql.Connection) = {
 	assert(pair.id == SpeechPartPair.noId)
 	// returns the new id, generated for this pair
     getByContents(pair) match { 
@@ -327,7 +333,7 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  private def remove(pair: AdjectivePair)(implicit c: java.sql.Connection): Option[AdjectivePair] = {
+  private def remove(pair: AdjectivePair)(implicit c: java.sql.Connection) = {
     assert(pair.id != SpeechPartPair.noId)
     getById(pair) match{
       case Some(p) => SQL("delete from adjectivepairs where id={id}").on('id -> pair.id).executeUpdate(); Some(p);
@@ -338,12 +344,13 @@ class DBDictionary extends AbstractDictionary {
   private def update(pair: AdjectivePair)(implicit c: java.sql.Connection) {
 	assert(pair.id != SpeechPartPair.noId)
     SQL("""update adjectivepairs 
-           set fromind={fromind}, fromadvind={fromadvind}, fromcmp={fomcmp}, fromadvcmp={fromadvcmp},
+           set fromind={fromind}, fromadvind={fromadvind}, fromcmp={fromcmp}, fromadvcmp={fromadvcmp},
                frommode={frommode}, fromadvmode={fromadvmode}, fromexceptions={fromexceptions},
                toind={toind}, toadvind={toadvind}, tocmp={tocmp}, toadvcmp={toadvcmp}, 
                toexceptions={toexceptions}, cmpignored={cmpignored}
            where id={id}""")
-    .on('fromind -> pair.plInd,
+    .on('id -> pair.id,
+        'fromind -> pair.plInd,
         'fromadvind -> pair.plAdvInd,
         'fromcmp -> pair.plCmp,
         'fromadvcmp -> pair.plAdvCmp,
@@ -359,7 +366,7 @@ class DBDictionary extends AbstractDictionary {
     .executeUpdate()  
   }  
   
-  private def getById(pair: AdjectivePair)(implicit c: java.sql.Connection): Option[AdjectivePair] = {
+  private def getById(pair: AdjectivePair)(implicit c: java.sql.Connection) = {
     val t = SQL("""select id, fromind, fromadvind, fromcmp, fromadvcmp, frommode, fromadvmode, fromexceptions,
                           toind, toadvind, tocmp, toadvcmp, toexceptions, cmpignored
                    from adjectivepairs where id={id}""")
@@ -368,7 +375,7 @@ class DBDictionary extends AbstractDictionary {
     if(t.isEmpty) None else Some(t(0))
   }  
   
-  private def getByContents(pair: AdjectivePair)(implicit c: java.sql.Connection): Option[AdjectivePair] = {
+  private def getByContents(pair: AdjectivePair)(implicit c: java.sql.Connection) = {
     val t = SQL("""select id, fromind, fromadvind, fromcmp, fromadvcmp, frommode, fromadvmode, fromexceptions,
                           toind, toadvind, tocmp, toadvcmp, toexceptions, cmpignored 
                    from adjectivepairs 
@@ -378,7 +385,7 @@ class DBDictionary extends AbstractDictionary {
     if(t.isEmpty) None else Some(t(0))
   } 
   
-  private def add(pair: NounPair)(implicit c: java.sql.Connection): Long = {
+  private def add(pair: NounPair)(implicit c: java.sql.Connection) = {
 	assert(pair.id == SpeechPartPair.noId)
 	// returns the new id, generated for this pair
     getByContents(pair) match { 
@@ -396,7 +403,7 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  private def remove(pair: NounPair)(implicit c: java.sql.Connection): Option[NounPair] = {
+  private def remove(pair: NounPair)(implicit c: java.sql.Connection) = {
     assert(pair.id != SpeechPartPair.noId)
     getById(pair) match{
       case Some(p) => SQL("delete from nounpairs where id={id}").on('id -> pair.id).executeUpdate(); Some(p);
@@ -410,7 +417,8 @@ class DBDictionary extends AbstractDictionary {
            set fromstem={fromstem}, frompattern={frompattern}, fromexceptions={fromexceptions},
                tostem={tostem}, topattern={topattern}, toexceptions={toexceptions}, ignored={ignored}
            where id={id}""")
-    .on('fromstem -> pair.plStem,
+    .on('id -> pair.id,
+        'fromstem -> pair.plStem,
         'frompattern -> pair.plPattern,
         'fromexceptions -> pair.plExceptions,
         'tostem -> pair.nsStem,
@@ -420,7 +428,7 @@ class DBDictionary extends AbstractDictionary {
     .executeUpdate() 
   }  
   
-  private def getById(pair: NounPair)(implicit c: java.sql.Connection): Option[NounPair] = {
+  private def getById(pair: NounPair)(implicit c: java.sql.Connection) = {
     val t = SQL("""select id, fromstem, frompattern, fromexceptions, 
                           tostem, topattern, toexceptions, ignored
                    from nounpairs where id={id}""")
@@ -429,7 +437,7 @@ class DBDictionary extends AbstractDictionary {
     if(t.isEmpty) None else Some(t(0))
   }
   
-  private def getByContents(pair: NounPair)(implicit c: java.sql.Connection): Option[NounPair] = {
+  private def getByContents(pair: NounPair)(implicit c: java.sql.Connection) = {
     val t = SQL("""select id, fromstem, frompattern, fromexceptions, 
                           tostem, topattern, toexceptions, ignored 
                    from nounpairs 
@@ -441,7 +449,7 @@ class DBDictionary extends AbstractDictionary {
     if(t.isEmpty) None else Some(t(0))
   }
   
-  private def add(pair: VerbPair)(implicit c: java.sql.Connection): Long = {
+  private def add(pair: VerbPair)(implicit c: java.sql.Connection) = {
 	assert(pair.id == SpeechPartPair.noId)
 	// returns the new id, generated for this pair
     getByContents(pair) match { 
@@ -465,7 +473,7 @@ class DBDictionary extends AbstractDictionary {
     }
   }
 
-  private def remove(pair: VerbPair)(implicit c: java.sql.Connection): Option[VerbPair] = {
+  private def remove(pair: VerbPair)(implicit c: java.sql.Connection) = {
     assert(pair.id != SpeechPartPair.noId)
     getById(pair) match{
       case Some(p) => SQL("delete from verbpairs where id={id}").on('id -> pair.id).executeUpdate(); Some(p);
@@ -481,7 +489,8 @@ class DBDictionary extends AbstractDictionary {
                toinfstem={toinfstem}, toimpstem={toimpstem}, topattern={topattern}, 
                toexceptions={toexceptions}, prefixes={prefixes}
            where id={id}""")
-    .on('frominfstem -> pair.plInfStem,
+    .on('id -> pair.id, 
+        'frominfstem -> pair.plInfStem,
         'fromimpstem -> pair.plImpStem,
         'frompattern -> pair.plPattern,
         'fromexceptions -> pair.plExceptions,
@@ -493,7 +502,7 @@ class DBDictionary extends AbstractDictionary {
     .executeUpdate()
   }  
   
-  private def getById(pair: VerbPair)(implicit c: java.sql.Connection): Option[VerbPair] = {
+  private def getById(pair: VerbPair)(implicit c: java.sql.Connection) = {
     val t = SQL("""select id, frominfstem, fromimpstem, frompattern, fromexceptions, 
                           toinfstem, toimpstem, topattern, toexceptions, prefixes
                    from verbpairs where id={id}""")
@@ -502,7 +511,7 @@ class DBDictionary extends AbstractDictionary {
     if(t.isEmpty) None else Some(t(0))
   }
   
-  private def getByContents(pair: VerbPair)(implicit c: java.sql.Connection): Option[VerbPair] = {
+  private def getByContents(pair: VerbPair)(implicit c: java.sql.Connection) = {
     val t = SQL("""select id, frominfstem, fromimpstem, frompattern, fromexceptions, 
                           toinfstem, toimpstem, topattern, toexceptions, prefixes
                    from verbpairs 
@@ -514,16 +523,115 @@ class DBDictionary extends AbstractDictionary {
     if(t.isEmpty) None else Some(t(0))
   }  
   
-  def listPairs: Seq[SpeechPartPair[_]]
+  def listPairs: Seq[SpeechPartPair[_ <: SpeechPart[_]]] = DB.withConnection {
+    implicit c => {
+      val uninflecteds = SQL("select id, fromword, toword from uninflectedpairs")
+                         .as(DBParsers.uninflectedPairParser *)
+      val adverbs = SQL("select id, fromind, fromcmp, frommode, toind, tocmp, cmpignored from adverbpairs")
+                    .as(DBParsers.adverbPairParser *)
+      val adjectives = SQL("""select id, fromind, fromadvind, fromcmp, fromadvcmp, frommode, fromadvmode, fromexceptions,
+                              toind, toadvind, tocmp, toadvcmp, toexceptions, cmpignored from adjectivepairs """)
+                       .as(DBParsers.adjectivePairParser *)
+      val nouns = SQL("""select id, fromstem, frompattern, fromexceptions, 
+                          tostem, topattern, toexceptions, ignored from nounpairs""")
+                  .as(DBParsers.nounPairParser *)
+      val verbs = SQL("""select id, frominfstem, fromimpstem, frompattern, fromexceptions, 
+                          toinfstem, toimpstem, topattern, toexceptions, prefixes from verbpairs""")
+                  .as(DBParsers.verbPairParser *)
+      uninflecteds ++ adverbs ++ adjectives ++ nouns ++ verbs
+    }
+  }
   
-  def add(entry: DictEntry): Long
-  def update(entry: DictEntry): Unit
-  def remove(id: Long): DictEntry
-  /** get by id */
-  def get(id: Long): Option[DictEntry]
-  /** get by contents */
-  def get(entry: DictEntry): Option[DictEntry]
-     
+  override def addEntry(entry: DictEntry) = DB.withConnection {
+    assert(entry.id == DictEntry.noId)
+    implicit c => add(entry) 
+  }
+  
+  override def addEntries(entries: Seq[DictEntry]) = DB.withConnection {
+    implicit c => entries.foreach( e => {  
+      assert(e.id == DictEntry.noId) 
+      add(e) 
+    })
+  }
+  
+  private def add(entry: DictEntry)(implicit c: java.sql.Connection) = getByContents(entry) match { 
+    case None => SQL("""insert into dictentries (fromword, fromlang, toword, tolang, caseid, speechpart, speechpartid) 
+                        values ({fromword}, {fromlang}, {toword}, {tolang}, {caseid}, {speechpart}, {speechpartid})""")
+                  .on('fromword -> entry.plWord,
+                      'fromlang -> entry.plLang,
+                      'toword -> entry.nsWord,
+                      'tolang -> entry.nsLang,
+                      'caseid -> entry.caseId,
+                      'speechpart -> entry.speechPart.toString(),
+                      'speechpartid -> entry.speechPartId)
+                  .executeInsert(scalar[Long].single)
+    case Some(e) => e.id
+  }
+  
+  override def getEntryByContents(entry: DictEntry) = DB.withConnection {
+    implicit c => getByContents(entry)
+  }
+  
+  override def getWord(word: String, lang: String) = DB.withConnection {
+    implicit c => getByContents(new DictEntry(word,lang,"",""))
+  }
+  
+  private def getByContents(entry: DictEntry)(implicit c: java.sql.Connection): Option[DictEntry] = {
+    val t = SQL("""select id, fromword, fromlang, toword, tolang, caseid, speechpart, speechpartid from dictentries
+                   where fromword={fromword} and fromlang={fromlang}""")
+            .on('fromword -> entry.plWord, 'fromlang -> entry.plLang, 'speechpart -> entry.speechPart.toString)
+            .as(DBParsers.dictEntryParser *)
+    if(t.isEmpty) None else Some(t(0))
+  }
+  
+  override def getEntryById(id: Long) = DB.withConnection {
+    implicit c => getById(id)
+  }
+  
+  private def getById(id: Long)(implicit c: java.sql.Connection) = {
+    val t = SQL("""select id, fromword, fromlang, toword, tolang, caseid, speechpart, speechpartid from dictentries
+                   where id={id}""")
+            .on('id -> id)
+            .as(DBParsers.dictEntryParser *)
+    if(t.isEmpty) None else Some(t(0))
+  }
+  
+  override def removeEntry(id: Long) = DB.withConnection {
+    implicit c => remove(id)
+  }
+  
+  private def remove(id: Long)(implicit c: java.sql.Connection) = {
+    assert(id != DictEntry.noId)
+    getById(id) match{
+      case Some(e) => SQL("delete from dictentries where id={id}").on('id -> id).executeUpdate(); Some(e);
+      case None => None
+    }
+  }
+  
+  override def updateEntry(entry: DictEntry) =
+    DB.withConnection {
+      implicit c => update(entry)
+    }
+  
+  
+  private def update(entry: DictEntry)(implicit c: java.sql.Connection){
+   	assert(entry.id != DictEntry.noId)
+    SQL("""update dicentries
+           set id={id}, fromword={fromword}, fromlang={fromlang},
+               toword={toword}, tolang={tolang}, caseid={caseid},
+               speechpard={speechpart}, speechpartid={speechpartid}
+           where id={id}""")
+    .on('id -> entry.id,
+        'fromword -> entry.plWord,
+        'fromlang -> entry.plLang,
+        'toword -> entry.nsWord,
+        'tolang -> entry.nsLang,
+        'caseid -> entry.caseId,
+        'speechpart -> entry.speechPart.toString(),
+        'speechpartid -> entry.speechPartId)
+    .executeUpdate()
+  }
+  /*   
   override def addRoot(root: Root):Option[Long] = DB.withConnection {
     implicit c => rootId(root) match {
       case Some(id) => Some(id)
@@ -549,6 +657,6 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  
+  */
 
 }

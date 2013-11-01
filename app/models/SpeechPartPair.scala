@@ -3,9 +3,8 @@ package models
 import logic.SpeechPart
 import logic.NSTranslator
 import logic.DictionaryFactory
-import logic.Contentized
 
-abstract class SpeechPartPair[T <: SpeechPart[T]](val id: Long, val speechPart: String) extends Contentized {
+abstract class SpeechPartPair[T <: SpeechPart[T]](val id: Long, val speechPart: String) {
   val fromLang = "pl"
   val toLang = "ns" // and let's leave it like this for some time
     
@@ -19,7 +18,7 @@ abstract class SpeechPartPair[T <: SpeechPart[T]](val id: Long, val speechPart: 
   def add() = {
     val id = DictionaryFactory.dict.addPair(this)
     val translations = pl.generate(ns, id)
-    translations.foreach{ entry => DictionaryFactory.dict.add(entry) }
+    DictionaryFactory.dict.addEntries(translations)
     Seq((pl.mainRoot,ns.mainRoot))
   }
   

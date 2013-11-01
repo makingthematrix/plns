@@ -23,5 +23,5 @@ case class AdverbPair(override val id: Long, plInd: String, plCmp: String, plMod
   override def ns = NSAdverb.word(nsInd,nsCmp,cmpIgnored.equals("true"))
   
   override def copyWithId(id: Long) = AdverbPair(id, plInd, plCmp, plMode, nsInd, nsCmp, cmpIgnored)
-  override protected def contentize = Seq(plInd, plCmp, plMode, nsInd, nsCmp, cmpIgnored).mkString(",")
+  
 }

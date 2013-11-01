@@ -59,8 +59,4 @@ case class AdjectivePair(override val id: Long, plInd: String, plAdvInd: String,
   override def copyWithId(id: Long) = AdjectivePair(id, plInd, plAdvInd, plCmp, plAdvCmp, plMode, plAdvMode, plExceptions,
                          							nsInd, nsAdvInd, nsCmp, nsAdvCmp, nsExceptions, cmpIgnored)
   
-  override protected def contentize = Seq(
-    plInd, plAdvInd, plCmp, plAdvCmp, plMode, plAdvMode, plExceptions.getOrElse(""),
-    nsInd, nsAdvInd, nsCmp, nsAdvCmp, nsExceptions.getOrElse(""), cmpIgnored
-  ).mkString(",")
 }

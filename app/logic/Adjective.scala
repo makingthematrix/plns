@@ -17,14 +17,14 @@ import SpeechPart._
  * @param ignored marks if the noun can be used in both singular and plural forms, only singular (eg. capitalism), or only plural (eg. pants)
  * @param lang the language of the verb
  */
-class Adjective(val ind:String, val cmp:String, val sup:String, val adverb:Option[Adverb],
-				val indDeclension:Map[AdjectiveGender.Value,DeclensionPattern],
-				val cmpDeclension:Map[AdjectiveGender.Value,DeclensionPattern],
-				val cmpIgnored: Boolean, val lang:String) 
+class Adjective(val ind: String, val cmp: String, val sup: String, val adverb: Option[Adverb],
+				val indDeclension: Map[AdjectiveGender.Value,DeclensionPattern],
+				val cmpDeclension: Map[AdjectiveGender.Value,DeclensionPattern],
+				val cmpIgnored: Boolean, override val lang: String) 
   extends SpeechPart[Adjective](lang){
   override val speechPart = ADJECTIVE
   override def mainRoot = decline(AdjectiveCase(MASCULINE, INDICATIVE, NOMS))
-  override def toRoot() = new Root(mainRoot,speechPart,lang)
+  override def toRoot(speechPartId: Long) = new Root(mainRoot, speechPart, lang, speechPartId)
   
   override def generate(adj: Adjective, id: Long):Seq[DictEntry] = {
 	if((adverb == None && adj.adverb != None) || (adverb != None && adj.adverb == None))  

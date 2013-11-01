@@ -12,11 +12,11 @@ import SpeechPart._
  * @param ignored marks if the noun can be used in both singular and plural forms, only singular (eg. capitalism), or only plural (eg. pants)
  * @param lang the language of the verb
  */
-class Noun(val stem: String, val declension: DeclensionPattern, val ignored: IgnoredNumber.Value, val lang: String) 
+class Noun(val stem: String, val declension: DeclensionPattern, val ignored: IgnoredNumber.Value, override val lang: String) 
   extends SpeechPart[Noun](lang) {
   override val speechPart = NOUN
   override def mainRoot = decline(NOMS)
-  override def toRoot = new Root(mainRoot, speechPart, lang)
+  override def toRoot(speechPartId: Long) = new Root(mainRoot, speechPart, lang, speechPartId)
 
   /** generates cases with the given declension and add them all to the dictionary
    *  @param noun a noun of another language which this one should be translated to

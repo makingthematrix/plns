@@ -5,6 +5,17 @@ DROP TABLE roottrans;
 DROP TABLE roots;
 DROP TABLE words;
 
+CREATE TABLE dictentries(
+	id serial primary key,
+	fromword varchar(255) NOT NULL, 
+	fromlang varchar(3) NOT NULL, 
+    toword varchar(255) NOT NULL, 
+    tolang varchar(3) NOT NULL, 
+    caseid varchar(15) NOT NULL, 
+    speechpart varchar(15) NOT NULL,
+    speechpartid integer NOT NULL
+);
+
 CREATE TABLE uninflectedpairs (
 	id serial primary key,
 	fromword varchar(255) NOT NULL,
@@ -38,18 +49,18 @@ CREATE TABLE adjectivepairs (
     cmpignored varchar(15) NOT NULL
 );
 
-CREATE TABLE nounpairs(
+CREATE TABLE nounpairs (
 	id serial primary key,
 	fromstem varchar(255) NOT NULL, 
 	frompattern varchar(255) NOT NULL, 
 	fromexceptions text, 
     tostem varchar(255) NOT NULL, 
     topattern varchar(255) NOT NULL, 
-    toexceptions: text, 
+    toexceptions text, 
     ignored varchar(15) NOT NULL
 );
 
-CREATE TABLE verbpairs(
+CREATE TABLE verbpairs (
 	id serial primary key,
 	frominfstem varchar(255) NOT NULL, 
 	fromimpstem varchar(255) NOT NULL, 
@@ -62,25 +73,15 @@ CREATE TABLE verbpairs(
 	prefixes text
 );
 
-CREATE TABLE dictentries(
-	id serial primary key,
-	fromword varchar(255) NOT NULL, 
-	fromlang varchar(3) NOT NULL, 
-    toword varchar(255) NOT NULL, 
-    tolang varchar(3) NOT NULL, 
-    caseid varchar(15) NOT NULL, 
-    speechpart varchar(15) NOT NULL,
-    speechpartid integer NOT NULL
-);
 
 # --- !Downs
 
+DROP TABLE dictentries;
 DROP TABLE verbpairs;
 DROP TABLE nounpairs;
 DROP TABLE adjectivepairs;
 DROP TABLE adverbpairs;
 DROP TABLE uninflectedpairs;
-DROP TABLE dictentries;
 
 CREATE TABLE words (
     id serial primary key,

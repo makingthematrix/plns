@@ -27,9 +27,6 @@ case class NounPair(override val id: Long, plStem: String, plPattern: String, pl
   
   override def copyWithId(id: Long) = NounPair(id, plStem, plPattern, plExceptions, nsStem, nsPattern, nsExceptions, ignored)
   
-  override protected def contentize = Seq(
-      plStem, plPattern, plExceptions.getOrElse(""), nsStem, nsPattern, nsExceptions.getOrElse(""), ignored
-  ).mkString(",")
 }
 
 object NounPair { 

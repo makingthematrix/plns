@@ -22,14 +22,14 @@ class AdjectiveSuite {
     setUp()
     try {
       val ap = new AdjectivePair("wielk","więk",SOFT,None,"velik","velik",None)
-      assertEquals(None,dict.get("wielki"))
+      assertEquals(None,dict.getTranslation("wielki"))
       ap.add()
-      assertEquals(Option("veliky"),dict.get("wielki"))
-      assertEquals(Option("velika"),dict.get("wielka"))
-      assertEquals(Option("velike"),dict.get("wielkie"))
-      assertEquals(Option("velikiejšy"),dict.get("większy"))
-      assertEquals(Option("velikiejšej"),dict.get("większej"))
-      assertEquals(Option("najvelikiejših"),dict.get("największych"))
+      assertEquals(Option("veliky"),dict.getTranslation("wielki"))
+      assertEquals(Option("velika"),dict.getTranslation("wielka"))
+      assertEquals(Option("velike"),dict.getTranslation("wielkie"))
+      assertEquals(Option("velikiejšy"),dict.getTranslation("większy"))
+      assertEquals(Option("velikiejšej"),dict.getTranslation("większej"))
+      assertEquals(Option("najvelikiejših"),dict.getTranslation("największych"))
     } finally tearDown()
   }
    
@@ -38,11 +38,11 @@ class AdjectiveSuite {
     setUp()
     try {
       val ap = new AdjectivePair("polityczn",HARD,None,"političn",None)
-      assertEquals(None,dict.get("polityczny"))
+      assertEquals(None,dict.getTranslation("polityczny"))
       ap.add()
-      assertEquals(Option("političny"),dict.get("polityczny"))
-      assertEquals(None,dict.get("polityczniejszy"))
-      assertEquals(None,dict.get("političnejšy"))
+      assertEquals(Option("političny"),dict.getTranslation("polityczny"))
+      assertEquals(None,dict.getTranslation("polityczniejszy"))
+      assertEquals(None,dict.getTranslation("političnejšy"))
     } finally tearDown() 
   }
   
@@ -53,12 +53,12 @@ class AdjectiveSuite {
       val mcNoms = AdjectiveCase(MASCULINE,COMPARATIVE,NOMS)
       val mcVocs = AdjectiveCase(MASCULINE,COMPARATIVE,VOCS)
       val ap = new AdjectivePair("duż","duż",HARD,Option(mcNoms+":większy,"+mcVocs+":większy"),"velik","velik",None)
-      assertEquals(None,dict.get("wielki"))
-      assertEquals(None,dict.get("duży"))
+      assertEquals(None,dict.getTranslation("wielki"))
+      assertEquals(None,dict.getTranslation("duży"))
       ap.add()
-      assertEquals(Option("veliky"),dict.get("duży"))
-      assertEquals(Option("velikiejšy"),dict.get("większy"))
-      assertEquals(None,dict.get("duższy"))
+      assertEquals(Option("veliky"),dict.getTranslation("duży"))
+      assertEquals(Option("velikiejšy"),dict.getTranslation("większy"))
+      assertEquals(None,dict.getTranslation("duższy"))
     } finally tearDown()
   }
   

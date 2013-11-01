@@ -29,10 +29,10 @@ object DBHelper extends Controller {
   }
   
   private def add(word1: String,word2: String) = {
-    if(dict.hasWord(word1,"pl")){
+    if(dict.getWord(word1,"pl") != None){
       BadRequest("The word " + word1 + " is already in the Polish dictionary")
     }
-    if(dict.hasWord(word2,"ns")){
+    if(dict.getWord(word2,"ns") != None){
       BadRequest("The word " + word2 + " is already in the Novoslovienski dictionary")
     }
     NSTranslator.add(word1,word2)
@@ -43,19 +43,8 @@ object DBHelper extends Controller {
     implicit request => {
       println("listTranslations")
       val sb = new StringBuilder()
-      dict.tuples.foreach{ t =>
-        sb.append(t._1).append(" -> ").append(t._2).append("\n")
-      }
-      Ok(sb.toString)
-    }
-  }
-  
-  def listWords = Action {
-    implicit request => {
-      println("listWords")
-      val sb = new StringBuilder()
-      dict.words.foreach{ w =>
-        sb.append(w).append("\n")
+      dict.listPairs.foreach{ p =>
+        sb.append(p.pl.mainRoot).append(" -> ").append(p.ns.mainRoot).append("\n")
       }
       Ok(sb.toString)
     }
