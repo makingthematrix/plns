@@ -1,6 +1,7 @@
 package logic
-import scala.collection.mutable;
+import scala.collection.mutable
 import SpeechPart._
+import models.UninflectedPair
 
 object NSTranslator {
    
@@ -30,8 +31,7 @@ object NSTranslator {
 	("byli","byli"), ("były","byle")
   ) 
 	  
-  def add(from: String, to:String) 
-    = DictionaryFactory.dict.addEntry(new DictEntry(from, "pl", to, "ns", Uninflected.caseId, UNINFLECTED, -1L))
+  private def add(from: String, to:String) = DictionaryFactory.dict.add(new UninflectedPair(from, to))
   
   def init() = {
 	pronouns.foreach{ t => add(t._1,t._2) }

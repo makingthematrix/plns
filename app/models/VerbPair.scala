@@ -6,6 +6,7 @@ import logic.NSVerb
 import logic.NSTranslator
 import logic.DictionaryFactory
 import logic.DictEntry
+import logic.AbstractDictionary
 
 /**
  * Holds all data needed for generating translations of all cases of a set of verbs.
@@ -58,14 +59,18 @@ case class VerbPair(override val id: Long,
    * and add them to the dictionary
    * @return a sequence of pairs of main roots; one for each pair of prefixes
    */
-  override def add() = { 
-    val id = DictionaryFactory.dict.addPair(this)
+  override def add(dict: AbstractDictionary) = { 
+    val id = dict.addPair(this)
     val translations = prefixes match {
       case Some(pre) => VerbPair.prefixesAsSeq(pre).flatMap( tuple => generate(tuple._1,tuple._2, id) ).toSeq
       case None => generate("","", id)
     }
-    DictionaryFactory.dict.addEntries(translations)
-    Seq(((pl.mainRoot,ns.mainRoot)))
+    dict.addEntries(translations)
+    val plRoot = pl.toRoot(id)
+    val nsRoot = ns.toRoot(id)
+    dict.addRoot(plRoot)
+    dict.addRoot(nsRoot)
+    (plRoot,nsRoot)
   }
   
   /**

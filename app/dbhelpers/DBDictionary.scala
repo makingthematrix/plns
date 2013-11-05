@@ -18,6 +18,17 @@ import logic.SpeechPart
 import logic.Adverb
 
 object DBParsers {
+  val rootParser = {
+    get[Long]("id") ~ 
+    get[String]("root") ~
+    get[String]("speechpart") ~ 
+    get[String]("lang") ~
+    get[Long]("speechpartid") map {
+      case id~root~speechpart~lang~speechpartid =>
+        Root(id, root, speechpart, lang, speechpartid)
+    }
+  }
+  
   val dictEntryParser = {
     get[Long]("id") ~ 
     get[String]("fromword") ~
@@ -168,7 +179,7 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  override def removePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = DB.withConnection {
+  override protected def removePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = DB.withConnection {
     implicit c => pair match {
       case un: UninflectedPair => this.synchronized { remove(un).asInstanceOf[Option[SpeechPartPair[T]]] }
       case adv: AdverbPair => this.synchronized { remove(adv).asInstanceOf[Option[SpeechPartPair[T]]] }
@@ -179,7 +190,22 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  override def updatePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = DB.withConnection {
+  override protected def removePair(speechPart: String, id: Long){
+    val t = speechPart match {
+      case "uninflected" => "uninflectedpairs"
+      case "adverb" => "adverbpairs"
+      case "adjective" => "adjectivepairs"
+      case "noun" => "nounpairs"
+      case "verb" => "verbpairs"
+      case _ => throw new IllegalArgumentException("Unknown speech part: " + speechPart)
+    } 
+    
+    DB.withConnection { 
+      implicit c => SQL("delete from {table} where id={id}").on('table -> t, 'id -> id).executeUpdate()
+    }
+  }
+  
+  override protected def updatePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = DB.withConnection {
     implicit c => pair match {
       case un: UninflectedPair => this.synchronized { update(un) }
       case adv: AdverbPair => this.synchronized { update(adv) }
@@ -198,6 +224,26 @@ class DBDictionary extends AbstractDictionary {
       case noun: NounPair => getById(noun).asInstanceOf[Option[SpeechPartPair[T]]] 
       case verb: VerbPair => getById(verb).asInstanceOf[Option[SpeechPartPair[T]]] 
       case _ => throw new IllegalArgumentException("Unrecognized speech part: " + pair.toString())
+    }
+  }
+  
+  override def getPairById[T <: SpeechPart[T]](speechPart: String, pairId: Long): Option[SpeechPartPair[T]] = {
+    val (table, parser) = speechPart match {
+      case "uninflected" => ("uninflectedpairs", DBParsers.uninflectedPairParser)
+      case "adverb" => ("adverbpairs", DBParsers.adverbPairParser)
+      case "adjective" => ("adjectivepairs", DBParsers.adjectivePairParser)
+      case "noun" => ("nounpairs", DBParsers.nounPairParser)
+      case "verb" => ("verbpairs", DBParsers.verbPairParser)
+      case _ => throw new IllegalArgumentException("Unknown speech part: " + speechPart)      
+    }
+    
+    DB.withConnection { 
+      implicit c => { 
+        val t:List[SpeechPartPair[_]] = SQL("select * from {table} where id={id}")
+                                        .on('table -> table, 'id -> pairId)
+                                        .as(parser *) 
+        if(t.isEmpty) None else Some(t(0).asInstanceOf[SpeechPartPair[T]])
+      }
     }
   }
 
@@ -542,7 +588,7 @@ class DBDictionary extends AbstractDictionary {
     }
   }
   
-  override def addEntry(entry: DictEntry) = DB.withConnection {
+  override protected def addEntry(entry: DictEntry) = DB.withConnection {
     assert(entry.id == DictEntry.noId)
     implicit c => add(entry) 
   }
@@ -585,10 +631,10 @@ class DBDictionary extends AbstractDictionary {
   }
   
   override def getEntryById(id: Long) = DB.withConnection {
-    implicit c => getById(id)
+    implicit c => getEntryByIdPriv(id)
   }
   
-  private def getById(id: Long)(implicit c: java.sql.Connection) = {
+  private def getEntryByIdPriv(id: Long)(implicit c: java.sql.Connection) = {
     val t = SQL("""select id, fromword, fromlang, toword, tolang, caseid, speechpart, speechpartid from dictentries
                    where id={id}""")
             .on('id -> id)
@@ -596,22 +642,27 @@ class DBDictionary extends AbstractDictionary {
     if(t.isEmpty) None else Some(t(0))
   }
   
-  override def removeEntry(id: Long) = DB.withConnection {
+  override protected def removeEntry(id: Long) = DB.withConnection {
     implicit c => remove(id)
   }
   
   private def remove(id: Long)(implicit c: java.sql.Connection) = {
     assert(id != DictEntry.noId)
-    getById(id) match{
+    getEntryByIdPriv(id) match{
       case Some(e) => SQL("delete from dictentries where id={id}").on('id -> id).executeUpdate(); Some(e);
       case None => None
     }
   }
   
-  override def updateEntry(entry: DictEntry) =
-    DB.withConnection {
-      implicit c => update(entry)
-    }
+  override protected def removeEntries(speechPart: String, pairId: Long) = DB.withConnection {
+    implicit c => SQL("delete from dictentries where speechpart={speechpart} and speechpartid={pairid}")
+                  .on('speechpart -> speechPart, 'speechpartid -> pairId)
+                  .executeUpdate()
+  }
+  
+  override protected def updateEntry(entry: DictEntry) = DB.withConnection {
+    implicit c => update(entry)
+  }
   
   
   private def update(entry: DictEntry)(implicit c: java.sql.Connection){
@@ -631,32 +682,42 @@ class DBDictionary extends AbstractDictionary {
         'speechpartid -> entry.speechPartId)
     .executeUpdate()
   }
-  /*   
-  override def addRoot(root: Root):Option[Long] = DB.withConnection {
-    implicit c => rootId(root) match {
-      case Some(id) => Some(id)
-      case None => {
-        SQL("insert into roots (root, speechpart, lang) values ({root},{speechpart},{lang})")
-        .on('root -> root.root,'speechpart -> root.speechpart, 'lang -> root.lang)
-        .executeInsert()
-        rootId(root)
-      }
+  
+  override def addRoot(root: Root): Long = DB.withConnection {
+    implicit c => getRootByIdPriv(root.id) match {
+      case Some(r) => r.id
+      case None => SQL("""insert into roots (id, root, speechpart, lang, speechpartid) 
+                          values ({id}, {root}, {speechpart}, {lang}, {speechpartid})""")
+                   .on('id -> root.id, 'root -> root.root,'speechpart -> root.speechPart, 
+                       'lang -> root.lang, 'speechpartid -> root.speechPartId)
+                   .executeInsert(scalar[Long].single)
     }
+  }
+  
+  override protected def removeRoots(speechPart: String, pairId: Long) = DB.withConnection {
+    implicit c => SQL("delete from roots where speechpart={speechpart} and speechpartid={speechpartid}")
+                  .on('speechpart -> speechPart, 'speechpartid -> pairId)
+                  .executeUpdate()
+  }
+  
+  def getRootByWord(root: String) = DB.withConnection {
+    implicit c => {
+      val t = SQL("select * from roots where root={root}").on('root -> root).as(DBParsers.rootParser *)
+       if(t.isEmpty) None else Some(t(0))
+    }
+  }
+  
+  def getRootById(id: Long) = DB.withConnection {
+    implicit c => getRootByIdPriv(id)
+  }
+    
+  private def getRootByIdPriv(id: Long)(implicit c: java.sql.Connection) = {
+    val t = SQL("select * from roots where id={id}").on('id -> id).as(DBParsers.rootParser *)
+    if(t.isEmpty) None else Some(t(0))
   }
   
   override def roots:Seq[Root] = DB.withConnection {
     implicit c => SQL("select * from roots").as(DBParsers.rootParser *)
   }
-  
-  private def rootId(root: Root)(implicit c: java.sql.Connection):Option[Long] = {
-    val idRowOption = SQL("select id from roots where root={root} and speechpart={speechPart} and lang={lang}")
-    		  			.on('root -> root.root, 'speechPart -> root.speechpart, 'lang -> root.lang).apply().headOption
-    idRowOption match {
-      case Some(idRow) => Some(idRow[Long]("id"))
-      case None => None
-    }
-  }
-  
-  */
 
 }

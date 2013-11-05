@@ -227,9 +227,9 @@ object Application extends Controller {
   }
   
   private def add[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = {
-    val results = pair.add()
+    val (plRoot, nsRoot) = pair.add(DictionaryFactory.dict)
     val sb = StringBuilder.newBuilder
-    results.foreach( tuple => sb.append("Dodałem ").append(tuple._1).append(" -> ").append(tuple._2).append('\n'))
+    sb.append("Dodałem ").append(plRoot.root).append(" -> ").append(nsRoot.root).append('\n')
     Ok(sb.toString)    
   }
   

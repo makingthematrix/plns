@@ -12,27 +12,65 @@ abstract class AbstractDictionary {
   def clear:Unit
   def size:Long
   def isEmpty:Boolean
+  
   def getTranslation(word: String):Option[String]
   
   def addPair[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Long
-  def updatePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Unit
-  def removePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
+  protected def updatePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Unit
+  protected def removePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
+  protected def removePair(speechPart: String, id: Long): Unit
+  
   def getPairById[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
+  def getPairById[T <: SpeechPart[T]](speechPart: String, pairId: Long): Option[SpeechPartPair[T]]
   /** Tries to retrieve the pair by its contents, different for every type.
    *  In order to use it, create a stub version of the pair of the given type
    *  and provide at least info for the 'from' part. */
   def getPairByContents[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
   def listPairs: Seq[SpeechPartPair[_ <: SpeechPart[_]]]
   
-  def addEntry(entry: DictEntry): Long
+  protected def addEntry(entry: DictEntry): Long
   def addEntries(entries: Seq[DictEntry]): Unit
-  def updateEntry(entry: DictEntry): Unit
-  def removeEntry(id: Long): Option[DictEntry]
+  protected def updateEntry(entry: DictEntry): Unit
+  protected def removeEntry(id: Long): Option[DictEntry]
+  protected def removeEntries(speechPart: String, pairId: Long): Unit
   def getEntryById(id: Long): Option[DictEntry]
   def getEntryByContents(entry: DictEntry): Option[DictEntry]
   def getWord(word: String, lang: String): Option[DictEntry]
+  
+  def addRoot(root: Root): Long
+  protected def removeRoots(speechPart: String, pairId: Long): Unit
+  def getRootByWord(root: String): Option[Root]
+  def getRootById(id: Long): Option[Root]
+  def roots: Seq[Root]
  
 //-----------------------------------------------------
+  
+  def add[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = getPairByContents(pair) match {
+    case Some(p) => throw new IllegalArgumentException("There is a pair with matching contents in the dictionary: " + pair)
+    case None => pair.add(this)
+  }
+  
+  def remove(speechPart: String, pairId: Long) = getPairById(speechPart, pairId) match {
+    case None => throw new IllegalArgumentException("Unable to find a " + speechPart + " with pairId: " + pairId)
+    case Some(p) => {
+      removeEntries(speechPart, pairId)
+      removeRoots(speechPart, pairId)
+      removePair(speechPart, pairId)
+    }
+  }
+  
+  def update[T <: SpeechPart[T]](pair: SpeechPartPair[T]) = getPairById(pair) match {
+    case None => throw new IllegalArgumentException("Unable to find a " + pair.speechPart + " with pairId: " + pair.id)
+    case Some(p) => {
+      removeEntries(pair.speechPart, pair.id)
+      removeRoots(pair.speechPart, pair.id)
+      updatePair(pair)
+      val (plRoot, nsRoot) = pair.roots
+      addRoot(plRoot)
+      addRoot(nsRoot)
+      addEntries(pair.generate)
+    }
+  }
   
   def translate(sentence: String):(String,Seq[String]) = {
 	val words = split(sentence)

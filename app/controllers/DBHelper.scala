@@ -7,9 +7,11 @@ import play.api.data.Forms._
 import dbhelpers.DBDictionary
 import logic.SpeechPart
 import logic.NSTranslator
+import logic.DictionaryFactory
+import models.UninflectedPair
 
 object DBHelper extends Controller {
-  private val dict = new DBDictionary()
+  private val dict = DictionaryFactory.dict(DictionaryFactory.DB)
   
   val translationForm = Form( tuple("word1" -> text, "word2" -> text) );
 	
@@ -35,7 +37,7 @@ object DBHelper extends Controller {
     if(dict.getWord(word2,"ns") != None){
       BadRequest("The word " + word2 + " is already in the Novoslovienski dictionary")
     }
-    NSTranslator.add(word1,word2)
+    dict.add(new UninflectedPair(word1,word2))
     Ok("Dodałem: " + word1 + " -> " + word2);
   }
   

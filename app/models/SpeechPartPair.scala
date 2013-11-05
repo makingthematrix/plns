@@ -3,6 +3,7 @@ package models
 import logic.SpeechPart
 import logic.NSTranslator
 import logic.DictionaryFactory
+import logic.AbstractDictionary
 
 abstract class SpeechPartPair[T <: SpeechPart[T]](val id: Long, val speechPart: String) {
   val fromLang = "pl"
@@ -15,11 +16,15 @@ abstract class SpeechPartPair[T <: SpeechPart[T]](val id: Long, val speechPart: 
   def pl: T
   def ns: T
 	
-  def add() = {
-    val id = DictionaryFactory.dict.addPair(this)
+  def add(dict: AbstractDictionary) = {
+    val id = dict.addPair(this)
     val translations = pl.generate(ns, id)
-    DictionaryFactory.dict.addEntries(translations)
-    Seq((pl.mainRoot,ns.mainRoot))
+    dict.addEntries(translations)
+    val plRoot = pl.toRoot(id)
+    val nsRoot = ns.toRoot(id)
+    dict.addRoot(plRoot)
+    dict.addRoot(nsRoot)
+    (plRoot,nsRoot)
   }
   
   def addExceptions(word: SpeechPart[T], exceptions: Option[String]) = exceptions match {
@@ -27,6 +32,8 @@ abstract class SpeechPartPair[T <: SpeechPart[T]](val id: Long, val speechPart: 
     case None => 
   } 
   
+  def roots = (pl.toRoot(id), ns.toRoot(id))
+  def generate = pl.generate(ns, id)
 }
 
 object SpeechPartPair {
