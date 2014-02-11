@@ -13,13 +13,13 @@ case class NounPair(override val id: Long, plStem: String, plPattern: String, pl
            nsStem: String, nsPattern: String, nsExceptions: Option[String], ignored: String) =
     this(SpeechPartPair.noId, plStem, plPattern, plExceptions, nsStem, nsPattern, nsExceptions, ignored)
   
-  override def pl = {
+  override protected def pl = {
 	val word = PLNoun.word(plStem, plPattern, ignored)
 	addExceptions(word,plExceptions)
 	word
   }
 	
-  override def ns = {
+  override protected def ns = {
 	val word = NSNoun.word(nsStem, nsPattern, ignored)
 	addExceptions(word,nsExceptions)
 	word

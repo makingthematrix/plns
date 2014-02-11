@@ -274,4 +274,3 @@ $ ->
   initInputs()
   refresh()
   hidePopup()
-  $('#nsInfStem').focus()

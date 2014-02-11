@@ -17,4 +17,3 @@ $('#nsWord').keyup (e) ->
 
 $ ->
 	refreshResult()
-	$('#nsWord').focus()

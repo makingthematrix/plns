@@ -32,7 +32,7 @@ case class VerbPair(override val id: Long,
   /**
    * Build a Verb of the source language based on the available data
    */
-  override def pl = {
+  override protected def pl = {
     // if the prefixes string starts with the perfective marker, it means that the verb is in the perfective aspect
     val perfective = prefixes.getOrElse("").startsWith(VerbPair.perfectiveMarker)
     // create the Verb of the source language
@@ -46,7 +46,7 @@ case class VerbPair(override val id: Long,
   /**
    * Build a Verb of the target language based on the available data
    */
-  override def ns:Verb = {
+  override protected def ns = {
     val perfective = prefixes.getOrElse("").startsWith(VerbPair.perfectiveMarker)
     // create the Verb of the target language
     val word = NSVerb.word(nsInfStem, nsImpStem, nsPattern, perfective, id)

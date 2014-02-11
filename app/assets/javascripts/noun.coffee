@@ -235,4 +235,3 @@ $ ->
   initInputs()
   refresh()
   hidePopup()
-  $('#nsStem').focus()

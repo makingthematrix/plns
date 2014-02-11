@@ -7,6 +7,8 @@ import models.AdjectivePair
 import models.NounPair
 import models.VerbPair
 import models.SpeechPartPair
+import SpeechPart._
+import play.api.Logger
 
 class Dictionary extends AbstractDictionary {
   private val pairsMap = new mutable.HashMap[Int, SpeechPartPair[_ <: SpeechPart[_]]]
@@ -14,6 +16,7 @@ class Dictionary extends AbstractDictionary {
   private val rootsMap = new mutable.HashMap[String, Root]
   
   override def clear(){
+    Logger("MyApp").debug("Dictionary.clear")
     pairsMap.clear
     rootsMap.clear
     entriesMap.clear
@@ -24,6 +27,7 @@ class Dictionary extends AbstractDictionary {
   override def isEmpty = entriesMap.isEmpty
   
   override def getTranslation(word: String) = {
+    Logger("MyApp").debug("Dictionary.getTranslation for: " + word)
     val entryOption = entriesMap.values.find{ _.plWord == word }
     entryOption match {
       case Some(entry) => Some(entry.nsWord)
@@ -68,8 +72,8 @@ class Dictionary extends AbstractDictionary {
     }
   }
   
-  override protected def removePair(speechPart: String, id: Long){
-    val pOption = pairsMap.values.find{ e => e.speechPart == speechPart && e.id == id }
+  override protected def removePair(speechPart: SpeechPart.Value, id: Long){
+    val pOption = pairsMap.values.find{ e => e.speechPart == speechPart.toString && e.id == id }
     pOption match {
       case Some(p) => pairsMap.remove(p.hashCode)
       case None =>
@@ -79,36 +83,37 @@ class Dictionary extends AbstractDictionary {
   override def getPairById[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]] = 
     pairsMap.values.find { _.id == pair.id }.asInstanceOf[Option[SpeechPartPair[T]]]
   
-  override def getPairById[T <: SpeechPart[T]](speechPart: String, pairId: Long): Option[SpeechPartPair[T]] = {
-    pairsMap.values.find{ e => e.speechPart == speechPart && e.id == pairId }.asInstanceOf[Option[SpeechPartPair[T]]]
+  override def getPairById[T <: SpeechPart[T]](speechPart: SpeechPart.Value, pairId: Long): Option[SpeechPartPair[T]] = {
+    pairsMap.values.find{ e => e.speechPart == speechPart.toString && e.id == pairId }.asInstanceOf[Option[SpeechPartPair[T]]]
   }
     
   /** @todo again, it should be something like filterBySpeechPart[T <: SpeechPartPair[T]] but it doesn't work */
-  private def filterBySpeechPart[T](speechPart: String) = 
-    pairsMap.values.filter{ _.speechPart == speechPart }.asInstanceOf[Iterable[T]]
+  private def filterBySpeechPart[T](speechPart: SpeechPart.Value) = 
+    pairsMap.values.filter{ _.speechPart == speechPart.toString }.asInstanceOf[Iterable[T]]
     
   private def getByContents(pair: UninflectedPair) = {
-    val filtered = filterBySpeechPart[UninflectedPair]("uninflected")
+    Logger("MyApp").debug("Dictionary.getByContents for uninflected; checking: " + pair)
+    val filtered = filterBySpeechPart[UninflectedPair](UNINFLECTED)
     filtered.find{ _.plWord == pair.plWord }
   }
   
   private def getByContents(pair: AdverbPair) = {
-    val filtered = filterBySpeechPart[AdverbPair]("adverb")
+    val filtered = filterBySpeechPart[AdverbPair](ADVERB)
     filtered.find{ p => p.plInd == pair.plInd && p.plCmp == pair.plCmp }
   }
   
   private def getByContents(pair: AdjectivePair) = {
-    val filtered = filterBySpeechPart[AdjectivePair]("adjective")
+    val filtered = filterBySpeechPart[AdjectivePair](ADJECTIVE)
     filtered.find{ p => p.plInd == pair.plInd && p.plCmp == pair.plCmp }
   }
   
   private def getByContents(pair: NounPair) = {
-    val filtered = filterBySpeechPart[NounPair]("noun")
+    val filtered = filterBySpeechPart[NounPair](NOUN)
     filtered.find{ p => p.plStem == pair.plStem && p.plPattern == pair.plPattern }
   }
   
   private def getByContents(pair: VerbPair) = {
-    val filtered = filterBySpeechPart[VerbPair]("verb")
+    val filtered = filterBySpeechPart[VerbPair](VERB)
     filtered.find{ p => p.plInfStem == pair.plInfStem && p.plImpStem == pair.plImpStem }
   }
   
@@ -152,8 +157,10 @@ class Dictionary extends AbstractDictionary {
     }
   }
   
-  override protected def removeEntries(speechPart: String, pairId: Long){
-    val codes = entriesMap.values.filter{ e => e.speechPart == speechPart && e.speechPartId == pairId }.map{ _.hashCode }
+  override protected def removeEntries(speechPart: SpeechPart.Value, pairId: Long){
+    val codes = entriesMap.values
+                .filter{ e => e.speechPart == speechPart.toString && e.speechPartId == pairId }
+                .map{ _.hashCode }
     codes.foreach{ entriesMap.remove(_) }
   }
   
@@ -182,8 +189,8 @@ class Dictionary extends AbstractDictionary {
     }
   }
   
-  protected def removeRoots(speechPart: String, pairId: Long){
-    val filtered = rootsMap.values.filter{ r => r.speechPart == speechPart && r.speechPartId == pairId }
+  protected def removeRoots(speechPart: SpeechPart.Value, pairId: Long){
+    val filtered = rootsMap.values.filter{ r => r.speechPart == speechPart.toString && r.speechPartId == pairId }
     filtered.foreach{ r => rootsMap.remove(r.root) }
   }
   

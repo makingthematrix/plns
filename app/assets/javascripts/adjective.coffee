@@ -50,26 +50,27 @@ fill = (lang, f, r, root, cases, suffices, exceptions) ->
       suffix = table[c]
       fillCase(id,root,suffix,exceptions)
 
-refreshPlAdvResult = ->
-  ind = $('#plAdvInd').val()
-  if ind == ''
-    ind = $('#plInd').val() 
-    $('#plAdvInd').val(ind)
+refreshPlAdvResult = (indChanged) ->
+  ind = $('#plInd').val()
+  advInd = $('#plAdvInd').val()
+  if indChanged and isFollowUp(ind,advInd)
+    advInd = $('#plInd').val() 
+    $('#plAdvInd').val(advInd)
     
-  cmp = $('#plAdvCmp').val()
-  if cmp == ''
-    cmp = ind
-    $('#plAdvCmp').val(cmp)
+  advCmp = $('#plAdvCmp').val()
+  if indChanged and isFollowUp(advInd,advCmp)
+    advCmp = advInd
+    $('#plAdvCmp').val(advCmp)
      
   mode = $('#plAdvMode').val()
-  suffices = if mode == "HARD" then plAdvHardSuffices else plAdvSoftSuffices
-  advFill("pl",ind,cmp,suffices)
+  suffices = if(mode == "HARD") then plAdvHardSuffices else plAdvSoftSuffices
+  advFill("pl",advInd,advCmp,suffices)
     
-refreshPlResult = ->
+refreshPlResult = (indChanged) ->
   ind = $('#plInd').val()
   cmp = $('#plCmp').val()
   
-  if cmp == ''
+  if indChanged and isFollowUp(ind,cmp)
     cmp = ind 
     $('#plCmp').val(cmp)
   
@@ -86,23 +87,30 @@ refreshPlResult = ->
   fill('pl','p','c',cmp+plCmp,casesPl,plHardSuffices,plExceptions)
   fill('pl','P','c',cmp+plCmp,casesPl,plHardSuffices,plExceptions)
 
-refreshNsAdvResult = ->
-  ind = $('#nsAdvInd').val()
-  if ind == ''
-    ind = $('#nsInd').val() 
-    $('#nsAdvInd').val(ind)
+refreshNsAdvResult = (indChanged) ->
+  ind = $('#nsInd').val()
+  advInd = $('#nsAdvInd').val()
+  if indChanged and isFollowUp(ind,advInd)
+    advInd = $('#nsInd').val() 
+    $('#nsAdvInd').val(advInd)
   
-  cmp = $('#nsAdvCmp').val()
-  if cmp == ''
-    cmp = ind 
-    $('#nsAdvCmp').val(cmp)
+  advCmp = $('#nsAdvCmp').val()
+  if indChanged and isFollowUp(advInd,advCmp)
+    advCmp = advInd 
+    $('#nsAdvCmp').val(advCmp)
   
-  advFill("ns",ind,cmp,nsAdvSuffices)
+  advFill("ns",advInd,advCmp,nsAdvSuffices)
+
+isFollowUp = (ind, cmp) ->
+  return true if cmp == ''
+  return true if ind.length == cmp.length + 1 and ind.indexOf(cmp) != -1  
+  return true if cmp.length == ind.length + 1 and cmp.indexOf(ind) != -1
+  return false
     
-refreshNsResult = ->
+refreshNsResult = (indChanged) ->
   ind = $('#nsInd').val()
   cmp = $('#nsCmp').val()
-  if cmp == ''
+  if indChanged and isFollowUp(ind,cmp) 
   	cmp = ind 
   	$('#nsCmp').val(cmp)
   fill('ns','m','i',ind,casesSing,nsSuffices,nsExceptions)
@@ -118,59 +126,60 @@ $('#plAdvInd').keyup (e) ->
   if(e.which == 13) 
     false 
   else 
-    refreshPlAdvResult()
+    refreshPlAdvResult(false)
 
 $('#plAdvCmp').keyup (e) -> 
   if(e.which == 13) 
     false
   else 
-    refreshPlAdvResult()
-
-$('#plAdvMode').change -> 
-  refreshPlAdvResult()
-
-$('#nsAdvInd').keyup (e) -> 
-  if(e.which == 13) 
-    false
-  else 
-    refreshNsAdvResult()
-        
-$('#nsAdvCmp').keyup (e) -> 
-  if(e.which == 13) 
-    false
-  else 
-    refreshNsAdvResult()
+    refreshPlAdvResult(false)
     
 $('#plInd').keyup (e) -> 
   if(e.which == 13) 
     false
   else 
-    refreshPlResult()
-    refreshPlAdvResult()
+    refreshPlResult(true)
+    refreshPlAdvResult(true)
 
 $('#plCmp').keyup (e) -> 
   if(e.which == 13) 
     false
   else 
-    refreshPlResult()
-    refreshPlAdvResult()
+    refreshPlResult(false)
+    refreshPlAdvResult(false)
     
 $('#plMode').change -> 
-  refreshPlResult()
+  refreshPlResult(false)
+
+$('#plAdvMode').change -> 
+  refreshPlAdvResult(false)
 
 $('#nsInd').keyup (e) -> 
   if(e.which == 13) 
     false
   else 
-    refreshNsResult()
-    refreshNsAdvResult()
+    refreshNsResult(true)
+    refreshNsAdvResult(true)
         
 $('#nsCmp').keyup (e) -> 
   if(e.which == 13) 
     false
   else 
-    refreshNsResult()
-    refreshNsAdvResult()
+    refreshNsResult(false)
+    refreshNsAdvResult(false)
+
+$('#nsAdvInd').keyup (e) -> 
+  if(e.which == 13) 
+    false
+  else 
+    refreshNsAdvResult(false)
+        
+$('#nsAdvCmp').keyup (e) -> 
+  if(e.which == 13) 
+    false
+  else 
+    refreshNsAdvResult(false)
+
     
 plExceptions = {}
 
@@ -400,4 +409,4 @@ $ ->
   initInputs()
   refresh()
   hidePopup()
-  $('#nsInd').focus()
+ 

@@ -45,9 +45,10 @@ object DBHelper extends Controller {
     implicit request => {
       println("listTranslations")
       val sb = new StringBuilder()
-      dict.listPairs.foreach{ p =>
-        sb.append(p.pl.mainRoot).append(" -> ").append(p.ns.mainRoot).append("\n")
-      }
+      dict.listPairs.foreach( p => {
+        val (plRoot, nsRoot) = p.roots
+        sb.append(plRoot).append(" -> ").append(nsRoot).append("\n")
+      })
       Ok(sb.toString)
     }
   }

@@ -18,10 +18,10 @@ abstract class AbstractDictionary {
   def addPair[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Long
   protected def updatePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Unit
   protected def removePair[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
-  protected def removePair(speechPart: String, id: Long): Unit
+  protected def removePair(speechPart: SpeechPart.Value, id: Long): Unit
   
   def getPairById[T <: SpeechPart[T]](pair: SpeechPartPair[T]): Option[SpeechPartPair[T]]
-  def getPairById[T <: SpeechPart[T]](speechPart: String, pairId: Long): Option[SpeechPartPair[T]]
+  def getPairById[T <: SpeechPart[T]](speechPart: SpeechPart.Value, pairId: Long): Option[SpeechPartPair[T]]
   /** Tries to retrieve the pair by its contents, different for every type.
    *  In order to use it, create a stub version of the pair of the given type
    *  and provide at least info for the 'from' part. */
@@ -32,13 +32,13 @@ abstract class AbstractDictionary {
   def addEntries(entries: Seq[DictEntry]): Unit
   protected def updateEntry(entry: DictEntry): Unit
   protected def removeEntry(id: Long): Option[DictEntry]
-  protected def removeEntries(speechPart: String, pairId: Long): Unit
+  protected def removeEntries(speechPart: SpeechPart.Value, pairId: Long): Unit
   def getEntryById(id: Long): Option[DictEntry]
   def getEntryByContents(entry: DictEntry): Option[DictEntry]
   def getWord(word: String, lang: String): Option[DictEntry]
   
   def addRoot(root: Root): Long
-  protected def removeRoots(speechPart: String, pairId: Long): Unit
+  protected def removeRoots(speechPart: SpeechPart.Value, pairId: Long): Unit
   def getRootByWord(root: String): Option[Root]
   def getRootById(id: Long): Option[Root]
   def roots: Seq[Root]
@@ -50,7 +50,7 @@ abstract class AbstractDictionary {
     case None => pair.add(this)
   }
   
-  def remove(speechPart: String, pairId: Long) = getPairById(speechPart, pairId) match {
+  def remove(speechPart: SpeechPart.Value, pairId: Long) = getPairById(speechPart, pairId) match {
     case None => throw new IllegalArgumentException("Unable to find a " + speechPart + " with pairId: " + pairId)
     case Some(p) => {
       removeEntries(speechPart, pairId)

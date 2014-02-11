@@ -11,8 +11,8 @@ import logic.Uninflected
 case class UninflectedPair(override val id: Long, plWord: String, nsWord: String) 
   extends SpeechPartPair[Uninflected]("uninflected"){
   def this(plWord: String, nsWord: String) = this(SpeechPartPair.noId, plWord, nsWord)
-  override def pl = new Uninflected(plWord, "pl")
-  override def ns = new Uninflected(nsWord, "ns")
+  override protected def pl = new Uninflected(plWord, "pl")
+  override protected def ns = new Uninflected(nsWord, "ns")
 
   override def copyWithId(id: Long) = UninflectedPair(id, plWord, nsWord)
 }

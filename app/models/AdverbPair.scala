@@ -19,8 +19,8 @@ case class AdverbPair(override val id: Long, plInd: String, plCmp: String, plMod
 			     nsInd: String, nsCmp: String, cmpIgnored: String) extends SpeechPartPair[Adverb]("adverb"){
   def this(plInd: String, plCmp: String, plMode: String, nsInd: String, nsCmp: String, cmpIgnored: String) =
     this(SpeechPartPair.noId, plInd, plCmp, plMode, nsInd, nsCmp, cmpIgnored)
-  override def pl = PLAdverb.word(plInd,plCmp,plMode,cmpIgnored.equals("true"))
-  override def ns = NSAdverb.word(nsInd,nsCmp,cmpIgnored.equals("true"))
+  override protected def pl = PLAdverb.word(plInd,plCmp,plMode,cmpIgnored.equals("true"))
+  override protected def ns = NSAdverb.word(nsInd,nsCmp,cmpIgnored.equals("true"))
   
   override def copyWithId(id: Long) = AdverbPair(id, plInd, plCmp, plMode, nsInd, nsCmp, cmpIgnored)
   

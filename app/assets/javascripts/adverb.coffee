@@ -86,4 +86,3 @@ refresh = ->
 
 $ ->
   refresh()
-  $('#nsInd').focus()

@@ -41,7 +41,7 @@ case class AdjectivePair(override val id: Long, plInd: String, plAdvInd: String,
   /**
    * Build an Adjective of the source language based on the available data
    */
-  override def pl = {	
+  override protected def pl = {	
     val word = PLAdjective.word(plInd, plCmp, plAdvInd, plAdvCmp, plMode, plAdvMode, cmpIgnored.equals("true"))
     addExceptions(word,plExceptions) 
     word
@@ -50,7 +50,7 @@ case class AdjectivePair(override val id: Long, plInd: String, plAdvInd: String,
   /**
    * Build a n Adjective of the target language based on the available data
    */
-  override def ns = {
+  override protected def ns = {
     val word = NSAdjective.word(nsInd, nsCmp, nsAdvInd, nsAdvCmp, cmpIgnored.equals("true"))
     addExceptions(word,nsExceptions)
     word

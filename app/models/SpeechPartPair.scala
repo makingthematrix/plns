@@ -13,8 +13,8 @@ abstract class SpeechPartPair[T <: SpeechPart[T]](val id: Long, val speechPart: 
   def copy = copyWithId(id)
   def copyWithId(id: Long): SpeechPartPair[T]
 
-  def pl: T
-  def ns: T
+  protected def pl: T
+  protected def ns: T
 	
   def add(dict: AbstractDictionary) = {
     val id = dict.addPair(this)

@@ -9,7 +9,7 @@
   </div>
   <div id="content">
     @form(routes.Application.translate) {
-    <table width="100%"><tr>
+   <center></center> <table width="800"><tr>
     	<td width="50%"><center>
     	@input(translateForm("source")){ (id,name, value, args) =>
     		<textarea rows="4" cols="50" name="@name" id="@id" @toHtmlArgs(args)>@t.source</textarea>
@@ -20,7 +20,7 @@
     		<textarea rows="4" cols="50" name="@name" id="@id" @toHtmlArgs(args)>@t.target</textarea>
     	}
     </center>
-    </td></tr></table>
+    </td></tr></table></center>
     <p><input type="submit" value="Przetłumacz">
     }
     
@@ -34,7 +34,7 @@
     							<a href="/noun/@word" target="_blank">rzeczownik</a>, 
     							<a href="/adjective/@word" target="_blank">przymiotnik</a>, 
     							<a href="/adverb/@word" target="_blank">przysłówek</a>, 
-    							<a href="/uninflected/@word" target="_blank">bez odmiany</a>.
+    							<a href="/uninflected/@word" target="_blank">bez odmiany</a>).
     }
     </ul>
     }

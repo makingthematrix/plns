@@ -11,7 +11,7 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 # Translation
 POST	/translate				controllers.Application.translate
 GET		/list					controllers.Application.list
-
+GET		/reset					controllers.Application.reset
 GET		/verb/:pl				controllers.Application.verb(pl: String)
 POST	/addVerb				controllers.Application.addVerb
 GET     /verbTemplates     		controllers.Application.verbTemplates

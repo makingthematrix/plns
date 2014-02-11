@@ -12,12 +12,21 @@ import logic.HardSoftMode._
 
 object Application extends Controller {
 
-  def index = Action { Ok(views.html.index(TranslationPair.empty,Seq[String](),translateForm)) }
+  def reset = Action { 
+    DictionaryFactory.dict.clear
+    init()
+    Ok(views.html.index(TranslationPair.empty,Seq[String](),translateForm)) 
+  }
+  
+  def index = Action { 
+    init()
+    Ok(views.html.index(TranslationPair.empty,Seq[String](),translateForm)) 
+  }
   
   private def translate(source: String) = {
     val dict = DictionaryFactory.dict
     val (target,untranslated) = if(source == "") ("",Seq[String]()) else {
-      if(dict.isEmpty) NSTranslator.init()
+      init()
       dict.translate(source)
     }
     Ok(views.html.index(TranslationPair(source,target),untranslated,translateForm));
@@ -34,20 +43,11 @@ object Application extends Controller {
   }
   
   val translateForm = Form( tuple("source" -> text, "target" -> text) );
-  
-  /** @todo there has to be some better way to handle it than using asInstanceOf
-   *  Probably dict.listRoots should not return a Seq[SpeechPartPair[_]] but something
-   *  more like Seq[SpeechPartPair[T <: SpeechPart[T]]] - but it doesn't work
-   */
+
   def list = Action { 
-    val dict = DictionaryFactory.dict
-    if(dict.isEmpty) NSTranslator.init()
-    val rootPairs = dict.listPairs.map( pair => {
-      val pl:SpeechPart[_] = pair.pl
-      val ns:SpeechPart[_] = pair.ns
-      (pl.toRoot(pair.id), ns.toRoot(pair.id)) 
-    })
-    Ok(views.html.list(rootPairs))
+    init
+    val rootPairs = DictionaryFactory.dict.listPairs.map( _.roots )
+    Ok(views.html.list(rootPairs)) 
   }
 
   val verbForm = Form(
@@ -153,7 +153,8 @@ object Application extends Controller {
   val declPl = Noun.pluralDeclension.map(d => d.toString());
   
   def adjective(pl:String) = Action {
-    Ok(views.html.adjective(SpeechPartPair.noId, pl, adjectiveForm))
+    val plAdjective = pl.substring(0, pl.size - 1)
+    Ok(views.html.adjective(SpeechPartPair.noId, plAdjective, adjectiveForm))
   }
   
   def addAdjective = Action {
@@ -239,6 +240,9 @@ object Application extends Controller {
       sb.append(error).append("\n")
       println(error)
     })
-    BadRequest(sb.toString);
+    BadRequest(sb.toString)
   }
+  
+  private def init() = if(DictionaryFactory.dict.isEmpty) NSTranslator.init()
+  
 }
